@@ -52,8 +52,6 @@ export default function Footer() {
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm uppercase tracking-wider">Informacija</h3>
             <ul className="space-y-2">
               <li><Link href="/#duk" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">D.U.K.</Link></li>
-              <li><Link href="/privatumas" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Privatumo politika</Link></li>
-              <li><Link href="/kontaktai" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Kontaktai</Link></li>
             </ul>
           </div>
         </div>
