@@ -110,15 +110,17 @@ export default function FaqAccordion() {
           {faqItems.map((item, i) => (
             <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
               <button
+                id={`faq-question-${i}`}
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 className="w-full flex items-center justify-between px-5 py-4 text-left font-semibold text-gray-800 dark:text-gray-200 hover:text-primary dark:hover:text-primary-light transition-colors"
                 aria-expanded={openIndex === i}
+                aria-controls={`faq-answer-${i}`}
               >
                 <span>{item.question}</span>
-                <span className={`text-xl transition-transform ${openIndex === i ? "rotate-45" : ""}`}>+</span>
+                <span className={`text-xl transition-transform ${openIndex === i ? "rotate-45" : ""}`} aria-hidden="true">+</span>
               </button>
               {openIndex === i && (
-                <div className="px-5 pb-4 text-gray-600 dark:text-gray-400 text-sm leading-relaxed animate-fade-in">
+                <div id={`faq-answer-${i}`} role="region" aria-labelledby={`faq-question-${i}`} className="px-5 pb-4 text-gray-600 dark:text-gray-400 text-sm leading-relaxed animate-fade-in">
                   {item.answer}
                 </div>
               )}

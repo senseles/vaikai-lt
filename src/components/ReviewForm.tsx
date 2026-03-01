@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ItemType } from '@/types';
 import StarRating from './StarRating';
 
@@ -22,6 +22,7 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
     e.preventDefault();
     if (rating === 0) { setError('Pasirinkite įvertinimą'); return; }
     if (!text.trim()) { setError('Parašykite atsiliepimą'); return; }
+    if (text.trim().length < 10) { setError('Atsiliepimas turi būti bent 10 simbolių'); return; }
     if (!authorName.trim()) { setError('Įveskite vardą'); return; }
 
     setSubmitting(true);
@@ -44,6 +45,12 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
       setSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (!success) return;
+    const timer = setTimeout(() => setSuccess(false), 5000);
+    return () => clearTimeout(timer);
+  }, [success]);
 
   if (success) {
     return (

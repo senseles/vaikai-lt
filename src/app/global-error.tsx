@@ -20,7 +20,10 @@ export default function GlobalError({
             </p>
             <button
               onClick={reset}
-              className="inline-block bg-green-700 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+              className="inline-block text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+              style={{ backgroundColor: '#2d6a4f' }}
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#40916c')}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#2d6a4f')}
             >
               Bandyti dar kartą
             </button>

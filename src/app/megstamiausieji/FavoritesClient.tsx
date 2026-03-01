@@ -72,6 +72,18 @@ export default function FavoritesClient() {
       setBureliai(b);
       setSpecialists(s);
       setLoading(false);
+
+      // Clean up stale favorites (items deleted from DB)
+      const foundIds = new Set([
+        ...k.map((i: Kindergarten) => i.id),
+        ...a.map((i: Aukle) => i.id),
+        ...b.map((i: Burelis) => i.id),
+        ...s.map((i: Specialist) => i.id),
+      ]);
+      const cleaned = favorites.filter((f) => foundIds.has(f.itemId));
+      if (cleaned.length < favorites.length) {
+        try { localStorage.setItem('vaikai-favorites', JSON.stringify(cleaned)); } catch { /* ignore */ }
+      }
     });
   }, []);
 
