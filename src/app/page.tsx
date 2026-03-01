@@ -1,21 +1,34 @@
 import SearchBar from "@/components/SearchBar";
 import CitySelector from "@/components/CitySelector";
 import FaqAccordion from "@/components/FaqAccordion";
+import prisma from "@/lib/prisma";
 
-interface StatsData {
-  readonly label: string;
-  readonly value: string;
-  readonly emoji: string;
+async function getStats() {
+  const [kindergartens, aukles, bureliai, specialists, reviews] = await Promise.all([
+    prisma.kindergarten.count(),
+    prisma.aukle.count(),
+    prisma.burelis.count(),
+    prisma.specialist.count(),
+    prisma.review.count(),
+  ]);
+
+  const cities = await prisma.kindergarten.groupBy({ by: ['city'] });
+
+  return { kindergartens, aukles, bureliai, specialists, reviews, cities: cities.length };
 }
 
-const stats: readonly StatsData[] = [
-  { label: "Darželiai", value: "2,400+", emoji: "🏫" },
-  { label: "Miestai", value: "60+", emoji: "🏙️" },
-  { label: "Atsiliepimai", value: "15,000+", emoji: "⭐" },
-  { label: "Tėveliai", value: "50,000+", emoji: "👨‍👩‍👧‍👦" },
-];
+export default async function HomePage() {
+  const s = await getStats();
 
-export default function HomePage() {
+  const stats = [
+    { label: "Darželiai", value: s.kindergartens.toLocaleString('lt-LT'), emoji: "🏫" },
+    { label: "Auklės", value: s.aukles.toLocaleString('lt-LT'), emoji: "👩‍👧" },
+    { label: "Būreliai", value: s.bureliai.toLocaleString('lt-LT'), emoji: "🎨" },
+    { label: "Specialistai", value: s.specialists.toLocaleString('lt-LT'), emoji: "👨‍⚕️" },
+    { label: "Miestai", value: `${s.cities}+`, emoji: "🏙️" },
+    { label: "Atsiliepimai", value: s.reviews.toLocaleString('lt-LT'), emoji: "⭐" },
+  ];
+
   return (
     <>
       {/* Hero */}
@@ -32,7 +45,7 @@ export default function HomePage() {
           <SearchBar />
 
           {/* Stats */}
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="mt-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {stats.map((stat) => (
               <div key={stat.label} className="flex flex-col items-center">
                 <span className="text-3xl mb-1">{stat.emoji}</span>

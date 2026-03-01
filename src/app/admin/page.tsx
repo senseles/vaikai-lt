@@ -39,7 +39,22 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!authenticated) return;
-    fetch('/api/admin/stats').then((r) => r.json()).then(setStats).catch(() => {});
+    fetch('/api/admin/stats')
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data) {
+          const d = res.data;
+          setStats({
+            kindergartens: d.kindergartenCount ?? 0,
+            aukles: d.aukleCount ?? 0,
+            bureliai: d.burelisCount ?? 0,
+            specialists: d.specialistCount ?? 0,
+            reviews: d.reviewCount ?? 0,
+            pendingReviews: 0,
+          });
+        }
+      })
+      .catch(() => {});
   }, [authenticated]);
 
   if (!authenticated) {
@@ -164,7 +179,7 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
   const [sortBy, setSortBy] = useState('name');
   const perPage = 20;
 
-  const apiPath = itemType === 'kindergarten' ? 'kindergartens' : itemType === 'aukle' ? 'aukles' : itemType === 'burelis' ? 'bureliai' : 'specialists';
+  const apiPath = itemType;
 
   const load = useCallback(async () => {
     const params = new URLSearchParams({ search, page: String(page), limit: String(perPage), sort: sortBy });

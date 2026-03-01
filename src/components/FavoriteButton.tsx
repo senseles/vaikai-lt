@@ -1,38 +1,57 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ItemType } from '@/types';
 
 interface FavoriteButtonProps {
   readonly itemId: string;
   readonly itemType: ItemType;
-  readonly initialFavorited?: boolean;
 }
 
-export default function FavoriteButton({ itemId, itemType, initialFavorited = false }: FavoriteButtonProps) {
-  const [favorited, setFavorited] = useState(initialFavorited);
-  const [loading, setLoading] = useState(false);
+interface FavoriteEntry {
+  itemId: string;
+  itemType: ItemType;
+}
 
-  const toggle = async (e: React.MouseEvent) => {
+function getFavorites(): FavoriteEntry[] {
+  try {
+    const raw = localStorage.getItem('vaikai-favorites');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setFavorites(favorites: FavoriteEntry[]) {
+  localStorage.setItem('vaikai-favorites', JSON.stringify(favorites));
+}
+
+export default function FavoriteButton({ itemId, itemType }: FavoriteButtonProps) {
+  const [favorited, setFavorited] = useState(false);
+
+  useEffect(() => {
+    const favs = getFavorites();
+    setFavorited(favs.some((f) => f.itemId === itemId && f.itemType === itemType));
+  }, [itemId, itemType]);
+
+  const toggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setLoading(true);
-    try {
-      const res = await fetch('/api/favorites', {
-        method: favorited ? 'DELETE' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemId, itemType }),
-      });
-      if (res.ok) setFavorited(!favorited);
-    } finally {
-      setLoading(false);
+    const favs = getFavorites();
+    const idx = favs.findIndex((f) => f.itemId === itemId && f.itemType === itemType);
+    if (idx >= 0) {
+      favs.splice(idx, 1);
+      setFavorited(false);
+    } else {
+      favs.push({ itemId, itemType });
+      setFavorited(true);
     }
+    setFavorites(favs);
   };
 
   return (
     <button
       type="button"
       onClick={toggle}
-      disabled={loading}
       className="p-1.5 rounded-full hover:bg-red-50 transition-colors"
       aria-label={favorited ? 'Pašalinti iš mėgstamų' : 'Pridėti prie mėgstamų'}
     >

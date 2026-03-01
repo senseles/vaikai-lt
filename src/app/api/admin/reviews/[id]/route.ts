@@ -3,6 +3,19 @@ import prisma from '@/lib/prisma';
 
 type Params = { params: { id: string } };
 
+/** PATCH /api/admin/reviews/[id] — update a review (approve etc.) */
+export async function PATCH(request: NextRequest, { params }: Params) {
+  const { id } = params;
+  try {
+    const body = await request.json();
+    const updated = await prisma.review.update({ where: { id }, data: body });
+    return NextResponse.json({ success: true, data: updated });
+  } catch (err) {
+    console.error(`Admin patch review/${id} error:`, err);
+    return NextResponse.json({ success: false, error: 'Nepavyko atnaujinti' }, { status: 500 });
+  }
+}
+
 /** DELETE /api/admin/reviews/[id] — delete a review */
 export async function DELETE(_request: NextRequest, { params }: Params) {
   const { id } = params;

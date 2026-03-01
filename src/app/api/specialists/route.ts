@@ -11,7 +11,10 @@ export async function GET(request: NextRequest) {
   const specialty = searchParams.get('specialty');
   const search = searchParams.get('search');
 
+  const ids = searchParams.getAll('ids');
+
   const where: Record<string, unknown> = {};
+  if (ids.length > 0) where.id = { in: ids };
   if (city) where.city = city;
   if (region) where.region = region;
   if (specialty) where.specialty = specialty;
