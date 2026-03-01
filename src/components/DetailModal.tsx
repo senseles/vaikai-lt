@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { Kindergarten, Aukle, Burelis, Specialist, ItemType } from '@/types';
 import StarRating from './StarRating';
 import ReviewList from './ReviewList';
@@ -121,6 +121,95 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
         <hr className="my-5 border-gray-200 dark:border-slate-700" />
         <ReviewList itemId={item.id} itemType={itemType} />
         <ReviewForm itemId={item.id} itemType={itemType} />
+
+        <ShareButtons itemName={item.name} />
+      </div>
+    </div>
+  );
+}
+
+function ShareButtons({ itemName }: { readonly itemName: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const shareText = `${itemName} | Vaikai.lt`;
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea');
+      textarea.value = window.location.href;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleFacebookShare = () => {
+    const url = encodeURIComponent(window.location.href);
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      '_blank',
+      'noopener,noreferrer,width=600,height=400'
+    );
+  };
+
+  const handleEmailShare = () => {
+    const subject = encodeURIComponent(shareText);
+    const body = encodeURIComponent(`${shareText}\n${window.location.href}`);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
+  return (
+    <div className="mt-5 pt-4 border-t border-gray-200 dark:border-slate-700">
+      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Dalintis</p>
+      <div className="flex gap-2">
+        {/* Copy link */}
+        <div className="relative">
+          <button
+            onClick={handleCopyLink}
+            className="w-9 h-9 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+            aria-label="Kopijuoti nuorodą"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.172 13.828a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.102 1.101" />
+            </svg>
+          </button>
+          {copied && (
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-2 py-1 rounded shadow">
+              Nuoroda nukopijuota!
+            </span>
+          )}
+        </div>
+
+        {/* Facebook */}
+        <button
+          onClick={handleFacebookShare}
+          className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors"
+          aria-label="Dalintis Facebook"
+        >
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3V2z" />
+          </svg>
+        </button>
+
+        {/* Email */}
+        <button
+          onClick={handleEmailShare}
+          className="w-9 h-9 rounded-full bg-gray-500 text-white flex items-center justify-center hover:bg-gray-600 transition-colors"
+          aria-label="Siųsti el. paštu"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </button>
       </div>
     </div>
   );

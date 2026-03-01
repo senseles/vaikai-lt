@@ -1,7 +1,12 @@
 import prisma from '@/lib/prisma';
 import { jsonResponse } from '@/lib/api-utils';
+import { getCached, setCache, CACHE_TTL } from '@/lib/cache';
 
 export async function GET() {
+  const cacheKey = 'cities';
+  const cached = getCached(cacheKey);
+  if (cached) return jsonResponse(cached);
+
   const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
     prisma.kindergarten.groupBy({ by: ['city'], _count: true, orderBy: { city: 'asc' } }),
     prisma.aukle.groupBy({ by: ['city'], _count: true, orderBy: { city: 'asc' } }),
@@ -32,5 +37,6 @@ export async function GET() {
     .map(([city, counts]) => ({ city, ...counts }))
     .sort((a, b) => a.city.localeCompare(b.city, 'lt'));
 
+  setCache(cacheKey, result, CACHE_TTL.CITIES);
   return jsonResponse(result);
 }

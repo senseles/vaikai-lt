@@ -2,10 +2,15 @@ import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getPagination, jsonResponse, matchesSearch } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { getCached, setCache, CACHE_TTL } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.PUBLIC_GET);
   if (rateLimitResponse) return rateLimitResponse;
+
+  const cacheKey = request.url;
+  const cached = getCached(cacheKey);
+  if (cached) return jsonResponse(cached);
 
   const { searchParams } = request.nextUrl;
   const { page, limit, skip } = getPagination(searchParams);
@@ -33,10 +38,12 @@ export async function GET(request: NextRequest) {
     const total = filtered.length;
     const paginated = filtered.slice(skip, skip + limit);
 
-    return jsonResponse({
+    const result = {
       data: paginated.map((i) => ({ ...i, features: JSON.parse(i.features) })),
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    });
+    };
+    setCache(cacheKey, result, CACHE_TTL.LIST);
+    return jsonResponse(result);
   }
 
   const [items, total] = await Promise.all([
@@ -44,8 +51,10 @@ export async function GET(request: NextRequest) {
     prisma.kindergarten.count({ where }),
   ]);
 
-  return jsonResponse({
+  const result = {
     data: items.map((i) => ({ ...i, features: JSON.parse(i.features) })),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-  });
+  };
+  setCache(cacheKey, result, CACHE_TTL.LIST);
+  return jsonResponse(result);
 }
