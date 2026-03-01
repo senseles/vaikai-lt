@@ -12,7 +12,7 @@ import SearchBar from '@/components/SearchBar';
 type AnyItem = Kindergarten | Aukle | Burelis | Specialist;
 
 interface SearchResultsClientProps {
-  readonly query: string;
+  readonly query?: string;
   readonly kindergartens: Kindergarten[];
   readonly aukles: Aukle[];
   readonly bureliai: Burelis[];

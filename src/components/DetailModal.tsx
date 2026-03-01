@@ -299,7 +299,7 @@ function MapEmbed({ address, city }: { readonly address: string; readonly city: 
           href={mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="group/link flex items-center justify-between px-3 py-2.5 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-750 transition-colors"
+          className="group/link flex items-center justify-between px-3 py-2.5 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
         >
           <div className="flex items-center gap-2 min-w-0">
             <svg className="w-4 h-4 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
