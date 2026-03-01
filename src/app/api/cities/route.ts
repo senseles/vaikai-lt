@@ -1,8 +1,7 @@
-import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 import { jsonResponse } from '@/lib/api-utils';
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
     prisma.kindergarten.groupBy({ by: ['city'], _count: true, orderBy: { city: 'asc' } }),
     prisma.aukle.groupBy({ by: ['city'], _count: true, orderBy: { city: 'asc' } }),
