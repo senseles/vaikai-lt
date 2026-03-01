@@ -40,6 +40,9 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
     if (itemType === 'kindergarten') {
       return (item as Kindergarten).address ?? null;
     }
+    if (itemType === 'specialist') {
+      return (item as Specialist).clinic ?? null;
+    }
     return null;
   };
 
@@ -137,7 +140,7 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
 
         <div className="mt-4 space-y-2">{renderDetails()}</div>
 
-        {address && <MapLink address={address} city={item.city} />}
+        {address && <MapEmbed address={address} city={item.city} />}
 
         <hr className="my-5 border-gray-200 dark:border-slate-700" />
         <ReviewList itemId={item.id} itemType={itemType} />
@@ -236,61 +239,79 @@ function ShareButtons({ itemName }: { readonly itemName: string }) {
   );
 }
 
-function MapLink({ address, city }: { readonly address: string; readonly city: string }) {
+function MapEmbed({ address, city }: { readonly address: string; readonly city: string }) {
+  const [showMap, setShowMap] = useState(false);
   const query = encodeURIComponent(`${address}, ${city}, Lithuania`);
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+  const embedUrl = `https://www.google.com/maps?q=${query}&output=embed`;
 
   return (
     <div className="mt-4">
-      <a
-        href={mapsUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group block rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
-      >
-        {/* Map placeholder with gradient background */}
-        <div className="relative h-32 bg-gradient-to-br from-blue-50 to-green-50 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center">
-          {/* Decorative grid lines to suggest a map */}
-          <svg
-            className="absolute inset-0 w-full h-full opacity-10 dark:opacity-5"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
+      <div className="rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+        {showMap ? (
+          <div className="relative h-48">
+            <iframe
+              src={embedUrl}
+              className="absolute inset-0 w-full h-full border-0"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title={`Žemėlapis: ${address}, ${city}`}
+            />
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowMap(true)}
+            className="group w-full text-left"
           >
-            <defs>
-              <pattern id="map-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-gray-400 dark:text-gray-300" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#map-grid)" />
-          </svg>
+            <div className="relative h-32 bg-gradient-to-br from-blue-50 to-green-50 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center">
+              <svg
+                className="absolute inset-0 w-full h-full opacity-10 dark:opacity-5"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <defs>
+                  <pattern id="map-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-gray-400 dark:text-gray-300" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#map-grid)" />
+              </svg>
+              <div className="relative flex flex-col items-center gap-1">
+                <svg
+                  className="w-10 h-10 text-red-500 dark:text-red-400 drop-shadow-md group-hover:scale-110 transition-transform"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+                </svg>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-300 bg-white/80 dark:bg-slate-800/80 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                  Paspauskite, kad pamatytumėte žemėlapį
+                </span>
+              </div>
+            </div>
+          </button>
+        )}
 
-          {/* Map pin icon */}
-          <div className="relative flex flex-col items-center gap-1">
-            <svg
-              className="w-10 h-10 text-red-500 dark:text-red-400 drop-shadow-md group-hover:scale-110 transition-transform"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
+        {/* Bottom bar with address and link to full Google Maps */}
+        <a
+          href={mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group/link flex items-center justify-between px-3 py-2.5 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-750 transition-colors"
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <svg className="w-4 h-4 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
             </svg>
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-300 bg-white/80 dark:bg-slate-800/80 px-2 py-0.5 rounded-full backdrop-blur-sm">
-              {address}, {city}
-            </span>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div className="flex items-center justify-between px-3 py-2.5 bg-white dark:bg-slate-800">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-base" aria-hidden="true">&#x1F4CD;</span>
             <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{address}, {city}</span>
           </div>
-          <span className="shrink-0 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
-            Žiūrėti žemėlapyje
+          <span className="shrink-0 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full group-hover/link:bg-blue-100 dark:group-hover/link:bg-blue-900/50 transition-colors">
+            Atidaryti Google Maps
           </span>
-        </div>
-      </a>
+        </a>
+      </div>
     </div>
   );
 }

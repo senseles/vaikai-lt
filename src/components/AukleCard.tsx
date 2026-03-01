@@ -17,7 +17,7 @@ export default function AukleCard({ item, onSelect }: AukleCardProps) {
       tabIndex={0}
       onClick={() => onSelect(item)}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(item); } }}
-      className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden"
+      className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden group"
     >
       <PlaceholderImage category="aukles" name={item.name} />
       <div className="p-4">

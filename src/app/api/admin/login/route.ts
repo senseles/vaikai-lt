@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { randomBytes, createHash } from 'crypto';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { createAdminToken } from '@/lib/admin-tokens';
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'darzeliai2026';
 
@@ -24,12 +24,7 @@ export async function POST(request: NextRequest) {
       return json({ success: false, error: 'Neteisingas slaptažodis' }, 401);
     }
 
-    // Generate a simple session token (hash of random bytes + timestamp)
-    const raw = randomBytes(32).toString('hex') + Date.now().toString();
-    const token = createHash('sha256').update(raw).digest('hex');
-
-    // In production, store token in DB or Redis with expiry.
-    // For now, we sign it so middleware can verify.
+    const token = await createAdminToken();
     const response = json({ success: true, data: { token } });
     response.cookies.set('admin_token', token, {
       httpOnly: true,

@@ -6,80 +6,148 @@ interface PlaceholderImageProps {
   readonly size?: 'sm' | 'md' | 'lg';
 }
 
-const categoryConfig: Record<PlaceholderCategory, { from: string; to: string; icon: string }> = {
+const categoryConfig: Record<PlaceholderCategory, { from: string; via: string; to: string; icon: string; label: string }> = {
   darzeliai: {
     from: '#2d6a4f',
+    via: '#40916c',
     to: '#52b788',
     icon: 'M3 21V9l9-7 9 7v12H3z M9 21v-6h6v6 M10 3v4h4V3',
+    label: 'Darželis',
   },
   aukles: {
-    from: '#e76f51',
+    from: '#c2185b',
+    via: '#e76f51',
     to: '#f4a261',
     icon: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
+    label: 'Auklė',
   },
   bureliai: {
     from: '#4361ee',
+    via: '#5a4fcf',
     to: '#7209b7',
     icon: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+    label: 'Būrelis',
   },
   specialistai: {
     from: '#0077b6',
+    via: '#0096c7',
     to: '#00b4d8',
-    icon: 'M4.8 2.1L3 3.9l1.4 1.4C2.9 6.7 2 8.8 2 11c0 4.4 3.6 8 8 8 2.2 0 4.3-.9 5.7-2.4L17.1 18l1.8-1.8L4.8 2.1zM10 19c-4.4 0-8-3.6-8-8 0-1.8.6-3.4 1.6-4.8L14.8 17.4C13.4 18.4 11.8 19 10 19zM15 4h2v8.2l-2-2V4zM20 7h2v5.2l-2-2V7z',
+    icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
+    label: 'Specialistas',
   },
 };
 
 const sizeClasses: Record<NonNullable<PlaceholderImageProps['size']>, string> = {
-  sm: 'h-28 min-h-[7rem]',
-  md: 'h-36 min-h-[9rem]',
-  lg: 'h-44 min-h-[11rem]',
+  sm: 'h-32 min-h-[8rem]',
+  md: 'h-40 min-h-[10rem]',
+  lg: 'h-48 min-h-[12rem]',
 };
+
+function hashCode(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
 
 export default function PlaceholderImage({ category, name, size = 'sm' }: PlaceholderImageProps) {
   const config = categoryConfig[category];
   const firstLetter = name.charAt(0).toUpperCase();
-  const gradientId = `grad-${category}-${name.replace(/\s/g, '').slice(0, 8)}`;
+  const hash = hashCode(name);
+  const uid = `ph-${category}-${hash}`;
+
+  // Generate deterministic variations based on name hash
+  const cx1 = 280 + (hash % 120);
+  const cy1 = 10 + (hash % 40);
+  const r1 = 50 + (hash % 40);
+  const cx2 = 30 + (hash % 80);
+  const cy2 = 130 + (hash % 40);
+  const r2 = 30 + (hash % 30);
+  const patternRotate = hash % 360;
 
   return (
-    <div className={`relative w-full ${sizeClasses[size]} rounded-t-xl overflow-hidden select-none`} style={{ aspectRatio: '400/180' }}>
+    <div className={`relative w-full ${sizeClasses[size]} rounded-t-xl overflow-hidden select-none`} style={{ aspectRatio: '400/200' }}>
       <svg
         className="absolute inset-0 w-full h-full"
-        viewBox="0 0 400 180"
+        viewBox="0 0 400 200"
         preserveAspectRatio="xMidYMid slice"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
       >
         <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id={`${uid}-bg`} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor={config.from} />
+            <stop offset="50%" stopColor={config.via} />
             <stop offset="100%" stopColor={config.to} />
           </linearGradient>
+          <radialGradient id={`${uid}-glow`} cx="50%" cy="40%" r="60%">
+            <stop offset="0%" stopColor="white" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
+          </radialGradient>
         </defs>
-        <rect width="400" height="180" fill={`url(#${gradientId})`} />
+        <rect width="400" height="200" fill={`url(#${uid}-bg)`} />
+        <rect width="400" height="200" fill={`url(#${uid}-glow)`} />
 
-        {/* Decorative circles */}
-        <circle cx="320" cy="30" r="60" fill="white" opacity="0.07" />
-        <circle cx="360" cy="140" r="40" fill="white" opacity="0.05" />
-        <circle cx="50" cy="150" r="50" fill="white" opacity="0.05" />
+        {/* Decorative shapes with name-based variation */}
+        <circle cx={cx1} cy={cy1} r={r1} fill="white" opacity="0.06" />
+        <circle cx={cx2} cy={cy2} r={r2} fill="white" opacity="0.05" />
+        <circle cx={200 + (hash % 60) - 30} cy={180} r={70} fill="white" opacity="0.04" />
 
-        {/* Category icon */}
-        <g transform="translate(170, 50) scale(2.5)" opacity="0.25" fill="white" stroke="none">
+        {/* Subtle diagonal pattern */}
+        <g transform={`rotate(${patternRotate} 200 100)`} opacity="0.04">
+          <line x1="0" y1="0" x2="400" y2="200" stroke="white" strokeWidth="0.5" />
+          <line x1="100" y1="0" x2="400" y2="150" stroke="white" strokeWidth="0.5" />
+          <line x1="0" y1="50" x2="300" y2="200" stroke="white" strokeWidth="0.5" />
+        </g>
+
+        {/* Category icon — larger, more prominent */}
+        <g transform="translate(165, 35) scale(3)" opacity="0.15" fill="white" stroke="none">
           <path d={config.icon} />
         </g>
 
-        {/* First letter */}
+        {/* First letter — larger with slight shadow */}
         <text
           x="200"
-          y="110"
+          y="120"
           textAnchor="middle"
           dominantBaseline="central"
-          fill="white"
-          fontSize="72"
+          fill="black"
+          fontSize="80"
           fontWeight="bold"
-          opacity="0.9"
+          opacity="0.08"
           fontFamily="system-ui, -apple-system, sans-serif"
         >
           {firstLetter}
+        </text>
+        <text
+          x="200"
+          y="118"
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="white"
+          fontSize="80"
+          fontWeight="bold"
+          opacity="0.92"
+          fontFamily="system-ui, -apple-system, sans-serif"
+        >
+          {firstLetter}
+        </text>
+
+        {/* Category label at bottom */}
+        <text
+          x="200"
+          y="178"
+          textAnchor="middle"
+          fill="white"
+          fontSize="11"
+          fontWeight="500"
+          opacity="0.5"
+          fontFamily="system-ui, -apple-system, sans-serif"
+          letterSpacing="2"
+        >
+          {config.label.toUpperCase()}
         </text>
       </svg>
     </div>

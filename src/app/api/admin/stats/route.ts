@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import type { AdminStats } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 function computeQuality(items: Array<Record<string, unknown>>, requiredFields: string[]): number {
   if (items.length === 0) return 100;
   let filled = 0;

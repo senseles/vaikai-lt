@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdminToken } from '@/lib/admin-tokens';
 
 /** All valid city slugs — must match cityNames in [city]/page.tsx */
 const VALID_CITY_SLUGS = new Set([
@@ -36,7 +37,7 @@ a:hover{background:#40916c}
 <body><div class="c"><div class="n">404</div><h1>Puslapis nerastas</h1><p>Atsiprašome, bet šis puslapis neegzistuoja arba buvo perkeltas.</p><a href="/">Grįžti į pradžią</a></div></body>
 </html>`;
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // --- City slug validation ---
@@ -62,7 +63,7 @@ export function middleware(request: NextRequest) {
     const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
     const token = cookieToken || bearerToken;
 
-    if (!token) {
+    if (!token || !(await verifyAdminToken(token))) {
       return NextResponse.json(
         { success: false, error: 'Neautorizuota. Prisijunkite.' },
         { status: 401 },

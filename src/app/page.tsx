@@ -44,23 +44,38 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-primary-bg via-white to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-16 md:py-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4 leading-tight">
-            Raskite geriausią darželį,{" "}
-            <span className="text-primary">auklę ar būrelį</span>{" "}
-            savo vaikui
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
-            Atsiliepimai, vertinimai ir palyginimas — viskas vienoje vietoje
-          </p>
+      <section className="relative bg-gradient-to-br from-primary-bg via-white to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-16 md:py-24 overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-32 -left-32 w-[28rem] h-[28rem] bg-secondary/5 dark:bg-secondary/10 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <div className="animate-fade-in-up">
+            <p className="inline-block text-sm font-medium text-primary dark:text-green-400 bg-primary/10 dark:bg-green-900/30 px-4 py-1.5 rounded-full mb-6">
+              Didžiausia vaikų paslaugų platforma Lietuvoje
+            </p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-5 leading-tight">
+              Raskite geriausią darželį,{" "}
+              <span className="text-primary dark:text-green-400">auklę ar būrelį</span>{" "}
+              savo vaikui
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+              Atsiliepimai, vertinimai ir palyginimas — viskas vienoje vietoje.
+              Patikima informacija iš tikrų tėvelių.
+            </p>
+          </div>
           <SearchBar />
 
           {/* Stats */}
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {stats.map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center min-h-[5rem]">
-                <span className="text-3xl mb-1" role="img" aria-hidden="true">{stat.emoji}</span>
+          <div className="mt-14 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {stats.map((stat, i) => (
+              <div
+                key={stat.label}
+                className={`flex flex-col items-center min-h-[5rem] animate-fade-in-up stagger-${i + 1}`}
+              >
+                <span className="text-3xl mb-1.5" role="img" aria-hidden="true">{stat.emoji}</span>
                 <span className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</span>
                 <span className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</span>
               </div>

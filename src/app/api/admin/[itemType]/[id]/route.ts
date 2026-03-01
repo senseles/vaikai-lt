@@ -36,9 +36,11 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return json({ success: true, data: updated });
   } catch (err) {
     console.error(`Admin update ${itemType}/${id} error:`, err);
-    const message = err instanceof Error ? err.message : 'Nepavyko atnaujinti';
-    const status = message.includes('Record to update not found') ? 404 : 500;
-    return json({ success: false, error: message }, status);
+    const message = err instanceof Error ? err.message : '';
+    if (message.includes('Record to update not found')) {
+      return json({ success: false, error: 'Įrašas nerastas' }, 404);
+    }
+    return json({ success: false, error: 'Nepavyko atnaujinti' }, 500);
   }
 }
 
@@ -66,8 +68,10 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     return json({ success: true });
   } catch (err) {
     console.error(`Admin delete ${itemType}/${id} error:`, err);
-    const message = err instanceof Error ? err.message : 'Nepavyko ištrinti';
-    const status = message.includes('Record to delete does not exist') ? 404 : 500;
-    return json({ success: false, error: message }, status);
+    const message = err instanceof Error ? err.message : '';
+    if (message.includes('Record to delete does not exist')) {
+      return json({ success: false, error: 'Įrašas nerastas' }, 404);
+    }
+    return json({ success: false, error: 'Nepavyko ištrinti' }, 500);
   }
 }

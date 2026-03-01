@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     return errorResponse('Invalid JSON body', 400);
   }
 
-  const { itemId, itemType, authorName, rating, text } = body as Record<string, unknown>;
+  const { itemId, itemType, authorName: rawAuthor, rating, text: rawText } = body as Record<string, unknown>;
 
   if (!itemId || typeof itemId !== 'string') {
     return errorResponse('itemId is required and must be a string', 400);
@@ -51,13 +51,24 @@ export async function POST(request: NextRequest) {
   if (!itemType || !VALID_ITEM_TYPES.includes(itemType as typeof VALID_ITEM_TYPES[number])) {
     return errorResponse(`itemType must be one of: ${VALID_ITEM_TYPES.join(', ')}`, 400);
   }
-  if (!authorName || typeof authorName !== 'string' || authorName.trim().length === 0) {
+  if (!rawAuthor || typeof rawAuthor !== 'string') {
     return errorResponse('authorName is required', 400);
   }
   if (rating == null || typeof rating !== 'number' || rating < 1 || rating > 5) {
     return errorResponse('rating must be a number between 1 and 5', 400);
   }
-  if (!text || typeof text !== 'string' || text.trim().length === 0) {
+  if (!rawText || typeof rawText !== 'string') {
+    return errorResponse('text is required', 400);
+  }
+
+  // Sanitize BEFORE validation — prevents empty-content reviews from XSS payloads
+  const cleanAuthor = stripHtml(rawAuthor.trim());
+  const cleanText = stripHtml(rawText.trim());
+
+  if (cleanAuthor.length === 0) {
+    return errorResponse('authorName is required', 400);
+  }
+  if (cleanText.length === 0) {
     return errorResponse('text is required', 400);
   }
 
@@ -65,9 +76,9 @@ export async function POST(request: NextRequest) {
     data: {
       itemId: itemId as string,
       itemType: itemType as string,
-      authorName: stripHtml((authorName as string).trim()),
+      authorName: cleanAuthor,
       rating: rating as number,
-      text: stripHtml((text as string).trim()),
+      text: cleanText,
       isApproved: false,
     },
   });
