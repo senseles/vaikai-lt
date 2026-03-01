@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import CategoryTabs from "./CategoryTabs";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -25,7 +24,7 @@ export default function Header() {
 
   const navLinks = [
     { href: "/#miestai", label: "Miestai" },
-    { href: "/#megstamiausieji", label: "Mėgstamiausieji" },
+    { href: "/megstamiausieji", label: "Mėgstamiausieji" },
     { href: "/#duk", label: "D.U.K." },
   ] as const;
 
@@ -73,9 +72,6 @@ export default function Header() {
             </div>
           </button>
         </div>
-
-        {/* Category tabs */}
-        <CategoryTabs />
 
         {/* Mobile nav */}
         {mobileOpen && (

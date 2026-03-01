@@ -42,6 +42,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👶</text></svg>",
   },
+  manifest: "/manifest.json",
   other: {
     "theme-color": "#2d6a4f",
   },
@@ -69,6 +70,26 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Vaikai.lt',
+              url: 'https://vaikai.lt',
+              logo: 'https://vaikai.lt/icons/icon-512.png',
+              description:
+                'Padedame tėveliams visoje Lietuvoje rasti darželius, aukles, būrelius ir specialistus.',
+              sameAs: [],
+              contactPoint: {
+                '@type': 'ContactPoint',
+                contactType: 'customer service',
+                availableLanguage: 'Lithuanian',
+              },
+            }),
+          }}
+        />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
