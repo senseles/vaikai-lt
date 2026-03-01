@@ -99,27 +99,36 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [stats, setStats] = useState<Stats | null>(null);
+  const [statsError, setStatsError] = useState(false);
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch('/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
-    });
-    if (res.ok) {
-      setAuthenticated(true);
-      setLoginError('');
-    } else {
-      setLoginError('Neteisingas slaptažodis');
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        setAuthenticated(true);
+        setLoginError('');
+      } else {
+        setLoginError('Neteisingas slaptažodis');
+      }
+    } catch {
+      setLoginError('Tinklo klaida. Bandykite dar kartą.');
     }
   };
 
   useEffect(() => {
     if (!authenticated) return;
     const controller = new AbortController();
+    setStatsError(false);
     fetch('/api/admin/stats', { signal: controller.signal })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then((res) => {
         if (res.success && res.data) {
           const d = res.data;
@@ -133,7 +142,11 @@ export default function AdminPage() {
           });
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (controller.signal.aborted) return;
+        console.error('Stats fetch error:', err);
+        setStatsError(true);
+      });
     return () => controller.abort();
   }, [authenticated]);
 
@@ -201,7 +214,7 @@ export default function AdminPage() {
           ))}
         </nav>
 
-        {activeTab === 'dashboard' && <Dashboard stats={stats} />}
+        {activeTab === 'dashboard' && <Dashboard stats={stats} error={statsError} />}
         {activeTab === 'kindergartens' && <CrudTable itemType="kindergarten" label="Darželiai" />}
         {activeTab === 'aukles' && <CrudTable itemType="aukle" label="Auklės" />}
         {activeTab === 'bureliai' && <CrudTable itemType="burelis" label="Būreliai" />}
@@ -214,7 +227,8 @@ export default function AdminPage() {
 
 // ─── Dashboard ───
 
-function Dashboard({ stats }: { readonly stats: Stats | null }) {
+function Dashboard({ stats, error }: { readonly stats: Stats | null; readonly error?: boolean }) {
+  if (error) return <p className="text-red-500 dark:text-red-400">Nepavyko užkrauti statistikos. Perkraukite puslapį.</p>;
   if (!stats) return <p className="text-gray-400">Kraunama...</p>;
 
   const cards = [

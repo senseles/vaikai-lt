@@ -6,13 +6,24 @@ export async function GET(request: NextRequest) {
   const format = searchParams.get('format') || 'json';
 
   try {
+    // Select only essential fields to reduce payload size
     const [kindergartens, aukles, bureliai, specialists, reviews] =
       await Promise.all([
-        prisma.kindergarten.findMany(),
-        prisma.aukle.findMany(),
-        prisma.burelis.findMany(),
-        prisma.specialist.findMany(),
-        prisma.review.findMany(),
+        prisma.kindergarten.findMany({
+          select: { id: true, name: true, city: true, type: true, address: true, phone: true, website: true, language: true, hours: true, ageFrom: true, groups: true, description: true, baseRating: true, baseReviewCount: true },
+        }),
+        prisma.aukle.findMany({
+          select: { id: true, name: true, city: true, phone: true, email: true, experience: true, ageRange: true, hourlyRate: true, languages: true, availability: true, description: true, baseRating: true, baseReviewCount: true },
+        }),
+        prisma.burelis.findMany({
+          select: { id: true, name: true, city: true, category: true, subcategory: true, ageRange: true, price: true, schedule: true, phone: true, website: true, description: true, baseRating: true, baseReviewCount: true },
+        }),
+        prisma.specialist.findMany({
+          select: { id: true, name: true, city: true, specialty: true, clinic: true, price: true, phone: true, website: true, languages: true, description: true, baseRating: true, baseReviewCount: true },
+        }),
+        prisma.review.findMany({
+          select: { id: true, itemId: true, itemType: true, authorName: true, rating: true, text: true, isApproved: true, createdAt: true },
+        }),
       ]);
 
     if (format === 'csv') {
@@ -54,32 +65,29 @@ export async function GET(request: NextRequest) {
         columns.map((col) => escapeCsvValue(row[col])).join(',')
       );
       const csvContent = [headerLine, ...dataLines].join('\n');
+      const csvBuffer = new TextEncoder().encode(csvContent);
 
-      return new NextResponse(csvContent, {
+      return new NextResponse(csvBuffer, {
         status: 200,
         headers: {
           'Content-Type': 'text/csv; charset=utf-8',
           'Content-Disposition': 'attachment; filename="vaikai-export.csv"',
+          'Content-Length': String(csvBuffer.byteLength),
         },
       });
     }
 
-    // Default: JSON format
-    const data = {
-      kindergartens,
-      aukles,
-      bureliai,
-      specialists,
-      reviews,
-    };
+    // Default: JSON format — use compact encoding to reduce size
+    const data = { kindergartens, aukles, bureliai, specialists, reviews };
+    const jsonContent = JSON.stringify(data);
+    const jsonBuffer = new TextEncoder().encode(jsonContent);
 
-    const jsonContent = JSON.stringify(data, null, 2);
-
-    return new NextResponse(jsonContent, {
+    return new NextResponse(jsonBuffer, {
       status: 200,
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
         'Content-Disposition': 'attachment; filename="vaikai-export.json"',
+        'Content-Length': String(jsonBuffer.byteLength),
       },
     });
   } catch (error) {
