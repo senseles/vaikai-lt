@@ -1,11 +1,11 @@
 import prisma from '@/lib/prisma';
-import { jsonResponse, errorResponse } from '@/lib/api-utils';
+import { cachedJsonResponse, errorResponse } from '@/lib/api-utils';
 import { getCached, setCache, CACHE_TTL } from '@/lib/cache';
 
 export async function GET() {
   const cacheKey = 'cities';
   const cached = getCached(cacheKey);
-  if (cached) return jsonResponse(cached);
+  if (cached) return cachedJsonResponse(cached);
 
   try {
     const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
@@ -39,7 +39,7 @@ export async function GET() {
       .sort((a, b) => a.city.localeCompare(b.city, 'lt'));
 
     setCache(cacheKey, result, CACHE_TTL.CITIES);
-    return jsonResponse(result);
+    return cachedJsonResponse(result);
   } catch {
     return errorResponse('Vidinė serverio klaida', 500);
   }

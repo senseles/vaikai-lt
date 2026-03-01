@@ -1,10 +1,6 @@
 import Link from "next/link";
 import NewsletterSignup from "./NewsletterSignup";
-
-const DIACRITICS: Record<string, string> = { ą: 'a', č: 'c', ę: 'e', ė: 'e', į: 'i', š: 's', ų: 'u', ū: 'u', ž: 'z' };
-function toSlug(name: string): string {
-  return name.toLowerCase().replace(/[ąčęėįšųūž]/g, (c) => DIACRITICS[c] ?? c);
-}
+import { toSlug } from "@/lib/utils";
 
 export default function Footer() {
   return (

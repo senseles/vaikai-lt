@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getPagination, jsonResponse, errorResponse, matchesSearch } from '@/lib/api-utils';
+import { getPagination, cachedJsonResponse, errorResponse, matchesSearch } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { getCached, setCache, CACHE_TTL } from '@/lib/cache';
 
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
   const cacheKey = request.url;
   const cached = getCached(cacheKey);
-  if (cached) return jsonResponse(cached);
+  if (cached) return cachedJsonResponse(cached);
 
   try {
     const { searchParams } = request.nextUrl;
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
         pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
       };
       setCache(cacheKey, result, CACHE_TTL.LIST);
-      return jsonResponse(result);
+      return cachedJsonResponse(result);
     }
 
     const [items, total] = await Promise.all([
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     };
     setCache(cacheKey, result, CACHE_TTL.LIST);
-    return jsonResponse(result);
+    return cachedJsonResponse(result);
   } catch {
     return errorResponse('Vidinė serverio klaida', 500);
   }

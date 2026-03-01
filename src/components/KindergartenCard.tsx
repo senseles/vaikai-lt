@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import type { Kindergarten } from '@/types';
 import StarRating from './StarRating';
 import FavoriteButton from './FavoriteButton';
@@ -17,7 +18,7 @@ const typeBadge: Record<string, { label: string; cls: string }> = {
   privatus: { label: 'Privatus', cls: 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300' },
 };
 
-export default function KindergartenCard({ item, onSelect, compareSelected = false, onCompareToggle }: KindergartenCardProps) {
+export default memo(function KindergartenCard({ item, onSelect, compareSelected = false, onCompareToggle }: KindergartenCardProps) {
   const badge = typeBadge[item.type] ?? { label: item.type, cls: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' };
 
   return (
@@ -62,4 +63,4 @@ export default function KindergartenCard({ item, onSelect, compareSelected = fal
       </div>
     </div>
   );
-}
+})

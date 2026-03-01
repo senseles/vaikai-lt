@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import type { Aukle } from '@/types';
 import StarRating from './StarRating';
 import FavoriteButton from './FavoriteButton';
@@ -10,7 +11,7 @@ interface AukleCardProps {
   readonly onSelect: (item: Aukle) => void;
 }
 
-export default function AukleCard({ item, onSelect }: AukleCardProps) {
+export default memo(function AukleCard({ item, onSelect }: AukleCardProps) {
   return (
     <div
       role="button"
@@ -52,4 +53,4 @@ export default function AukleCard({ item, onSelect }: AukleCardProps) {
       </div>
     </div>
   );
-}
+})

@@ -3,59 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
-interface CityCoords {
-  name: string;
-  slug: string;
-  lat: number;
-  lng: number;
-}
-
-const allCities: CityCoords[] = [
-  { name: 'Vilnius', slug: 'vilnius', lat: 54.6872, lng: 25.2797 },
-  { name: 'Kaunas', slug: 'kaunas', lat: 54.8985, lng: 23.9036 },
-  { name: 'Klaipėda', slug: 'klaipeda', lat: 55.7033, lng: 21.1443 },
-  { name: 'Šiauliai', slug: 'siauliai', lat: 55.9349, lng: 23.3137 },
-  { name: 'Panevėžys', slug: 'panevezys', lat: 55.7348, lng: 24.3575 },
-  { name: 'Palanga', slug: 'palanga', lat: 55.9204, lng: 21.0686 },
-  { name: 'Šilutė', slug: 'silute', lat: 55.3485, lng: 21.4808 },
-  { name: 'Tauragė', slug: 'taurage', lat: 55.2514, lng: 22.2891 },
-  { name: 'Telšiai', slug: 'telsiai', lat: 55.9835, lng: 22.2465 },
-  { name: 'Mažeikiai', slug: 'mazeikiai', lat: 56.3093, lng: 22.3427 },
-  { name: 'Kėdainiai', slug: 'kedainiai', lat: 55.2879, lng: 23.9776 },
-  { name: 'Marijampolė', slug: 'marijampole', lat: 54.5594, lng: 23.3500 },
-  { name: 'Utena', slug: 'utena', lat: 55.4980, lng: 25.6027 },
-  { name: 'Alytus', slug: 'alytus', lat: 54.3963, lng: 24.0459 },
-  { name: 'Jonava', slug: 'jonava', lat: 55.0722, lng: 24.2800 },
-  { name: 'Visaginas', slug: 'visaginas', lat: 55.5965, lng: 26.4308 },
-  { name: 'Druskininkai', slug: 'druskininkai', lat: 54.0166, lng: 23.9697 },
-  { name: 'Elektrėnai', slug: 'elektrenai', lat: 54.7855, lng: 24.6617 },
-  { name: 'Ukmergė', slug: 'ukmerge', lat: 55.2478, lng: 24.7606 },
-  { name: 'Trakai', slug: 'trakai', lat: 54.6375, lng: 24.9350 },
-  { name: 'Akmenė', slug: 'akmene', lat: 56.2453, lng: 22.7472 },
-  { name: 'Anykščiai', slug: 'anyksciai', lat: 55.5265, lng: 25.1029 },
-  { name: 'Biržai', slug: 'birzai', lat: 56.2005, lng: 24.7522 },
-  { name: 'Ignalina', slug: 'ignalina', lat: 55.3419, lng: 26.1647 },
-  { name: 'Joniškis', slug: 'joniskis', lat: 56.2391, lng: 23.6152 },
-  { name: 'Jurbarkas', slug: 'jurbarkas', lat: 55.0780, lng: 22.7720 },
-  { name: 'Kaišiadorys', slug: 'kaisiadorys', lat: 54.8659, lng: 24.4568 },
-  { name: 'Kelmė', slug: 'kelme', lat: 55.6310, lng: 22.9347 },
-  { name: 'Kretinga', slug: 'kretinga', lat: 55.8897, lng: 21.2448 },
-  { name: 'Kupiškis', slug: 'kupiskis', lat: 55.8394, lng: 24.9810 },
-  { name: 'Lazdijai', slug: 'lazdijai', lat: 54.2331, lng: 23.5159 },
-  { name: 'Molėtai', slug: 'moletai', lat: 55.2267, lng: 25.4185 },
-  { name: 'Pakruojis', slug: 'pakruojis', lat: 55.9732, lng: 23.8572 },
-  { name: 'Pasvalys', slug: 'pasvalys', lat: 56.0601, lng: 24.4031 },
-  { name: 'Plungė', slug: 'plunge', lat: 55.9113, lng: 21.8447 },
-  { name: 'Prienai', slug: 'prienai', lat: 54.6382, lng: 23.9445 },
-  { name: 'Radviliškis', slug: 'radviliskis', lat: 55.8108, lng: 23.5408 },
-  { name: 'Raseiniai', slug: 'raseiniai', lat: 55.3825, lng: 23.1168 },
-  { name: 'Rokiškis', slug: 'rokiskis', lat: 55.9622, lng: 25.5861 },
-  { name: 'Šakiai', slug: 'sakiai', lat: 54.9534, lng: 23.0481 },
-  { name: 'Varėna', slug: 'varena', lat: 54.2104, lng: 24.5782 },
-  { name: 'Vilkaviškis', slug: 'vilkaviskis', lat: 54.6532, lng: 23.0359 },
-  { name: 'Zarasai', slug: 'zarasai', lat: 55.7316, lng: 26.2469 },
-];
+import { CITIES } from '@/lib/cities';
 
 const topCities = [
   { name: 'Vilnius', slug: 'vilnius', emoji: '🏛️' },
@@ -107,9 +55,9 @@ export default function CitySelector() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        let closest = allCities[0];
+        let closest = CITIES[0];
         let minDist = Infinity;
-        for (const city of allCities) {
+        for (const city of CITIES) {
           const d = haversineKm(latitude, longitude, city.lat, city.lng);
           if (d < minDist) { minDist = d; closest = city; }
         }

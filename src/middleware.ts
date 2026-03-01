@@ -1,17 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminToken } from '@/lib/admin-tokens';
-
-/** All valid city slugs — must match cityNames in [city]/page.tsx */
-const VALID_CITY_SLUGS = new Set([
-  'vilnius', 'kaunas', 'klaipeda', 'siauliai', 'panevezys', 'palanga',
-  'silute', 'taurage', 'telsiai', 'mazeikiai', 'kedainiai', 'marijampole',
-  'utena', 'alytus', 'jonava', 'visaginas', 'druskininkai', 'elektrenai',
-  'ukmerge', 'akmene', 'anyksciai', 'birzai', 'ignalina', 'joniskis',
-  'jurbarkas', 'kaisiadorys', 'kelme', 'kretinga', 'kupiskis', 'lazdijai',
-  'moletai', 'pakruojis', 'pasvalys', 'plunge', 'prienai', 'radviliskis',
-  'raseiniai', 'rokiskis', 'trakai', 'varena', 'vilkaviskis', 'zarasai',
-  'sakiai',
-]);
+import { VALID_CITY_SLUGS } from '@/lib/cities';
 
 /** Known top-level routes that are NOT city slugs */
 const KNOWN_ROUTES = new Set(['', 'megstamiausieji', 'paieska', 'admin', 'prisijungti', 'privatumo-politika']);

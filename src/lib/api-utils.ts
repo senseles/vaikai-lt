@@ -17,6 +17,12 @@ export function jsonResponse(data: unknown, status = 200): NextResponse {
   return NextResponse.json(data, { status });
 }
 
+export function cachedJsonResponse(data: unknown, maxAge = 300, sMaxAge = 600): NextResponse {
+  const res = NextResponse.json(data);
+  res.headers.set('Cache-Control', `public, max-age=${maxAge}, s-maxage=${sMaxAge}, stale-while-revalidate=60`);
+  return res;
+}
+
 export function errorResponse(message: string, status: number): NextResponse {
   return NextResponse.json({ error: message }, { status });
 }

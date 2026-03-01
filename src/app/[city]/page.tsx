@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
+import { CITY_NAMES, CITY_SLUG_LIST } from '@/lib/cities';
 import CityPageClient from './CityPageClient';
 
 interface CityPageProps {
@@ -8,27 +9,9 @@ interface CityPageProps {
   readonly searchParams: { category?: string; type?: string; sort?: string; page?: string; sub?: string; spec?: string; area?: string; price?: string };
 }
 
-const cityNames: Record<string, string> = {
-  vilnius: 'Vilnius', kaunas: 'Kaunas', klaipeda: 'Klaipėda',
-  siauliai: 'Šiauliai', panevezys: 'Panevėžys', palanga: 'Palanga',
-  silute: 'Šilutė', taurage: 'Tauragė', telsiai: 'Telšiai',
-  mazeikiai: 'Mažeikiai', kedainiai: 'Kėdainiai', marijampole: 'Marijampolė',
-  utena: 'Utena', alytus: 'Alytus', jonava: 'Jonava',
-  visaginas: 'Visaginas', druskininkai: 'Druskininkai', elektrenai: 'Elektrėnai',
-  ukmerge: 'Ukmergė', akmene: 'Akmenė', anyksciai: 'Anykščiai',
-  birzai: 'Biržai', ignalina: 'Ignalina', joniskis: 'Joniškis',
-  jurbarkas: 'Jurbarkas', kaisiadorys: 'Kaišiadorys', kelme: 'Kelmė',
-  kretinga: 'Kretinga', kupiskis: 'Kupiškis', lazdijai: 'Lazdijai',
-  moletai: 'Molėtai', pakruojis: 'Pakruojis', pasvalys: 'Pasvalys',
-  plunge: 'Plungė', prienai: 'Prienai', radviliskis: 'Radviliškis',
-  raseiniai: 'Raseiniai', rokiskis: 'Rokiškis', trakai: 'Trakai',
-  varena: 'Varėna', vilkaviskis: 'Vilkaviškis', zarasai: 'Zarasai',
-  sakiai: 'Šakiai',
-};
-
 /** Tell Next.js which city slugs are valid — unknown slugs get 404 before rendering */
 export function generateStaticParams() {
-  return Object.keys(cityNames).map((city) => ({ city }));
+  return CITY_SLUG_LIST.map((city) => ({ city }));
 }
 export const dynamicParams = false;
 
@@ -48,7 +31,7 @@ function getOrderBy(sort: SortField): Record<string, 'asc' | 'desc'> {
 const PER_PAGE = 12;
 
 export async function generateMetadata({ params }: CityPageProps) {
-  const cityName = cityNames[params.city];
+  const cityName = CITY_NAMES[params.city];
   if (!cityName) return { title: 'Puslapis nerastas | Vaikai.lt' };
   const title = `Darželiai, auklės, būreliai — ${cityName} | Vaikai.lt`;
   const description = `Darželių, auklių, būrelių ir specialistų sąrašas ${cityName} mieste. Atsiliepimai ir vertinimai.`;
@@ -78,7 +61,7 @@ export async function generateMetadata({ params }: CityPageProps) {
 
 export default async function CityPage({ params, searchParams }: CityPageProps) {
   const citySlug = params.city;
-  const cityName = cityNames[citySlug];
+  const cityName = CITY_NAMES[citySlug];
 
   // Return 404 for unknown city slugs
   if (!cityName) {

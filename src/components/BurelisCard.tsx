@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import type { Burelis } from '@/types';
 import StarRating from './StarRating';
 import FavoriteButton from './FavoriteButton';
@@ -10,7 +11,7 @@ interface BurelisCardProps {
   readonly onSelect: (item: Burelis) => void;
 }
 
-export default function BurelisCard({ item, onSelect }: BurelisCardProps) {
+export default memo(function BurelisCard({ item, onSelect }: BurelisCardProps) {
   return (
     <div
       role="button"
@@ -48,4 +49,4 @@ export default function BurelisCard({ item, onSelect }: BurelisCardProps) {
       </div>
     </div>
   );
-}
+})

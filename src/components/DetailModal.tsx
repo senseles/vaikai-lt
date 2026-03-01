@@ -7,11 +7,7 @@ import StarRating from './StarRating';
 import ReviewList from './ReviewList';
 import ReviewForm from './ReviewForm';
 import { addToRecentlyViewed } from './RecentlyViewed';
-
-const DIACRITICS: Record<string, string> = { ą: 'a', č: 'c', ę: 'e', ė: 'e', į: 'i', š: 's', ų: 'u', ū: 'u', ž: 'z' };
-function citySlug(name: string): string {
-  return name.toLowerCase().replace(/[ąčęėįšųūž]/g, (c) => DIACRITICS[c] ?? c);
-}
+import { toSlug } from '@/lib/utils';
 
 type DetailItem = Kindergarten | Aukle | Burelis | Specialist;
 
@@ -140,7 +136,7 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
 
         <h2 className="text-xl font-bold text-gray-900 dark:text-white pr-8">{item.name}</h2>
         <Link
-          href={`/${citySlug(item.city)}`}
+          href={`/${toSlug(item.city)}`}
           onClick={onClose}
           className="inline-block text-sm text-gray-500 dark:text-gray-400 mt-0.5 hover:text-primary dark:hover:text-primary-light transition-colors"
         >

@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import type { Specialist } from '@/types';
 import StarRating from './StarRating';
 import FavoriteButton from './FavoriteButton';
@@ -10,7 +11,7 @@ interface SpecialistCardProps {
   readonly onSelect: (item: Specialist) => void;
 }
 
-export default function SpecialistCard({ item, onSelect }: SpecialistCardProps) {
+export default memo(function SpecialistCard({ item, onSelect }: SpecialistCardProps) {
   return (
     <div
       role="button"
@@ -48,4 +49,4 @@ export default function SpecialistCard({ item, onSelect }: SpecialistCardProps) 
       </div>
     </div>
   );
-}
+})
