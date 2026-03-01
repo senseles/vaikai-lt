@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 import { jsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { notifyNewReview } from '@/lib/notifications';
 
 const VALID_ITEM_TYPES = ['kindergarten', 'aukle', 'burelis', 'specialist'] as const;
 
@@ -70,6 +71,15 @@ export async function POST(request: NextRequest) {
       isApproved: false,
     },
   });
+
+  // Send email notification to admin (non-blocking)
+  notifyNewReview({
+    authorName: review.authorName,
+    rating: review.rating,
+    text: review.text,
+    itemType: review.itemType,
+    itemId: review.itemId,
+  }).catch(() => { /* notification failure should not block review creation */ });
 
   return jsonResponse(review, 201);
 }

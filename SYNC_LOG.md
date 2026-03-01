@@ -106,3 +106,23 @@
 **Blockers:** None.
 
 **Notes:** Project stable. Seed data commit landed. DB counts are above seed numbers (existing + seeded data merged). Language switcher still placeholder — next priority.
+
+---
+
+## SYNC 2026-03-01 11:40 (America/New_York)
+
+**Commits (last 20):** 20 commits visible — latest: `6d2715b fix: lint errors — unused vars, aria attrs, preconnect warnings`
+
+**Build Status:** ❌ FAILED — ESLint error in `src/app/api/reviews/route.ts:5` — `notifyNewReview` imported but never used. Compilation itself succeeds; lint blocks the build.
+
+**DB Status:** ✅ Healthy
+- Kindergartens: 1,437
+- Auklės: 150
+- Bureliai: 164
+- Specialists: 124
+- Reviews: 52
+
+**Blockers:**
+1. **Build broken** — unused import `notifyNewReview` in `src/app/api/reviews/route.ts`. Quick fix: remove or prefix with `_`. Devs should fix next cycle.
+
+**Notes:** DB counts unchanged from last sync — no new data ingestion. Feature velocity strong (search suggestions, mobile nav, auth, animations, admin UX, Lighthouse, favicons all landed). Language switcher still placeholder.
