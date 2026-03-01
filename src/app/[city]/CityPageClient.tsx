@@ -162,6 +162,7 @@ export default function CityPageClient({
           <select
             value={searchParams.get('sub') ?? ''}
             onChange={(e) => updateParams({ sub: e.target.value })}
+            aria-label="Pasirinkti kategoriją"
             className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white"
           >
             <option value="">Visos kategorijos</option>
@@ -174,6 +175,7 @@ export default function CityPageClient({
           <select
             value={searchParams.get('spec') ?? ''}
             onChange={(e) => updateParams({ spec: e.target.value })}
+            aria-label="Pasirinkti specializaciją"
             className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white"
           >
             <option value="">Visos specializacijos</option>
@@ -187,6 +189,7 @@ export default function CityPageClient({
           <select
             value={searchParams.get('area') ?? ''}
             onChange={(e) => updateParams({ area: e.target.value })}
+            aria-label="Pasirinkti rajoną"
             className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white"
           >
             <option value="">Visi rajonai</option>
@@ -208,6 +211,7 @@ export default function CityPageClient({
       </div>
 
       {/* Cards */}
+      <h2 className="sr-only">{categoryTabs.find(t => t.id === category)?.label ?? 'Rezultatai'}</h2>
       {items.length === 0 ? (
         <EmptyState
           icon="filter"

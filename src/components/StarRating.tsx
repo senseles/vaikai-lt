@@ -40,6 +40,9 @@ export default function StarRating({
             key={i}
             type="button"
             disabled={!interactive}
+            aria-hidden={!interactive}
+            tabIndex={interactive ? 0 : -1}
+            aria-label={interactive ? `${starValue} iš ${maxStars}` : undefined}
             className={`${cls} ${interactive ? 'cursor-pointer' : 'cursor-default'} transition-colors`}
             onClick={() => interactive && onChange?.(starValue)}
             onMouseEnter={() => interactive && setHoverRating(starValue)}
