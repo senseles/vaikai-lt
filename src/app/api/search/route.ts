@@ -7,29 +7,29 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ suggestions: [] });
   }
 
-  // Search across all entity types for suggestions (limit to 8 total)
+  // Search across all entity types — match name, city, or type-specific fields
   const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
     prisma.kindergarten.findMany({
-      where: { name: { contains: q } },
+      where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { address: { contains: q } }] },
       select: { name: true, city: true, slug: true },
       take: 3,
       orderBy: { baseRating: 'desc' },
     }),
     prisma.aukle.findMany({
-      where: { name: { contains: q } },
+      where: { OR: [{ name: { contains: q } }, { city: { contains: q } }] },
       select: { name: true, city: true, slug: true },
       take: 2,
       orderBy: { baseRating: 'desc' },
     }),
     prisma.burelis.findMany({
-      where: { name: { contains: q } },
-      select: { name: true, city: true, slug: true },
+      where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { category: { contains: q } }] },
+      select: { name: true, city: true, slug: true, category: true },
       take: 2,
       orderBy: { baseRating: 'desc' },
     }),
     prisma.specialist.findMany({
-      where: { name: { contains: q } },
-      select: { name: true, city: true, slug: true },
+      where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { specialty: { contains: q } }] },
+      select: { name: true, city: true, slug: true, specialty: true },
       take: 2,
       orderBy: { baseRating: 'desc' },
     }),
