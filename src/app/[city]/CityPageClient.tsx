@@ -1,18 +1,20 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Kindergarten, Aukle, Burelis, Specialist, ItemType } from '@/types';
 import KindergartenCard from '@/components/KindergartenCard';
 import AukleCard from '@/components/AukleCard';
 import BurelisCard from '@/components/BurelisCard';
 import SpecialistCard from '@/components/SpecialistCard';
-import DetailModal from '@/components/DetailModal';
-import CompareTable from '@/components/CompareTable';
 import TypeFilter from '@/components/TypeFilter';
 import SortSelect from '@/components/SortSelect';
 import PriceFilter from '@/components/PriceFilter';
 import EmptyState from '@/components/EmptyState';
+
+const DetailModal = dynamic(() => import('@/components/DetailModal'));
+const CompareTable = dynamic(() => import('@/components/CompareTable'));
 
 type Category = 'darzeliai' | 'aukles' | 'bureliai' | 'specialistai';
 
@@ -289,11 +291,13 @@ export default function CityPageClient({
       )}
 
       {/* Detail Modal */}
-      <DetailModal
-        item={selectedItem}
-        itemType={selectedItemType}
-        onClose={() => setSelectedItem(null)}
-      />
+      {selectedItem && (
+        <DetailModal
+          item={selectedItem}
+          itemType={selectedItemType}
+          onClose={() => setSelectedItem(null)}
+        />
+      )}
     </>
   );
 }

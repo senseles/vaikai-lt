@@ -17,10 +17,19 @@ export default function CookieConsent() {
     setVisible(false);
   };
 
+  useEffect(() => {
+    if (!visible) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleAccept(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!visible) return null;
 
   return (
     <div
+      role="dialog"
+      aria-label="Slapukų pranešimas"
       className="fixed bottom-0 inset-x-0 z-50 p-4 animate-slide-up"
     >
       <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-lg shadow-lg p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">

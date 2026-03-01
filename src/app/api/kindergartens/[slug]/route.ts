@@ -8,5 +8,7 @@ export async function GET(
 ) {
   const item = await prisma.kindergarten.findUnique({ where: { slug: params.slug } });
   if (!item) return errorResponse('Kindergarten not found', 404);
-  return jsonResponse({ ...item, features: JSON.parse(item.features) });
+  let features: string[] = [];
+  try { features = JSON.parse(item.features); } catch { /* invalid JSON fallback */ }
+  return jsonResponse({ ...item, features });
 }

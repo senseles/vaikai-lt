@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     const paginated = filtered.slice(skip, skip + limit);
 
     const result = {
-      data: paginated.map((i) => ({ ...i, features: JSON.parse(i.features) })),
+      data: paginated.map((i) => { try { return { ...i, features: JSON.parse(i.features) }; } catch { return { ...i, features: [] }; } }),
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     };
     setCache(cacheKey, result, CACHE_TTL.LIST);
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
   ]);
 
   const result = {
-    data: items.map((i) => ({ ...i, features: JSON.parse(i.features) })),
+    data: items.map((i) => { try { return { ...i, features: JSON.parse(i.features) }; } catch { return { ...i, features: [] }; } }),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   };
   setCache(cacheKey, result, CACHE_TTL.LIST);
