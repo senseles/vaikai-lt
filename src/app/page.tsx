@@ -1,5 +1,6 @@
 import SearchBar from "@/components/SearchBar";
 import CitySelector from "@/components/CitySelector";
+import Testimonials from "@/components/Testimonials";
 import FaqAccordion from "@/components/FaqAccordion";
 import prisma from "@/lib/prisma";
 
@@ -59,6 +60,9 @@ export default async function HomePage() {
 
       {/* Cities */}
       <CitySelector />
+
+      {/* Testimonials */}
+      <Testimonials />
 
       {/* FAQ */}
       <FaqAccordion />
