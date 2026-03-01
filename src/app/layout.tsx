@@ -80,6 +80,12 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-primary focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-semibold"
+        >
+          Pereiti prie turinio
+        </a>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -102,7 +108,7 @@ export default function RootLayout({
         />
         <LanguageProvider>
           <Header />
-          <main className="flex-1 pb-16 md:pb-0">{children}</main>
+          <main id="main-content" className="flex-1 pb-16 md:pb-0">{children}</main>
           <Footer />
           <MobileBottomNav />
           <CookieConsent />

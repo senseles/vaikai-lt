@@ -30,11 +30,11 @@ export default function CompareTable({ items, onClose }: CompareTableProps) {
   if (items.length < 2) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Palyginimo lentelė" onClick={onClose}>
       <div className="fixed inset-0 bg-black/40" />
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white dark:bg-slate-800 rounded-xl max-w-3xl w-full max-h-[80vh] overflow-auto p-5"
+        className="relative bg-white dark:bg-slate-800 rounded-xl max-w-3xl w-full max-h-[80vh] overflow-auto p-5 animate-slide-up"
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">Palyginimas</h2>
@@ -45,12 +45,13 @@ export default function CompareTable({ items, onClose }: CompareTableProps) {
           </button>
         </div>
 
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto -mx-5 px-5">
+        <table className="w-full text-sm min-w-[400px]">
           <thead>
             <tr>
-              <th className="text-left py-2 pr-4 text-gray-500 dark:text-gray-400 font-medium" />
+              <th scope="col" className="text-left py-2 pr-4 text-gray-500 dark:text-gray-400 font-medium" />
               {items.map((item) => (
-                <th key={item.id} className="text-left py-2 px-2 font-semibold text-gray-900 dark:text-white">{item.name}</th>
+                <th key={item.id} scope="col" className="text-left py-2 px-2 font-semibold text-gray-900 dark:text-white">{item.name}</th>
               ))}
             </tr>
           </thead>
@@ -79,6 +80,7 @@ export default function CompareTable({ items, onClose }: CompareTableProps) {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

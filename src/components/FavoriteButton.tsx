@@ -52,7 +52,7 @@ export default function FavoriteButton({ itemId, itemType }: FavoriteButtonProps
     <button
       type="button"
       onClick={toggle}
-      className="p-1.5 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+      className="p-1.5 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 focus:outline-none focus:ring-2 focus:ring-red-300 dark:focus:ring-red-700 transition-colors"
       aria-label={favorited ? 'Pašalinti iš mėgstamų' : 'Pridėti prie mėgstamų'}
     >
       <svg

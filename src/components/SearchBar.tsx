@@ -147,6 +147,11 @@ export default function SearchBar() {
         </div>
       </form>
 
+      {/* Screen reader announcement for suggestion count */}
+      <div className="sr-only" aria-live="polite" role="status">
+        {showSuggestions && suggestions.length > 0 && `${suggestions.length} pasiūlymų`}
+      </div>
+
       {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
         <ul

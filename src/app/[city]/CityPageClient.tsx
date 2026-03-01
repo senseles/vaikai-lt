@@ -273,7 +273,7 @@ export default function CityPageClient({
 
       {/* Compare bar */}
       {compareIds.size >= 2 && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-primary text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
+        <div role="status" aria-live="polite" className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-primary text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
           <span className="text-sm font-medium">Pasirinkta: {compareIds.size}</span>
           <button
             onClick={() => setShowCompare(true)}

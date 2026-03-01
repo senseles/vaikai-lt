@@ -1,6 +1,11 @@
 import Link from "next/link";
 import NewsletterSignup from "./NewsletterSignup";
 
+const DIACRITICS: Record<string, string> = { ą: 'a', č: 'c', ę: 'e', ė: 'e', į: 'i', š: 's', ų: 'u', ū: 'u', ž: 'z' };
+function toSlug(name: string): string {
+  return name.toLowerCase().replace(/[ąčęėįšųūž]/g, (c) => DIACRITICS[c] ?? c);
+}
+
 export default function Footer() {
   return (
     <footer className="bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 mt-16">
@@ -40,10 +45,10 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm uppercase tracking-wider">Miestai</h3>
             <ul className="space-y-2">
-              {["Vilnius", "Kaunas", "Klaipėda", "Šiauliai", "Panevėžys"].map((city) => (
+              {["Vilnius", "Kaunas", "Klaipėda", "Šiauliai", "Panevėžys", "Alytus", "Marijampolė"].map((city) => (
                 <li key={city}>
                   <Link
-                    href={`/${city.toLowerCase().replace(/[ė]/g, "e").replace(/[š]/g, "s").replace(/[ž]/g, "z").replace(/[ų]/g, "u")}`}
+                    href={`/${toSlug(city)}`}
                     className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
                   >
                     {city}
