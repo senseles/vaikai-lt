@@ -64,6 +64,8 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
+        {/* Analytics — uncomment and set domain when going live */}
+        {/* <script defer data-domain="vaikai.lt" src="https://plausible.io/js/script.js" /> */}
         {/* Prevent FOUC for dark mode */}
         <script
           dangerouslySetInnerHTML={{

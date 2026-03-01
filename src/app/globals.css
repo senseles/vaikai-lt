@@ -33,3 +33,37 @@
     }
   }
 }
+
+/* Print styles */
+@media print {
+  header, footer, .fixed, button, nav[role="tablist"],
+  [aria-label="Grįžti į viršų"], [aria-label="Perjungti tamsų režimą"] {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  .shadow-sm, .shadow-md, .shadow-lg {
+    box-shadow: none !important;
+  }
+  a {
+    color: black !important;
+    text-decoration: underline !important;
+  }
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+  .grid {
+    display: block !important;
+  }
+  .grid > * {
+    margin-bottom: 1rem;
+    page-break-inside: avoid;
+  }
+}

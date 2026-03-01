@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NewsletterSignup from "./NewsletterSignup";
 
 export default function Footer() {
   return (
@@ -47,9 +48,15 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Info */}
+          {/* Newsletter + Info */}
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm uppercase tracking-wider">Informacija</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm uppercase tracking-wider">Naujienlaiškis</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Gaukite naujausias žinias apie vaikiškų paslaugų naujienas.
+            </p>
+            <NewsletterSignup />
+
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 mt-6 text-sm uppercase tracking-wider">Informacija</h3>
             <ul className="space-y-2">
               <li><Link href="/#duk" className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">D.U.K.</Link></li>
             </ul>

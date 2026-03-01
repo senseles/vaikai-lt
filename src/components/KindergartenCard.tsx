@@ -21,8 +21,11 @@ export default function KindergartenCard({ item, onSelect, compareSelected = fal
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => onSelect(item)}
-      className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 hover:shadow-md transition-shadow cursor-pointer"
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(item); } }}
+      className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 hover:shadow-md transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">

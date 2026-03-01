@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import type { Kindergarten } from '@/types';
 import StarRating from './StarRating';
 
@@ -20,6 +21,12 @@ const fields: { key: keyof Kindergarten | 'rating'; label: string }[] = [
 ];
 
 export default function CompareTable({ items, onClose }: CompareTableProps) {
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [onClose]);
+
   if (items.length < 2) return null;
 
   return (
