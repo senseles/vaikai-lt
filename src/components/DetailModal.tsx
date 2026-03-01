@@ -5,6 +5,7 @@ import type { Kindergarten, Aukle, Burelis, Specialist, ItemType } from '@/types
 import StarRating from './StarRating';
 import ReviewList from './ReviewList';
 import ReviewForm from './ReviewForm';
+import { addToRecentlyViewed } from './RecentlyViewed';
 
 type DetailItem = Kindergarten | Aukle | Burelis | Specialist;
 
@@ -17,6 +18,13 @@ interface DetailModalProps {
 export default function DetailModal({ item, itemType, onClose }: DetailModalProps) {
   useEffect(() => {
     if (!item) return;
+    addToRecentlyViewed({
+      id: item.id,
+      name: item.name,
+      city: item.city,
+      itemType,
+      baseRating: item.baseRating,
+    });
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handler);
     document.body.style.overflow = 'hidden';
@@ -24,7 +32,7 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
       document.removeEventListener('keydown', handler);
       document.body.style.overflow = '';
     };
-  }, [item, onClose]);
+  }, [item, itemType, onClose]);
 
   if (!item) return null;
 

@@ -1,5 +1,6 @@
 import SearchBar from "@/components/SearchBar";
 import CitySelector from "@/components/CitySelector";
+import RecentlyViewed from "@/components/RecentlyViewed";
 import Testimonials from "@/components/Testimonials";
 import FaqAccordion from "@/components/FaqAccordion";
 import prisma from "@/lib/prisma";
@@ -57,6 +58,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Recently Viewed */}
+      <RecentlyViewed />
 
       {/* Cities */}
       <CitySelector />
