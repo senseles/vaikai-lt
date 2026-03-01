@@ -171,9 +171,22 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
     } : {}),
   }));
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Pradžia', item: 'https://vaikai.lt/' },
+      { '@type': 'ListItem', position: 2, name: cityName, item: `https://vaikai.lt/${citySlug}` },
+    ],
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      {/* JSON-LD structured data for kindergartens */}
+      {/* JSON-LD structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {localBusinessJsonLd.length > 0 && (
         <script
           type="application/ld+json"
