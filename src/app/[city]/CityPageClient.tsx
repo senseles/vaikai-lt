@@ -8,6 +8,7 @@ import AukleCard from '@/components/AukleCard';
 import BurelisCard from '@/components/BurelisCard';
 import SpecialistCard from '@/components/SpecialistCard';
 import DetailModal from '@/components/DetailModal';
+import CompareTable from '@/components/CompareTable';
 import TypeFilter from '@/components/TypeFilter';
 import SortSelect from '@/components/SortSelect';
 
@@ -51,6 +52,8 @@ export default function CityPageClient({
   const searchParams = useSearchParams();
   const [selectedItem, setSelectedItem] = useState<AnyItem | null>(null);
   const [selectedItemType, setSelectedItemType] = useState<ItemType>('kindergarten');
+  const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
+  const [showCompare, setShowCompare] = useState(false);
 
   const category = (searchParams.get('category') as Category) || initialCategory;
   const type = searchParams.get('type') ?? initialType;
@@ -72,6 +75,15 @@ export default function CityPageClient({
     setSelectedItem(item);
     setSelectedItemType(itemType);
   };
+
+  const toggleCompare = useCallback((id: string) => {
+    setCompareIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else if (next.size < 4) next.add(id);
+      return next;
+    });
+  }, []);
 
   const itemsForCategory = () => {
     switch (category) {
@@ -122,7 +134,13 @@ export default function CityPageClient({
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {category === 'darzeliai' && kindergartens.map((item) => (
-            <KindergartenCard key={item.id} item={item} onSelect={(i) => openDetail(i, 'kindergarten')} />
+            <KindergartenCard
+              key={item.id}
+              item={item}
+              onSelect={(i) => openDetail(i, 'kindergarten')}
+              compareSelected={compareIds.has(item.id)}
+              onCompareToggle={toggleCompare}
+            />
           ))}
           {category === 'aukles' && aukles.map((item) => (
             <AukleCard key={item.id} item={item} onSelect={(i) => openDetail(i, 'aukle')} />
@@ -157,6 +175,33 @@ export default function CityPageClient({
             Kitas →
           </button>
         </div>
+      )}
+
+      {/* Compare bar */}
+      {compareIds.size >= 2 && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-primary text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
+          <span className="text-sm font-medium">Pasirinkta: {compareIds.size}</span>
+          <button
+            onClick={() => setShowCompare(true)}
+            className="bg-white text-primary font-semibold text-sm px-4 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            Palyginti
+          </button>
+          <button
+            onClick={() => setCompareIds(new Set())}
+            className="text-white/70 hover:text-white text-sm underline"
+          >
+            Išvalyti
+          </button>
+        </div>
+      )}
+
+      {/* Compare Table */}
+      {showCompare && (
+        <CompareTable
+          items={kindergartens.filter((k) => compareIds.has(k.id))}
+          onClose={() => setShowCompare(false)}
+        />
       )}
 
       {/* Detail Modal */}
