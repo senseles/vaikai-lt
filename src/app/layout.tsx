@@ -39,21 +39,12 @@ export const metadata: Metadata = {
     url: "https://vaikai.lt/",
     siteName: "Vaikai.lt",
     locale: "lt_LT",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Vaikai.lt — Darželiai, auklės, būreliai ir specialistai visoje Lietuvoje",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Vaikai.lt — Darželiai, auklės, būreliai ir specialistai",
     description:
       "Padedame tėveliams visoje Lietuvoje rasti darželius, aukles, būrelius ir specialistus.",
-    images: ["/og-image.png"],
   },
   icons: {
     icon: [
