@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  role         String   @default("USER")
+  createdAt    DateTime @default(now())
+  reviews      Review[]
+}
+
+model Kindergarten {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  city            String
+  region          String?
+  area            String?
+  address         String?
+  type            String   @default("valstybinis")
+  phone           String?
+  website         String?
+  language        String?
+  ageFrom         Int?
+  groups          Int?
+  hours           String?
+  features        String   @default("[]")
+  description     String?
+  note            String?
+  baseRating      Float    @default(0)
+  baseReviewCount Int      @default(0)
+  isUserAdded     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Aukle {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  city            String
+  region          String?
+  area            String?
+  phone           String?
+  email           String?
+  experience      String?
+  ageRange        String?
+  hourlyRate      String?
+  languages       String?
+  description     String?
+  availability    String?
+  baseRating      Float    @default(0)
+  baseReviewCount Int      @default(0)
+  isServicePortal Boolean  @default(false)
+  isUserAdded     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Burelis {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  city            String
+  region          String?
+  area            String?
+  category        String?
+  subcategory     String?
+  ageRange        String?
+  price           String?
+  schedule        String?
+  phone           String?
+  website         String?
+  description     String?
+  baseRating      Float    @default(0)
+  baseReviewCount Int      @default(0)
+  isUserAdded     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Specialist {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  city            String
+  region          String?
+  area            String?
+  specialty       String?
+  clinic          String?
+  price           String?
+  phone           String?
+  website         String?
+  languages       String?
+  description     String?
+  baseRating      Float    @default(0)
+  baseReviewCount Int      @default(0)
+  isUserAdded     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  itemId     String
+  itemType   String
+  authorName String
+  rating     Int      @default(5)
+  text       String
+  isApproved Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  itemId    String
+  itemType  String
+  sessionId String
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@unique([itemId, itemType, sessionId])
+}
