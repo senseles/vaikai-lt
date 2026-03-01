@@ -23,7 +23,7 @@
 - [x] ~~CitySelector - verify all city links work~~ (43 cities mapped)
 
 ### 🟢 Enhancements (Nice to Have)
-- [ ] Add more seed data - at least 1000+ kindergartens for realism
+- [x] ~~Add more seed data - at least 1000+ kindergartens for realism~~ (1437 kindergartens, 150 aukles, 164 bureliai, 124 specialists)
 - [ ] Add images/photos placeholders for listings
 - [ ] Add map integration (Google Maps embed for addresses)
 - [x] ~~Add breadcrumb navigation on all pages~~ (city + search pages have breadcrumbs)
@@ -38,7 +38,7 @@
 - [x] ~~Improve loading animations / transitions~~ (loading.tsx skeletons added)
 - [x] ~~Add category filter for bureliai~~ (dropdown: Menai, Sportas, Muzika, etc.)
 - [x] ~~Add specialty filter for specialists~~ (dropdown: Logopedas, Psichologas, etc.)
-- [ ] Add filter by district/area within city
+- [x] ~~Add filter by district/area within city~~ (area dropdown on city pages)
 - [ ] Add sorting by distance (if geolocation available)
 - [x] ~~Add "recently viewed" section~~ (localStorage-backed, horizontal scroll, shown on home page)
 - [x] ~~Add newsletter signup form in footer~~ (NewsletterSignup component in Footer)
@@ -51,7 +51,18 @@
 - [x] ~~Cache API responses for better performance~~ (src/lib/cache.ts with TTL, applied to all GET routes)
 - [x] ~~Add database indexes for frequent queries~~ (city, baseRating, name indexes on all models)
 - [x] ~~Optimize font loading~~ (next/font/google Inter, self-hosted, preloaded)
-- [ ] Add Lighthouse score improvements (target 90+) — font optimization done, images N/A
+- [x] ~~Add Lighthouse score improvements (target 90+)~~ (dynamic imports, compression, X-Powered-By removed, lazy DetailModal/CompareTable)
+
+### ✅ Done (Sprint 3 — QA & Polish)
+- [x] Fix /prisijungti 404 (middleware KNOWN_ROUTES missing)
+- [x] Safe JSON.parse in kindergartens API (try-catch with fallback)
+- [x] Accessibility: form labels on ReviewForm, Escape key + ARIA role on CookieConsent
+- [x] 191 seed reviews added (243 total: kg, aukles, bureliai, specialists)
+- [x] Performance: dynamic import DetailModal/CompareTable, gzip compression, no X-Powered-By
+- [x] Search API expanded to cover city, specialty, category fields
+- [x] Area/district filter on city pages
+- [x] Lighthouse optimizations (lazy loading, compression, header cleanup)
+- [x] Build-lock.sh script to prevent concurrent builds
 
 ### ✅ Done (Sprint 2)
 - [x] QA V2 bugs fixed (BUG-1 XSS, BUG-2 sitemap, BUG-3 404 status, WARN-2, WARN-3)
