@@ -159,6 +159,7 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  void label; // used for future heading
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('name');
   const perPage = 20;
