@@ -5,6 +5,7 @@ import FavoritesClient from './FavoritesClient';
 export const metadata: Metadata = {
   title: 'Mėgstamiausieji | Vaikai.lt',
   description: 'Jūsų mėgstamiausi darželiai, auklės, būreliai ir specialistai.',
+  robots: { index: false },
 };
 
 export default function FavoritesPage() {

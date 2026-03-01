@@ -11,7 +11,8 @@ export async function generateMetadata({ searchParams }: SearchPageProps) {
   const q = searchParams.q ?? '';
   return {
     title: q ? `„${q}" — Paieška | Vaikai.lt` : 'Paieška | Vaikai.lt',
-    description: `Ieškokite darželių, auklių, būrelių ir specialistų visoje Lietuvoje.`,
+    description: 'Ieškokite darželių, auklių, būrelių ir specialistų visoje Lietuvoje.',
+    alternates: { canonical: 'https://vaikai.lt/paieska' },
   };
 }
 
