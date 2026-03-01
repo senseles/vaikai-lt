@@ -39,31 +39,32 @@ export default function Testimonials() {
           Ką sako tėveliai
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t) => (
-            <div
-              key={t.author}
-              className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm min-h-[10rem] hover:shadow-md transition-shadow"
-            >
-              <p className="italic text-gray-700 dark:text-gray-300 mb-4">
-                &ldquo;{t.quote}&rdquo;
-              </p>
+        <ul className="grid grid-cols-1 md:grid-cols-3 gap-6 list-none p-0 m-0">
+          {testimonials.map((t, i) => (
+            <li key={`testimonial-${i}`}>
+              <blockquote className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm min-h-[10rem] hover:shadow-md transition-shadow h-full">
+                <p className="italic text-gray-700 dark:text-gray-300 mb-4">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
 
-              <div>
-                <span className="font-bold text-gray-900 dark:text-white">
-                  {t.author}
-                </span>
-                <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                  {t.role}
-                </span>
-              </div>
+                <footer>
+                  <cite className="not-italic">
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      {t.author}
+                    </span>
+                    <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
+                      {t.role}
+                    </span>
+                  </cite>
+                </footer>
 
-              <div className="mt-2">
-                <StarRating rating={t.rating} size="sm" />
-              </div>
-            </div>
+                <div className="mt-2">
+                  <StarRating rating={t.rating} size="sm" />
+                </div>
+              </blockquote>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );
