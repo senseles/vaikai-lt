@@ -12,6 +12,7 @@ import TypeFilter from '@/components/TypeFilter';
 import SortSelect from '@/components/SortSelect';
 import PriceFilter from '@/components/PriceFilter';
 import EmptyState from '@/components/EmptyState';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 const DetailModal = dynamic(() => import('@/components/DetailModal'), {
   loading: () => <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"><div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>,
@@ -154,7 +155,7 @@ export default function CityPageClient({
       </nav>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-6">
         {category === 'darzeliai' && (
           <TypeFilter value={type} onChange={(v) => updateParams({ type: v })} />
         )}
@@ -205,7 +206,7 @@ export default function CityPageClient({
             onChange={(v) => updateParams({ price: v })}
           />
         )}
-        <div className="ml-auto">
+        <div className="w-full sm:w-auto sm:ml-auto">
           <SortSelect value={sort} onChange={(v) => updateParams({ sort: v })} />
         </div>
       </div>
@@ -219,33 +220,35 @@ export default function CityPageClient({
           description="Šiame mieste su pasirinktais filtrais rezultatų nerasta. Pabandykite pakeisti filtrus."
         />
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {category === 'darzeliai' && kindergartens.map((item, i) => (
-            <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
-              <KindergartenCard
-                item={item}
-                onSelect={(it) => openDetail(it, 'kindergarten')}
-                compareSelected={compareIds.has(item.id)}
-                onCompareToggle={toggleCompare}
-              />
-            </div>
-          ))}
-          {category === 'aukles' && (filterByPrice(aukles) as Aukle[]).map((item, i) => (
-            <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
-              <AukleCard item={item} onSelect={(it) => openDetail(it, 'aukle')} />
-            </div>
-          ))}
-          {category === 'bureliai' && bureliai.map((item, i) => (
-            <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
-              <BurelisCard item={item} onSelect={(it) => openDetail(it, 'burelis')} />
-            </div>
-          ))}
-          {category === 'specialistai' && (filterByPrice(specialists) as Specialist[]).map((item, i) => (
-            <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
-              <SpecialistCard item={item} onSelect={(it) => openDetail(it, 'specialist')} />
-            </div>
-          ))}
-        </div>
+        <ErrorBoundary fallback={<EmptyState icon="filter" title="Klaida" description="Nepavyko atvaizduoti rezultatų. Pabandykite perkrauti puslapį." />}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {category === 'darzeliai' && kindergartens.map((item, i) => (
+              <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
+                <KindergartenCard
+                  item={item}
+                  onSelect={(it) => openDetail(it, 'kindergarten')}
+                  compareSelected={compareIds.has(item.id)}
+                  onCompareToggle={toggleCompare}
+                />
+              </div>
+            ))}
+            {category === 'aukles' && (filterByPrice(aukles) as Aukle[]).map((item, i) => (
+              <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
+                <AukleCard item={item} onSelect={(it) => openDetail(it, 'aukle')} />
+              </div>
+            ))}
+            {category === 'bureliai' && bureliai.map((item, i) => (
+              <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
+                <BurelisCard item={item} onSelect={(it) => openDetail(it, 'burelis')} />
+              </div>
+            ))}
+            {category === 'specialistai' && (filterByPrice(specialists) as Specialist[]).map((item, i) => (
+              <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
+                <SpecialistCard item={item} onSelect={(it) => openDetail(it, 'specialist')} />
+              </div>
+            ))}
+          </div>
+        </ErrorBoundary>
       )}
 
       {/* Pagination */}
@@ -275,7 +278,7 @@ export default function CityPageClient({
 
       {/* Compare bar */}
       {compareIds.size >= 2 && (
-        <div role="status" aria-live="polite" className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-primary text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
+        <div role="status" aria-live="polite" className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-primary text-white px-4 sm:px-6 py-3 rounded-full shadow-lg flex items-center gap-2 sm:gap-3 max-w-[90vw]">
           <span className="text-sm font-medium">Pasirinkta: {compareIds.size}</span>
           <button
             onClick={() => setShowCompare(true)}

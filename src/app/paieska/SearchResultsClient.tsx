@@ -1,13 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import type { Kindergarten, Aukle, Burelis, Specialist, ItemType } from '@/types';
 import KindergartenCard from '@/components/KindergartenCard';
 import AukleCard from '@/components/AukleCard';
 import BurelisCard from '@/components/BurelisCard';
 import SpecialistCard from '@/components/SpecialistCard';
-import DetailModal from '@/components/DetailModal';
 import SearchBar from '@/components/SearchBar';
+
+const DetailModal = dynamic(() => import('@/components/DetailModal'), {
+  loading: () => <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"><div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>,
+});
 
 type AnyItem = Kindergarten | Aukle | Burelis | Specialist;
 
