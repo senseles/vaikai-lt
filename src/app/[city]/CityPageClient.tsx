@@ -142,17 +142,17 @@ export default function CityPageClient({
           <button
             disabled={page <= 1}
             onClick={() => updateParams({ page: String(page - 1) })}
-            className="px-4 py-2 text-sm border rounded-lg disabled:opacity-30 hover:bg-gray-50"
+            className="px-4 py-2 text-sm border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700"
           >
             ← Ankstesnis
           </button>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-500 dark:text-gray-400">
             {page} / {tp}
           </span>
           <button
             disabled={page >= tp}
             onClick={() => updateParams({ page: String(page + 1) })}
-            className="px-4 py-2 text-sm border rounded-lg disabled:opacity-30 hover:bg-gray-50"
+            className="px-4 py-2 text-sm border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700"
           >
             Kitas →
           </button>

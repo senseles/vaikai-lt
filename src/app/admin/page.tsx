@@ -59,15 +59,15 @@ export default function AdminPage() {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <form onSubmit={login} className="bg-white p-6 rounded-xl shadow-sm border max-w-sm w-full space-y-4">
-          <h1 className="text-xl font-bold text-gray-900">Administravimas</h1>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 p-4">
+        <form onSubmit={login} className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border dark:border-slate-700 max-w-sm w-full space-y-4">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">Administravimas</h1>
           <input
             type="password"
             placeholder="Slaptažodis"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
           />
           {loginError && <p className="text-red-500 text-sm">{loginError}</p>}
           <button type="submit" className="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700">
@@ -88,11 +88,11 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b px-4 py-3">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+      <header className="bg-white dark:bg-slate-800 border-b dark:border-slate-700 px-4 py-3">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 className="text-lg font-bold text-gray-900">Vaikai.lt Admin</h1>
-          <button onClick={() => setAuthenticated(false)} className="text-sm text-gray-500 hover:text-gray-700">
+          <h1 className="text-lg font-bold text-gray-900 dark:text-white">Vaikai.lt Admin</h1>
+          <button onClick={() => setAuthenticated(false)} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
             Atsijungti
           </button>
         </div>
@@ -105,7 +105,7 @@ export default function AdminPage() {
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`px-3 py-2 text-sm rounded-lg whitespace-nowrap transition-colors ${
-                activeTab === tab.key ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                activeTab === tab.key ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800'
               }`}
             >
               {tab.label}
@@ -128,12 +128,12 @@ function Dashboard({ stats }: { readonly stats: Stats | null }) {
   if (!stats) return <p className="text-gray-400">Kraunama...</p>;
 
   const cards = [
-    { label: 'Darželiai', count: stats.kindergartens, color: 'bg-blue-50 text-blue-700' },
-    { label: 'Auklės', count: stats.aukles, color: 'bg-green-50 text-green-700' },
-    { label: 'Būreliai', count: stats.bureliai, color: 'bg-orange-50 text-orange-700' },
-    { label: 'Specialistai', count: stats.specialists, color: 'bg-teal-50 text-teal-700' },
-    { label: 'Atsiliepimai', count: stats.reviews, color: 'bg-purple-50 text-purple-700' },
-    { label: 'Laukia patvirtinimo', count: stats.pendingReviews, color: 'bg-red-50 text-red-700' },
+    { label: 'Darželiai', count: stats.kindergartens, color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' },
+    { label: 'Auklės', count: stats.aukles, color: 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300' },
+    { label: 'Būreliai', count: stats.bureliai, color: 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300' },
+    { label: 'Specialistai', count: stats.specialists, color: 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300' },
+    { label: 'Atsiliepimai', count: stats.reviews, color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' },
+    { label: 'Laukia patvirtinimo', count: stats.pendingReviews, color: 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300' },
   ];
 
   const exportData = async (format: 'json' | 'csv') => {
@@ -159,10 +159,10 @@ function Dashboard({ stats }: { readonly stats: Stats | null }) {
         ))}
       </div>
       <div className="flex gap-2">
-        <button onClick={() => exportData('json')} className="px-4 py-2 text-sm bg-white border rounded-lg hover:bg-gray-50">
+        <button onClick={() => exportData('json')} className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
           Eksportuoti JSON
         </button>
-        <button onClick={() => exportData('csv')} className="px-4 py-2 text-sm bg-white border rounded-lg hover:bg-gray-50">
+        <button onClick={() => exportData('csv')} className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
           Eksportuoti CSV
         </button>
       </div>
@@ -209,31 +209,31 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
           placeholder="Ieškoti..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm flex-1 focus:ring-2 focus:ring-blue-500"
+          className="border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm flex-1 focus:ring-2 focus:ring-blue-500"
         />
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white">
           <option value="name">Pavadinimas</option>
           <option value="city">Miestas</option>
           <option value="baseRating">Įvertinimas</option>
         </select>
       </div>
 
-      <div className="bg-white rounded-xl border overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-gray-50 dark:bg-slate-800 border-b dark:border-slate-700">
               <tr>
-                <th className="text-left px-4 py-2 font-medium text-gray-500">Pavadinimas</th>
-                <th className="text-left px-4 py-2 font-medium text-gray-500">Miestas</th>
-                <th className="text-left px-4 py-2 font-medium text-gray-500">Įvertinimas</th>
-                <th className="text-right px-4 py-2 font-medium text-gray-500">Veiksmai</th>
+                <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Pavadinimas</th>
+                <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Miestas</th>
+                <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Įvertinimas</th>
+                <th className="text-right px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Veiksmai</th>
               </tr>
             </thead>
             <tbody>
               {items.map((item) => (
-                <tr key={String(item.id)} className="border-b border-gray-50 hover:bg-gray-50">
-                  <td className="px-4 py-2 text-gray-900">{String(item.name ?? '')}</td>
-                  <td className="px-4 py-2 text-gray-600">{String(item.city ?? '')}</td>
+                <tr key={String(item.id)} className="border-b border-gray-50 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700">
+                  <td className="px-4 py-2 text-gray-900 dark:text-white">{String(item.name ?? '')}</td>
+                  <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{String(item.city ?? '')}</td>
                   <td className="px-4 py-2">
                     <StarRating rating={Number(item.baseRating ?? 0)} size="sm" />
                   </td>
@@ -253,10 +253,10 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
       </div>
 
       <div className="flex items-center justify-between mt-3">
-        <p className="text-sm text-gray-500">Viso: {total} | Puslapis {page}/{totalPages}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Viso: {total} | Puslapis {page}/{totalPages}</p>
         <div className="flex gap-1">
-          <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-3 py-1 text-sm border rounded disabled:opacity-30">←</button>
-          <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="px-3 py-1 text-sm border rounded disabled:opacity-30">→</button>
+          <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30">←</button>
+          <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30">→</button>
         </div>
       </div>
     </div>
@@ -284,23 +284,23 @@ function ReviewModeration() {
 
   return (
     <div className="space-y-3">
-      <h3 className="font-semibold text-gray-900">Laukiantys patvirtinimo</h3>
+      <h3 className="font-semibold text-gray-900 dark:text-white">Laukiantys patvirtinimo</h3>
       {reviews.length === 0 && <p className="text-sm text-gray-400">Nėra laukiančių atsiliepimų.</p>}
       {reviews.map((r) => (
-        <div key={r.id} className="bg-white rounded-xl border p-4">
+        <div key={r.id} className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <span className="font-medium text-gray-900">{r.authorName}</span>
+              <span className="font-medium text-gray-900 dark:text-white">{r.authorName}</span>
               <span className="text-xs text-gray-400 ml-2">{r.itemType} · {new Date(r.createdAt).toLocaleDateString('lt-LT')}</span>
             </div>
             <StarRating rating={r.rating} size="sm" />
           </div>
-          <p className="text-sm text-gray-600 mt-1">{r.text}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{r.text}</p>
           <div className="flex gap-2 mt-3">
             <button onClick={() => action(r.id, 'approve')} className="px-3 py-1 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">
               Patvirtinti
             </button>
-            <button onClick={() => action(r.id, 'delete')} className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200">
+            <button onClick={() => action(r.id, 'delete')} className="px-3 py-1 text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50">
               Ištrinti
             </button>
           </div>

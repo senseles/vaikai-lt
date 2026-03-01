@@ -4,6 +4,11 @@ import { jsonResponse, errorResponse } from '@/lib/api-utils';
 
 const VALID_ITEM_TYPES = ['kindergarten', 'aukle', 'burelis', 'specialist'] as const;
 
+/** Strip HTML tags from user input to prevent stored XSS */
+function stripHtml(input: string): string {
+  return input.replace(/<[^>]*>/g, '');
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const itemId = searchParams.get('itemId');
@@ -18,7 +23,7 @@ export async function GET(request: NextRequest) {
   }
 
   const reviews = await prisma.review.findMany({
-    where: { itemId, itemType },
+    where: { itemId, itemType, isApproved: true },
     orderBy: { createdAt: 'desc' },
   });
 
@@ -55,9 +60,10 @@ export async function POST(request: NextRequest) {
     data: {
       itemId: itemId as string,
       itemType: itemType as string,
-      authorName: (authorName as string).trim(),
+      authorName: stripHtml((authorName as string).trim()),
       rating: rating as number,
-      text: (text as string).trim(),
+      text: stripHtml((text as string).trim()),
+      isApproved: true,
     },
   });
 

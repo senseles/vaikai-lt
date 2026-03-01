@@ -20,3 +20,9 @@ export function jsonResponse(data: unknown, status = 200): NextResponse {
 export function errorResponse(message: string, status: number): NextResponse {
   return NextResponse.json({ error: message }, { status });
 }
+
+/** Case-insensitive search that works with Lithuanian characters (ą,č,ę,ė,į,š,ų,ū,ž) */
+export function matchesSearch(value: string | null | undefined, query: string): boolean {
+  if (!value) return false;
+  return value.toLocaleLowerCase('lt').includes(query.toLocaleLowerCase('lt'));
+}

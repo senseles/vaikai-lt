@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
+import { matchesSearch } from '@/lib/api-utils';
 import SearchResultsClient from './SearchResultsClient';
 
 interface SearchPageProps {
@@ -21,37 +22,34 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Paieška</h1>
-        <p className="text-gray-500">Įveskite paieškos frazę, kad rastumėte darželius, aukles, būrelius ar specialistus.</p>
+        <p className="text-gray-500 dark:text-gray-400">Įveskite paieškos frazę, kad rastumėte darželius, aukles, būrelius ar specialistus.</p>
       </div>
     );
   }
 
-  // SQLite contains is case-insensitive for ASCII but not for Lithuanian chars.
-  // Use Prisma contains which maps to LIKE %...%
-  const searchFilter = (field: string) => ({ [field]: { contains: query } });
-
-  const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
-    prisma.kindergarten.findMany({
-      where: { OR: [searchFilter('name'), searchFilter('city'), searchFilter('description')] },
-      take: 20,
-      orderBy: { baseRating: 'desc' },
-    }),
-    prisma.aukle.findMany({
-      where: { OR: [searchFilter('name'), searchFilter('city'), searchFilter('description')] },
-      take: 20,
-      orderBy: { baseRating: 'desc' },
-    }),
-    prisma.burelis.findMany({
-      where: { OR: [searchFilter('name'), searchFilter('city'), searchFilter('description'), searchFilter('category')] },
-      take: 20,
-      orderBy: { baseRating: 'desc' },
-    }),
-    prisma.specialist.findMany({
-      where: { OR: [searchFilter('name'), searchFilter('city'), searchFilter('description'), searchFilter('specialty')] },
-      take: 20,
-      orderBy: { baseRating: 'desc' },
-    }),
+  // Fetch all and filter in JS for proper Lithuanian case-insensitive search
+  const [allKg, allAukles, allBureliai, allSpecialists] = await Promise.all([
+    prisma.kindergarten.findMany({ orderBy: { baseRating: 'desc' } }),
+    prisma.aukle.findMany({ orderBy: { baseRating: 'desc' } }),
+    prisma.burelis.findMany({ orderBy: { baseRating: 'desc' } }),
+    prisma.specialist.findMany({ orderBy: { baseRating: 'desc' } }),
   ]);
+
+  const kindergartens = allKg.filter((i) =>
+    matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query)
+  ).slice(0, 20);
+
+  const aukles = allAukles.filter((i) =>
+    matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query)
+  ).slice(0, 20);
+
+  const bureliai = allBureliai.filter((i) =>
+    matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query) || matchesSearch(i.category, query)
+  ).slice(0, 20);
+
+  const specialists = allSpecialists.filter((i) =>
+    matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query) || matchesSearch(i.specialty, query)
+  ).slice(0, 20);
 
   const serialize = <T extends { createdAt: Date; updatedAt?: Date }>(items: T[]) =>
     items.map((i) => ({ ...i, createdAt: i.createdAt.toISOString(), updatedAt: (i as { updatedAt?: Date }).updatedAt?.toISOString() ?? '' }));
@@ -69,10 +67,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
         Paieškos rezultatai: &bdquo;{query}&ldquo;
       </h1>
-      <p className="text-gray-500 mb-8">Rasta: {totalResults}</p>
+      <p className="text-gray-500 dark:text-gray-400 mb-8">Rasta: {totalResults}</p>
 
       {totalResults === 0 ? (
-        <p className="text-center text-gray-400 py-12">Nieko nerasta pagal &bdquo;{query}&ldquo;. Pabandykite kitą paieškos frazę.</p>
+        <p className="text-center text-gray-400 dark:text-gray-500 py-12">Nieko nerasta pagal &bdquo;{query}&ldquo;. Pabandykite kitą paieškos frazę.</p>
       ) : (
         <SearchResultsClient
           query={query}
