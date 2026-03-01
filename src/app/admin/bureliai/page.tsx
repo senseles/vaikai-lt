@@ -1,0 +1,81 @@
+'use client';
+
+import AdminTable from '@/components/admin/AdminTable';
+import type { ColumnDef, FieldDef } from '@/components/admin/AdminTable';
+
+const columns: ColumnDef[] = [
+  {
+    key: 'name',
+    label: 'Pavadinimas',
+    render: (val) => <span className="font-medium text-gray-900">{String(val ?? '')}</span>,
+  },
+  {
+    key: 'city',
+    label: 'Miestas',
+    render: (val) => <span className="text-gray-600">{String(val ?? '')}</span>,
+  },
+  {
+    key: 'category',
+    label: 'Kategorija',
+    render: (val) => {
+      const cat = String(val ?? '');
+      if (!cat || cat === '—') return <span className="text-gray-300">—</span>;
+      return (
+        <span className="text-xs px-2 py-1 rounded-full font-medium bg-orange-50 text-orange-700">
+          {cat}
+        </span>
+      );
+    },
+  },
+  {
+    key: 'baseRating',
+    label: 'Įvertinimas',
+    render: (val) => {
+      const r = Number(val ?? 0);
+      if (r === 0) return <span className="text-gray-300">—</span>;
+      return (
+        <span className="inline-flex items-center gap-1 text-sm">
+          <span className="text-yellow-500">★</span>
+          <span className="font-medium text-gray-700">{r.toFixed(1)}</span>
+        </span>
+      );
+    },
+  },
+  {
+    key: 'price',
+    label: 'Kaina',
+    render: (val) => <span className="text-gray-500 text-sm">{String(val ?? '—')}</span>,
+    hideOnMobile: true,
+  },
+];
+
+const fields: FieldDef[] = [
+  { key: 'name', label: 'Pavadinimas', type: 'text', required: true, placeholder: 'Būrelio pavadinimas' },
+  { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
+  { key: 'category', label: 'Kategorija', type: 'text', placeholder: 'Menai, sportas...' },
+  { key: 'subcategory', label: 'Subkategorija', type: 'text', placeholder: 'Piešimas, futbolas...' },
+  { key: 'ageRange', label: 'Amžiaus grupė', type: 'text', placeholder: '5-12 m.' },
+  { key: 'price', label: 'Kaina', type: 'text', placeholder: '50 €/mėn.' },
+  { key: 'schedule', label: 'Tvarkaraštis', type: 'text', placeholder: 'Pirm., Treč. 16:00' },
+  { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
+  { key: 'website', label: 'Svetainė', type: 'text', placeholder: 'https://...' },
+  { key: 'description', label: 'Aprašymas', type: 'textarea' },
+];
+
+export default function AdminBureliai() {
+  return (
+    <div>
+      <div className="mb-6">
+        <h1 className="text-lg font-bold text-gray-900">Būreliai</h1>
+        <p className="text-sm text-gray-500 mt-1">Tvarkykite būrelių sąrašą</p>
+      </div>
+      <AdminTable
+        apiPath="/api/admin/bureliai"
+        columns={columns}
+        fields={fields}
+        entityLabel="būrelių"
+        perPage={25}
+      />
+    </div>
+  );
+}

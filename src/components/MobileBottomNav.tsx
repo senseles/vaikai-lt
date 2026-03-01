@@ -31,18 +31,18 @@ export default function MobileBottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]" aria-label="Mobilusis meniu">
-      <div className="flex items-center justify-around h-16 px-2">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-t border-gray-200 dark:border-slate-700 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} aria-label="Mobilusis meniu">
+      <div className="flex items-center justify-around h-16 px-1">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href.replace('/#', '/')));
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center gap-0.5 min-w-[60px] py-1 rounded-lg transition-colors ${
+              className={`flex flex-col items-center justify-center gap-0.5 min-w-[60px] min-h-[48px] py-1 px-2 rounded-lg transition-colors active:bg-gray-100 dark:active:bg-slate-800 ${
                 isActive
                   ? 'text-primary dark:text-primary-light'
-                  : 'text-gray-500 dark:text-gray-400 active:text-primary'
+                  : 'text-gray-500 dark:text-gray-400'
               }`}
             >
               {item.icon(isActive)}
@@ -51,8 +51,6 @@ export default function MobileBottomNav() {
           );
         })}
       </div>
-      {/* Safe area for iOS notch */}
-      <div className="h-[env(safe-area-inset-bottom)]" />
     </nav>
   );
 }

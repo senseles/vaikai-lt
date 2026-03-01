@@ -48,8 +48,8 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-16">
-      <nav className="text-sm text-gray-500 dark:text-gray-400 mb-8" aria-label="Navigacija">
+    <div className="max-w-md mx-auto px-4 py-8 sm:py-16">
+      <nav className="text-sm text-gray-500 dark:text-gray-400 mb-6 sm:mb-8" aria-label="Navigacija">
         <Link href="/" className="hover:text-primary transition-colors">Pradžia</Link>
         <span className="mx-2">/</span>
         <span className="text-gray-800 dark:text-gray-200 font-medium">
@@ -57,8 +57,8 @@ export default function AuthPage() {
         </span>
       </nav>
 
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-5 sm:p-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
           {mode === 'login' ? 'Prisijungimas' : 'Registracija'}
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
@@ -72,7 +72,7 @@ export default function AuthPage() {
           <button
             type="button"
             onClick={() => { setMode('login'); setError(''); }}
-            className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`flex-1 py-2.5 min-h-[44px] text-sm font-medium rounded-md transition-colors ${
               mode === 'login'
                 ? 'bg-white dark:bg-slate-600 shadow-sm text-gray-900 dark:text-white'
                 : 'text-gray-600 dark:text-gray-400'
@@ -83,7 +83,7 @@ export default function AuthPage() {
           <button
             type="button"
             onClick={() => { setMode('register'); setError(''); }}
-            className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`flex-1 py-2.5 min-h-[44px] text-sm font-medium rounded-md transition-colors ${
               mode === 'register'
                 ? 'bg-white dark:bg-slate-600 shadow-sm text-gray-900 dark:text-white'
                 : 'text-gray-600 dark:text-gray-400'
@@ -106,7 +106,7 @@ export default function AuthPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Jūsų vardas"
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full px-4 py-3 min-h-[48px] rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white text-base focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
               />
             </div>
           )}
@@ -123,7 +123,7 @@ export default function AuthPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="jus@pavyzdys.lt"
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full px-4 py-3 min-h-[48px] rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white text-base focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
             />
           </div>
 
@@ -140,7 +140,7 @@ export default function AuthPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={mode === 'register' ? 'Mažiausiai 6 simboliai' : '••••••••'}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full px-4 py-3 min-h-[48px] rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white text-base focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
             />
           </div>
 
@@ -153,7 +153,7 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-lg bg-primary hover:bg-primary-dark text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 min-h-[48px] rounded-lg bg-primary hover:bg-primary-dark active:bg-primary-dark text-white font-semibold text-base transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Palaukite...' : mode === 'login' ? 'Prisijungti' : 'Registruotis'}
           </button>

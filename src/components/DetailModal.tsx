@@ -138,16 +138,16 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label={item.name} onClick={onClose}>
-      <div className="fixed inset-0 bg-black/40" />
+      <div className="fixed inset-0 bg-black/40 animate-backdrop" />
       <div
         ref={modalRef}
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white dark:bg-slate-800 w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-5 animate-slide-up"
+        className="relative bg-white dark:bg-slate-800 w-full sm:max-w-lg sm:rounded-xl rounded-t-2xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto overflow-x-hidden overscroll-contain p-4 sm:p-5 animate-modal-enter"
       >
         <button
           data-modal-close
           onClick={onClose}
-          className="absolute top-2 right-2 w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-500"
+          className="sticky top-0 float-right z-10 w-11 h-11 flex items-center justify-center rounded-full bg-gray-100/80 dark:bg-slate-700/80 backdrop-blur-sm hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-500 dark:text-gray-400 transition-colors"
           aria-label="Uždaryti"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -288,7 +288,7 @@ function MapEmbed({ address, city }: { readonly address: string; readonly city: 
     <div className="mt-4">
       <div className="rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
         {showMap ? (
-          <div className="relative h-48">
+          <div className="relative aspect-video sm:h-48 sm:aspect-auto">
             <iframe
               src={embedUrl}
               className="absolute inset-0 w-full h-full border-0"
@@ -357,8 +357,8 @@ function MapEmbed({ address, city }: { readonly address: string; readonly city: 
 
 function InfoRow({ label, value, link = false }: { readonly label: string; readonly value: string; readonly link?: boolean }) {
   return (
-    <div className="flex flex-col xs:flex-row gap-0.5 xs:gap-2 text-sm min-w-0">
-      <span className="text-gray-500 dark:text-gray-400 shrink-0">{label}:</span>
+    <div className="flex flex-col sm:flex-row gap-0.5 sm:gap-2 text-sm min-w-0">
+      <span className="text-gray-500 dark:text-gray-400 shrink-0 text-xs sm:text-sm uppercase sm:normal-case tracking-wide sm:tracking-normal">{label}:</span>
       {link ? (
         <a href={value.startsWith('http') ? value : `https://${value}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline break-all min-w-0">
           {value}

@@ -136,14 +136,14 @@ export default function CityPageClient({
   return (
     <>
       {/* Category Tabs */}
-      <nav className="flex gap-1 overflow-x-auto pb-2 mb-6 scrollbar-none" role="tablist">
+      <nav className="flex gap-1.5 overflow-x-auto pb-2 mb-6 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0" role="tablist">
         {categoryTabs.map((tab) => (
           <button
             key={tab.id}
             role="tab"
             aria-selected={category === tab.id}
             onClick={() => updateParams({ category: tab.id, type: '', sub: '', spec: '', page: '' })}
-            className={`px-4 py-2.5 min-h-[44px] text-sm font-semibold rounded-lg whitespace-nowrap transition-all duration-200 ${
+            className={`px-4 py-2.5 min-h-[44px] min-w-[5rem] text-sm font-semibold rounded-lg whitespace-nowrap transition-all duration-200 active:scale-[0.97] ${
               category === tab.id
                 ? 'bg-primary text-white shadow-sm shadow-primary/25'
                 : 'text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800'
@@ -164,7 +164,7 @@ export default function CityPageClient({
             value={searchParams.get('sub') ?? ''}
             onChange={(e) => updateParams({ sub: e.target.value })}
             aria-label="Pasirinkti kategoriją"
-            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-base sm:text-sm bg-white dark:bg-slate-700 dark:text-white"
+            className="w-full sm:w-auto border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 min-h-[44px] text-base bg-white dark:bg-slate-700 dark:text-white transition-colors focus:ring-2 focus:ring-primary/50 focus:border-primary"
           >
             <option value="">Visos kategorijos</option>
             {['Menai', 'Sportas', 'Muzika', 'Šokiai', 'Kalbos', 'IT', 'Gamta/Mokslas', 'Kita'].map((c) => (
@@ -177,7 +177,7 @@ export default function CityPageClient({
             value={searchParams.get('spec') ?? ''}
             onChange={(e) => updateParams({ spec: e.target.value })}
             aria-label="Pasirinkti specializaciją"
-            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-base sm:text-sm bg-white dark:bg-slate-700 dark:text-white"
+            className="w-full sm:w-auto border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 min-h-[44px] text-base bg-white dark:bg-slate-700 dark:text-white transition-colors focus:ring-2 focus:ring-primary/50 focus:border-primary"
           >
             <option value="">Visos specializacijos</option>
             {['Logopedas', 'Psichologas', 'Pediatras', 'Ergoterapeutas', 'Kineziterapeutas', 'Ortodontas', 'Alergologas'].map((s) => (
@@ -185,13 +185,13 @@ export default function CityPageClient({
             ))}
           </select>
         )}
-        {/* Area / district filter — shown when city has areas */}
+        {/* Area / district filter -- shown when city has areas */}
         {areas.length > 0 && (
           <select
             value={searchParams.get('area') ?? ''}
             onChange={(e) => updateParams({ area: e.target.value })}
             aria-label="Pasirinkti rajoną"
-            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-base sm:text-sm bg-white dark:bg-slate-700 dark:text-white"
+            className="w-full sm:w-auto border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 min-h-[44px] text-base bg-white dark:bg-slate-700 dark:text-white transition-colors focus:ring-2 focus:ring-primary/50 focus:border-primary"
           >
             <option value="">Visi rajonai</option>
             {areas.map((a) => (
@@ -199,7 +199,7 @@ export default function CityPageClient({
             ))}
           </select>
         )}
-        {/* Price range filter — shown for aukles and specialists */}
+        {/* Price range filter -- shown for aukles and specialists */}
         {(category === 'aukles' || category === 'specialistai') && (
           <PriceFilter
             value={searchParams.get('price') ?? ''}
@@ -257,18 +257,18 @@ export default function CityPageClient({
           <button
             disabled={page <= 1}
             onClick={() => updateParams({ page: String(page - 1) })}
-            className="px-4 py-2 text-sm border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-4 py-2.5 min-h-[44px] text-sm font-medium border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 active:bg-gray-100 dark:active:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
             aria-label={`Ankstesnis puslapis (${page - 1})`}
           >
             &larr; Ankstesnis
           </button>
-          <span className="text-sm text-gray-500 dark:text-gray-400" aria-current="page">
+          <span className="text-sm text-gray-500 dark:text-gray-400 px-2" aria-current="page">
             {page} / {tp}
           </span>
           <button
             disabled={page >= tp}
             onClick={() => updateParams({ page: String(page + 1) })}
-            className="px-4 py-2 text-sm border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-4 py-2.5 min-h-[44px] text-sm font-medium border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 active:bg-gray-100 dark:active:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
             aria-label={`Kitas puslapis (${page + 1})`}
           >
             Kitas &rarr;
@@ -278,17 +278,17 @@ export default function CityPageClient({
 
       {/* Compare bar */}
       {compareIds.size >= 2 && (
-        <div role="status" aria-live="polite" className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-primary text-white px-4 sm:px-6 py-3 rounded-full shadow-lg flex items-center gap-2 sm:gap-3 max-w-[90vw]">
-          <span className="text-sm font-medium">Pasirinkta: {compareIds.size}</span>
+        <div role="status" aria-live="polite" className="fixed bottom-[5.5rem] md:bottom-6 left-1/2 -translate-x-1/2 z-40 bg-primary text-white px-4 sm:px-6 py-3 rounded-full shadow-lg flex items-center gap-2 sm:gap-3 max-w-[calc(100%-2rem)] sm:max-w-md animate-scale-in">
+          <span className="text-sm font-medium whitespace-nowrap">Pasirinkta: {compareIds.size}</span>
           <button
             onClick={() => setShowCompare(true)}
-            className="bg-white text-primary font-semibold text-sm px-4 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
+            className="bg-white text-primary font-semibold text-sm px-4 py-1.5 min-h-[36px] rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors"
           >
             Palyginti
           </button>
           <button
             onClick={() => setCompareIds(new Set())}
-            className="text-white/70 hover:text-white text-sm underline"
+            className="text-white/70 hover:text-white text-sm underline min-h-[36px] flex items-center"
           >
             Išvalyti
           </button>

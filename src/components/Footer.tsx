@@ -4,11 +4,11 @@ import { toSlug } from "@/lib/utils";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <footer className="bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 mt-12 sm:mt-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {/* Brand */}
-          <div>
+          <div className="col-span-2 sm:col-span-1">
             <Link href="/" className="flex items-center gap-2 text-lg font-extrabold text-primary mb-3">
               <span aria-hidden="true">👶</span>
               <span>Vaikai<span className="text-secondary">.lt</span></span>
@@ -55,7 +55,7 @@ export default function Footer() {
           </div>
 
           {/* Newsletter + Info */}
-          <div>
+          <div className="col-span-2 sm:col-span-1">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm uppercase tracking-wider">Naujienlaiškis</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Gaukite naujausias žinias apie vaikiškų paslaugų naujienas.

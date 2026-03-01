@@ -79,24 +79,24 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(searchActionJsonLd) }}
       />
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-primary-bg via-white to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 md:py-24 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-bg via-white to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-10 md:py-24 overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-32 -left-32 w-[28rem] h-[28rem] bg-secondary/5 dark:bg-secondary/10 rounded-full blur-3xl" />
+          <div className="absolute -top-24 -right-24 w-72 sm:w-96 h-72 sm:h-96 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-32 -left-32 w-72 sm:w-[28rem] h-72 sm:h-[28rem] bg-secondary/5 dark:bg-secondary/10 rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <div className="animate-fade-in-up">
-            <p className="inline-block text-sm font-medium text-primary dark:text-green-400 bg-primary/10 dark:bg-green-900/30 px-4 py-1.5 rounded-full mb-6">
+            <p className="inline-block text-xs sm:text-sm font-medium text-primary dark:text-green-400 bg-primary/10 dark:bg-green-900/30 px-3 sm:px-4 py-1.5 rounded-full mb-4 sm:mb-6">
               Didžiausia vaikų paslaugų platforma Lietuvoje
             </p>
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-5 leading-tight">
+            <h1 className="text-[1.625rem] leading-tight sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4 sm:mb-5">
               Raskite geriausią darželį,{" "}
               <span className="text-primary dark:text-green-400">auklę ar būrelį</span>{" "}
               savo vaikui
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
               Atsiliepimai, vertinimai ir palyginimas — viskas vienoje vietoje.
               Patikima informacija iš tikrų tėvelių.
             </p>
@@ -104,15 +104,15 @@ export default async function HomePage() {
           <SearchBar />
 
           {/* Stats */}
-          <div className="mt-10 sm:mt-14 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-6">
+          <div className="mt-8 sm:mt-14 grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-6">
             {stats.map((stat, i) => (
               <div
                 key={stat.label}
-                className={`flex flex-col items-center min-h-[5rem] animate-fade-in-up stagger-${i + 1}`}
+                className={`flex flex-col items-center min-h-[4.5rem] sm:min-h-[5rem] animate-fade-in-up stagger-${i + 1}`}
               >
-                <span className="text-2xl sm:text-3xl mb-1" role="img" aria-hidden="true">{stat.emoji}</span>
-                <span className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</span>
-                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{stat.label}</span>
+                <span className="text-xl sm:text-3xl mb-0.5 sm:mb-1" role="img" aria-hidden="true">{stat.emoji}</span>
+                <span className="text-base sm:text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</span>
+                <span className="text-[11px] sm:text-sm text-gray-500 dark:text-gray-400">{stat.label}</span>
               </div>
             ))}
           </div>

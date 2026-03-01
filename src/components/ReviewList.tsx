@@ -51,7 +51,7 @@ export default function ReviewList({ itemId, itemType }: ReviewListProps) {
   if (reviews.length === 0) {
     return (
       <div className="text-center py-6">
-        <p className="text-gray-400 dark:text-gray-500 text-2xl mb-2">{'\u{1F4AC}'}</p>
+        <p className="text-gray-400 dark:text-gray-500 text-2xl mb-2">💬</p>
         <p className="text-sm text-gray-500 dark:text-gray-400">Atsiliepimų dar nėra.</p>
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Būkite pirmas ir pasidalinkite savo patirtimi!</p>
       </div>

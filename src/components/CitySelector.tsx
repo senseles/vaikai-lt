@@ -78,11 +78,11 @@ export default function CitySelector() {
         </h2>
 
         {/* Geolocation button */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-6 sm:mb-8">
           <button
             onClick={findNearest}
             disabled={locating}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary dark:text-green-400 bg-primary/10 dark:bg-green-900/30 rounded-full hover:bg-primary/20 dark:hover:bg-green-900/50 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm font-medium text-primary dark:text-green-400 bg-primary/10 dark:bg-green-900/30 rounded-full hover:bg-primary/20 dark:hover:bg-green-900/50 active:bg-primary/25 transition-colors disabled:opacity-50"
           >
             <svg className={`w-4 h-4 ${locating ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {locating ? (
@@ -96,15 +96,15 @@ export default function CitySelector() {
         </div>
 
         {/* Top cities */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-12">
-          {topCities.map((city) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mb-10 sm:mb-12">
+          {topCities.map((city, i) => (
             <Link
               key={city.slug}
               href={`/${city.slug}`}
-              className="flex flex-col items-center gap-2 p-5 rounded-xl bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 hover:border-primary dark:hover:border-primary-light hover:shadow-lg transition-all group min-h-[6rem]"
+              className={`flex flex-col items-center gap-1.5 sm:gap-2 p-4 sm:p-5 rounded-xl bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 hover:border-primary dark:hover:border-primary-light hover:shadow-lg active:shadow-sm active:scale-[0.98] transition-all group min-h-[5.5rem] sm:min-h-[6rem] ${i === topCities.length - 1 ? 'col-span-2 sm:col-span-1' : ''}`}
             >
-              <span className="text-3xl group-hover:scale-110 transition-transform">{city.emoji}</span>
-              <span className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-primary dark:group-hover:text-primary-light transition-colors">
+              <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">{city.emoji}</span>
+              <span className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200 group-hover:text-primary dark:group-hover:text-primary-light transition-colors">
                 {city.name}
               </span>
             </Link>
@@ -112,7 +112,7 @@ export default function CitySelector() {
         </div>
 
         {/* Regional cities */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8">
           {Object.entries(regionCities).map(([region, cities]) => (
             <div key={region}>
               <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
@@ -123,7 +123,7 @@ export default function CitySelector() {
                   <Link
                     key={city.slug}
                     href={`/${city.slug}`}
-                    className="px-3 py-1.5 text-sm rounded-full bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-primary-bg dark:hover:bg-primary-dark hover:text-primary-dark dark:hover:text-primary-bg transition-colors"
+                    className="px-3.5 py-2 min-h-[36px] text-sm rounded-full bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-primary-bg dark:hover:bg-primary-dark hover:text-primary-dark dark:hover:text-primary-bg active:scale-[0.97] transition-all"
                   >
                     {city.name}
                   </Link>

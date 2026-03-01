@@ -13,7 +13,7 @@ interface StarRatingProps {
 const sizeClasses = {
   sm: 'w-4 h-4',
   md: 'w-5 h-5',
-  lg: 'w-6 h-6',
+  lg: 'w-7 h-7',
 } as const;
 
 export default function StarRating({
@@ -29,7 +29,7 @@ export default function StarRating({
   const cls = sizeClasses[size];
 
   return (
-    <div className="flex items-center gap-0.5" role="img" aria-label={`Įvertinimas: ${rating} iš ${maxStars}`}>
+    <div className={`flex items-center ${interactive ? 'gap-1' : 'gap-0.5'}`} role="img" aria-label={`Įvertinimas: ${rating} iš ${maxStars}`}>
       {Array.from({ length: maxStars }, (_, i) => {
         const starValue = i + 1;
         const filled = displayRating >= starValue;
@@ -43,7 +43,7 @@ export default function StarRating({
             aria-hidden={!interactive}
             tabIndex={interactive ? 0 : -1}
             aria-label={interactive ? `${starValue} iš ${maxStars}` : undefined}
-            className={`${cls} ${interactive ? 'cursor-pointer' : 'cursor-default'} transition-colors`}
+            className={`${interactive ? 'w-8 h-8 p-1' : cls} ${interactive ? 'cursor-pointer hover:scale-110 active:scale-125' : 'cursor-default'} transition-all`}
             onClick={() => interactive && onChange?.(starValue)}
             onMouseEnter={() => interactive && setHoverRating(starValue)}
             onMouseLeave={() => interactive && setHoverRating(0)}

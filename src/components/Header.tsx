@@ -98,20 +98,20 @@ export default function Header() {
 
         {/* Mobile nav */}
         {mobileOpen && (
-          <nav className="md:hidden flex flex-col gap-1 pb-4 border-t border-gray-200 dark:border-slate-700 pt-3 animate-fade-in" aria-label="Mobilusis meniu">
+          <nav className="md:hidden flex flex-col gap-1 pb-4 border-t border-gray-200 dark:border-slate-700 pt-3 animate-slide-down" aria-label="Mobilusis meniu">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3 py-3 rounded-lg text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                className="px-3 py-3 min-h-[44px] flex items-center rounded-lg text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200 dark:active:bg-slate-700 transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-            <div className="flex items-center gap-2 mt-2 ml-3">
+            <div className="flex items-center gap-3 mt-2 px-3">
               <select
-                className="text-sm font-medium border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 min-h-[44px] bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300"
+                className="text-base font-medium border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 min-h-[44px] bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300"
                 value={locale}
                 onChange={handleLocaleChange}
                 aria-label={t('nav.language')}
@@ -121,7 +121,7 @@ export default function Header() {
               </select>
               <button
                 onClick={toggleDark}
-                className="w-11 h-11 flex items-center justify-center rounded-full border-2 border-gray-200 dark:border-slate-600 text-lg"
+                className="w-11 h-11 flex items-center justify-center rounded-full border-2 border-gray-200 dark:border-slate-600 hover:border-primary dark:hover:border-primary-light text-lg transition-colors"
                 aria-label={t('nav.darkMode')}
               >
                 {dark ? "☀️" : "🌙"}

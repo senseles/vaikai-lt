@@ -132,7 +132,7 @@ export default function SearchBar() {
             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
             onKeyDown={handleKeyDown}
             placeholder="Ieškoti darželio, auklės, būrelio..."
-            className="w-full px-5 py-3.5 pr-14 rounded-xl border-2 border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary dark:focus:border-primary-light focus:ring-4 focus:ring-primary/10 dark:focus:ring-primary/20 focus:outline-none transition-all text-base"
+            className="w-full px-4 sm:px-5 py-3.5 pr-14 rounded-xl border-2 border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary dark:focus:border-primary-light focus:ring-4 focus:ring-primary/10 dark:focus:ring-primary/20 focus:outline-none transition-all text-base"
             aria-label="Paieška"
             autoComplete="off"
             role="combobox"
@@ -169,10 +169,10 @@ export default function SearchBar() {
               key={`${s.type}-${s.name}-${i}`}
               role="option"
               aria-selected={i === selectedIdx}
-              className={`px-4 py-2.5 cursor-pointer flex items-center justify-between gap-2 transition-colors ${
+              className={`px-4 py-3 cursor-pointer flex items-center justify-between gap-2 transition-colors ${
                 i === selectedIdx
                   ? 'bg-primary/10 dark:bg-primary/20'
-                  : 'hover:bg-gray-50 dark:hover:bg-slate-700'
+                  : 'hover:bg-gray-50 dark:hover:bg-slate-700 active:bg-gray-100 dark:active:bg-slate-600'
               }`}
               onMouseEnter={() => setSelectedIdx(i)}
               onClick={() => navigateToSearch(s.name)}

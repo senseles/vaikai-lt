@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
         <span className="text-gray-800 dark:text-gray-200 font-medium">Privatumo politika</span>
       </nav>
 
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Privatumo politika</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8">Privatumo politika</h1>
 
       <div className="prose prose-gray dark:prose-invert max-w-none space-y-6 text-gray-700 dark:text-gray-300">
         <p className="text-sm text-gray-500 dark:text-gray-400">Paskutinis atnaujinimas: 2026-03-01</p>

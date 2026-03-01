@@ -170,3 +170,21 @@
 **Blockers:** None.
 
 **Notes:** DB counts unchanged from last sync — no new data ingestion this cycle. All 20 recent commits are quality/polish: a11y, SEO structured data, performance (React.memo, cache headers), and UX fixes. Build remains stable. Project is in a solid polishing phase.
+
+## SYNC 2026-03-01 15:00 (ET) / 22:00 (EET)
+
+**Commits (last 20):** Heavy activity — animations, 31K+ real reviews seeded, admin fixes, mobile CSS, a11y, SEO, error handling, Lithuanian diacritics fixes.
+
+**Build: ❌ FAIL** — Type error in `src/app/api/forum/comments/route.ts:17` — `parent` implicitly has type `any` (recursive reference). Quick fix: add explicit type annotation.
+
+**DB Status: ✅ Healthy**
+- Kindergartens: 2,531
+- Auklės: 150
+- Būreliai: 164
+- Specialists: 124
+- Reviews: 58,731
+
+**Blockers:**
+1. Build broken — forum comments API route type error must be fixed before deploy
+
+**Next:** Fix the `parent` type annotation in forum comments route, then verify clean build.

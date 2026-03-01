@@ -30,22 +30,22 @@ export default function CompareTable({ items, onClose }: CompareTableProps) {
   if (items.length < 2) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="Palyginimo lentelė" onClick={onClose}>
-      <div className="fixed inset-0 bg-black/40" />
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true" aria-label="Palyginimo lentelė" onClick={onClose}>
+      <div className="fixed inset-0 bg-black/40 animate-backdrop" />
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white dark:bg-slate-800 rounded-xl max-w-3xl w-full max-h-[80vh] overflow-auto p-5 animate-slide-up"
+        className="relative bg-white dark:bg-slate-800 w-full sm:max-w-3xl rounded-t-2xl sm:rounded-xl max-h-[90vh] sm:max-h-[80vh] overflow-auto overscroll-contain p-4 sm:p-5 animate-modal-enter"
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">Palyginimas</h2>
-          <button onClick={onClose} className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-500" aria-label="Uždaryti">
+          <button onClick={onClose} className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-500 transition-colors" aria-label="Uždaryti">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <div className="overflow-x-auto -mx-5 px-5" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="overflow-x-auto -mx-4 px-4 sm:-mx-5 sm:px-5 scrollbar-none" style={{ WebkitOverflowScrolling: 'touch' }}>
         <table className="w-full text-sm min-w-[320px]">
           <thead>
             <tr>

@@ -39,10 +39,10 @@ export default function Testimonials() {
           Ką sako tėveliai
         </h2>
 
-        <ul className="grid grid-cols-1 md:grid-cols-3 gap-6 list-none p-0 m-0">
+        <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 list-none p-0 m-0">
           {testimonials.map((t, i) => (
             <li key={`testimonial-${i}`}>
-              <blockquote className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 shadow-sm min-h-[10rem] hover:shadow-md transition-shadow h-full">
+              <blockquote className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 shadow-sm min-h-0 sm:min-h-[10rem] hover:shadow-md transition-shadow h-full">
                 <p className="italic text-gray-700 dark:text-gray-300 mb-4">
                   &ldquo;{t.quote}&rdquo;
                 </p>

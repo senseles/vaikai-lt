@@ -150,3 +150,72 @@ model Favorite {
 
   @@unique([itemId, itemType, sessionId])
 }
+
+model ForumCategory {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String?
+  icon        String?
+  order       Int         @default(0)
+  createdAt   DateTime    @default(now())
+  posts       ForumPost[]
+}
+
+model ForumPost {
+  id         String         @id @default(cuid())
+  title      String
+  slug       String         @unique
+  content    String
+  authorName String
+  authorId   String?
+  categoryId String
+  category   ForumCategory  @relation(fields: [categoryId], references: [id])
+  city       String?
+  upvotes    Int            @default(0)
+  downvotes  Int            @default(0)
+  viewCount  Int            @default(0)
+  isPinned   Boolean        @default(false)
+  isLocked   Boolean        @default(false)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  comments   ForumComment[]
+  votes      ForumVote[]
+
+  @@index([categoryId, createdAt])
+  @@index([slug])
+  @@index([createdAt])
+  @@index([upvotes])
+}
+
+model ForumComment {
+  id         String         @id @default(cuid())
+  postId     String
+  post       ForumPost      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parentId   String?
+  parent     ForumComment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies    ForumComment[] @relation("CommentReplies")
+  content    String
+  authorName String
+  authorId   String?
+  upvotes    Int            @default(0)
+  downvotes  Int            @default(0)
+  createdAt  DateTime       @default(now())
+  votes      ForumVote[]
+
+  @@index([postId, createdAt])
+  @@index([parentId])
+}
+
+model ForumVote {
+  id        String        @id @default(cuid())
+  postId    String?
+  post      ForumPost?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment   ForumComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  sessionId String
+  value     Int
+
+  @@unique([postId, sessionId])
+  @@unique([commentId, sessionId])
+}

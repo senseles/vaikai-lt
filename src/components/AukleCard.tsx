@@ -18,7 +18,7 @@ export default memo(function AukleCard({ item, onSelect }: AukleCardProps) {
       tabIndex={0}
       onClick={() => onSelect(item)}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(item); } }}
-      className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden group"
+      className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 active:shadow-sm transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden group"
     >
       <PlaceholderImage category="aukles" name={item.name} />
       <div className="p-4">
@@ -40,14 +40,14 @@ export default memo(function AukleCard({ item, onSelect }: AukleCardProps) {
         </div>
       )}
 
-      <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 mt-3">
+        <div className="flex items-center gap-2 shrink-0">
           <StarRating rating={item.baseRating} size="sm" />
           <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount})</span>
         </div>
-        <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-          {item.hourlyRate && <span>{item.hourlyRate}</span>}
-          {item.phone && <span>{item.phone}</span>}
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 truncate min-w-0">
+          {item.hourlyRate && <span className="shrink-0">{item.hourlyRate}</span>}
+          {item.phone && <span className="truncate">{item.phone}</span>}
         </div>
       </div>
       </div>

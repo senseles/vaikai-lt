@@ -119,7 +119,7 @@ export default function RecentlyViewed({ onItemClick }: RecentlyViewedProps) {
             Išvalyti
           </button>
         </div>
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
           {items.map((item) => {
             const badge = badgeConfig[item.itemType] ?? badgeConfig.kindergarten;
             return (
@@ -130,6 +130,7 @@ export default function RecentlyViewed({ onItemClick }: RecentlyViewedProps) {
                 className="flex-shrink-0 w-40 sm:w-48 min-h-[7rem] rounded-xl border border-gray-200 dark:border-gray-700
                   bg-white dark:bg-slate-800 p-3 text-left shadow-sm
                   hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600
+                  active:shadow-sm active:scale-[0.98]
                   transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <span

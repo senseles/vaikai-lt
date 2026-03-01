@@ -1,129 +1,42 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import type { Review, ItemType } from '@/types';
-import StarRating from '@/components/StarRating';
+import StatsCard from '@/components/admin/StatsCard';
 
-interface Stats {
-  kindergartens: number;
-  aukles: number;
-  bureliai: number;
-  specialists: number;
-  reviews: number;
-  pendingReviews: number;
+interface DashboardStats {
+  kindergartenCount: number;
+  aukleCount: number;
+  burelisCount: number;
+  specialistCount: number;
+  reviewCount: number;
+  pendingReviewCount: number;
+  forumPostCount: number;
+  recentReviews: {
+    id: string;
+    authorName: string;
+    rating: number;
+    text: string;
+    itemType: string;
+    isApproved: boolean;
+    createdAt: string;
+  }[];
+  recentForumPosts: {
+    id: string;
+    title: string;
+    authorName: string;
+    createdAt: string;
+  }[];
+  reviewsPerDay: { date: string; count: number }[];
+  entitiesPerWeek: { week: string; count: number }[];
 }
 
-type Tab = 'dashboard' | 'kindergartens' | 'aukles' | 'bureliai' | 'specialists' | 'reviews';
-
-// ─── Form field definitions per item type ───
-
-interface FieldDef {
-  key: string;
-  label: string;
-  type: 'text' | 'number' | 'select' | 'textarea';
-  required?: boolean;
-  options?: { value: string; label: string }[];
-  placeholder?: string;
-}
-
-const FIELDS: Record<ItemType, FieldDef[]> = {
-  kindergarten: [
-    { key: 'name', label: 'Pavadinimas', type: 'text', required: true, placeholder: 'Darželio pavadinimas' },
-    { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
-    { key: 'type', label: 'Tipas', type: 'select', options: [{ value: 'valstybinis', label: 'Valstybinis' }, { value: 'privatus', label: 'Privatus' }] },
-    { key: 'address', label: 'Adresas', type: 'text', placeholder: 'Gatvė 1' },
-    { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
-    { key: 'website', label: 'Svetainė', type: 'text', placeholder: 'https://...' },
-    { key: 'language', label: 'Kalba', type: 'text', placeholder: 'Lietuvių' },
-    { key: 'ageFrom', label: 'Amžius nuo (metai)', type: 'number' },
-    { key: 'groups', label: 'Grupių skaičius', type: 'number' },
-    { key: 'hours', label: 'Darbo laikas', type: 'text', placeholder: '7:00 – 18:00' },
-    { key: 'description', label: 'Aprašymas', type: 'textarea' },
-  ],
-  aukle: [
-    { key: 'name', label: 'Vardas', type: 'text', required: true, placeholder: 'Vardas Pavardė' },
-    { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
-    { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
-    { key: 'email', label: 'El. paštas', type: 'text', placeholder: 'el@pastas.lt' },
-    { key: 'experience', label: 'Patirtis', type: 'text', placeholder: '5 metai' },
-    { key: 'ageRange', label: 'Amžiaus grupė', type: 'text', placeholder: '1-6 m.' },
-    { key: 'hourlyRate', label: 'Valandinis tarifas', type: 'text', placeholder: '15 €/val.' },
-    { key: 'languages', label: 'Kalbos', type: 'text', placeholder: 'Lietuvių, anglų' },
-    { key: 'availability', label: 'Prieinamumas', type: 'text', placeholder: 'Darbo dienomis' },
-    { key: 'description', label: 'Aprašymas', type: 'textarea' },
-  ],
-  burelis: [
-    { key: 'name', label: 'Pavadinimas', type: 'text', required: true, placeholder: 'Būrelio pavadinimas' },
-    { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
-    { key: 'category', label: 'Kategorija', type: 'text', placeholder: 'Menai, sportas...' },
-    { key: 'subcategory', label: 'Subkategorija', type: 'text', placeholder: 'Piešimas, futbolas...' },
-    { key: 'ageRange', label: 'Amžiaus grupė', type: 'text', placeholder: '5-12 m.' },
-    { key: 'price', label: 'Kaina', type: 'text', placeholder: '50 €/mėn.' },
-    { key: 'schedule', label: 'Tvarkaraštis', type: 'text', placeholder: 'Pirm., Treč. 16:00' },
-    { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
-    { key: 'website', label: 'Svetainė', type: 'text', placeholder: 'https://...' },
-    { key: 'description', label: 'Aprašymas', type: 'textarea' },
-  ],
-  specialist: [
-    { key: 'name', label: 'Vardas', type: 'text', required: true, placeholder: 'Vardas Pavardė' },
-    { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
-    { key: 'specialty', label: 'Specializacija', type: 'text', placeholder: 'Logopedas, psichologas...' },
-    { key: 'clinic', label: 'Klinika', type: 'text', placeholder: 'Klinikos pavadinimas' },
-    { key: 'price', label: 'Kaina', type: 'text', placeholder: '40 €/vizitas' },
-    { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
-    { key: 'website', label: 'Svetainė', type: 'text', placeholder: 'https://...' },
-    { key: 'languages', label: 'Kalbos', type: 'text', placeholder: 'Lietuvių, anglų' },
-    { key: 'description', label: 'Aprašymas', type: 'textarea' },
-  ],
-};
-
-// ─── Phone validation helper ───
-
-function isValidPhone(phone: string): boolean {
-  if (!phone) return true; // phone is optional
-  const trimmed = phone.trim();
-  // +370XXXXXXXX or 8XXXXXXXX format
-  const internationalPattern = /^\+370\d{8}$/;
-  const localPattern = /^8\d{8}$/;
-  // Also allow formatted versions with spaces/dashes
-  const cleaned = trimmed.replace(/[\s\-()]/g, '');
-  return internationalPattern.test(cleaned) || localPattern.test(cleaned);
-}
-
-// ─── Main Admin Page ───
-
-export default function AdminPage() {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [activeTab, setActiveTab] = useState<Tab>('dashboard');
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [statsError, setStatsError] = useState(false);
-
-  const login = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-      if (res.ok) {
-        setAuthenticated(true);
-        setLoginError('');
-      } else {
-        setLoginError('Neteisingas slaptažodis');
-      }
-    } catch {
-      setLoginError('Tinklo klaida. Bandykite dar kartą.');
-    }
-  };
+export default function AdminDashboard() {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!authenticated) return;
     const controller = new AbortController();
-    setStatsError(false);
     fetch('/api/admin/stats', { signal: controller.signal })
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -131,114 +44,93 @@ export default function AdminPage() {
       })
       .then((res) => {
         if (res.success && res.data) {
-          const d = res.data;
-          setStats({
-            kindergartens: d.kindergartenCount ?? 0,
-            aukles: d.aukleCount ?? 0,
-            bureliai: d.burelisCount ?? 0,
-            specialists: d.specialistCount ?? 0,
-            reviews: d.reviewCount ?? 0,
-            pendingReviews: d.pendingReviewCount ?? 0,
-          });
+          setStats(res.data);
         }
       })
       .catch((err) => {
         if (controller.signal.aborted) return;
         console.error('Stats fetch error:', err);
-        setStatsError(true);
+        setError(true);
       });
     return () => controller.abort();
-  }, [authenticated]);
+  }, []);
 
-  if (!authenticated) {
+  if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 p-4">
-        <form onSubmit={login} className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border dark:border-slate-700 max-w-sm w-full space-y-4">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">Administravimas</h1>
-          <input
-            type="password"
-            placeholder="Slaptažodis"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-base focus:ring-2 focus:ring-blue-500"
-          />
-          {loginError && <p className="text-red-500 dark:text-red-400 text-sm">{loginError}</p>}
-          <button type="submit" className="w-full bg-blue-600 text-white rounded-lg py-3 min-h-[48px] text-base font-medium hover:bg-blue-700">
-            Prisijungti
-          </button>
-        </form>
+      <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+        <p className="text-red-600 font-medium">Nepavyko užkrauti statistikos</p>
+        <p className="text-red-500 text-sm mt-1">Perkraukite puslapį arba bandykite vėliau.</p>
       </div>
     );
   }
 
-  const tabs: { key: Tab; label: string; icon: string }[] = [
-    { key: 'dashboard', label: 'Suvestinė', icon: '\u{1F4CA}' },
-    { key: 'kindergartens', label: 'Darželiai', icon: '\u{1F3EB}' },
-    { key: 'aukles', label: 'Auklės', icon: '\u{1F469}‍\u{1F467}' },
-    { key: 'bureliai', label: 'Būreliai', icon: '\u{1F3A8}' },
-    { key: 'specialists', label: 'Specialistai', icon: '\u{1F468}‍⚕️' },
-    { key: 'reviews', label: 'Atsiliepimai', icon: '⭐' },
-  ];
-
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-      <header className="bg-white dark:bg-slate-800 border-b dark:border-slate-700 px-4 py-3">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 className="text-lg font-bold text-gray-900 dark:text-white">Vaikai.lt Admin</h1>
-          <button onClick={() => setAuthenticated(false)} className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-            Atsijungti
-          </button>
-        </div>
-      </header>
-
-      <div className="max-w-6xl mx-auto px-4 py-4">
-        {/* Breadcrumb */}
-        <nav className="text-sm text-gray-500 dark:text-gray-400 mb-4" aria-label="Navigacija">
-          <Link href="/" className="hover:text-primary transition-colors">Pradžia</Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-800 dark:text-gray-200 font-medium">Administravimas</span>
-        </nav>
-
-        <nav className="flex gap-1 overflow-x-auto mb-6 scrollbar-none pb-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`px-3 py-2.5 min-h-[44px] text-sm rounded-lg whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-                activeTab === tab.key ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <span>{tab.icon}</span>
-              {tab.label}
-            </button>
+  if (!stats) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div key={i} className="h-24 bg-gray-200 rounded-xl animate-pulse" />
           ))}
-        </nav>
-
-        {activeTab === 'dashboard' && <Dashboard stats={stats} error={statsError} />}
-        {activeTab === 'kindergartens' && <CrudTable itemType="kindergarten" label="Darželiai" />}
-        {activeTab === 'aukles' && <CrudTable itemType="aukle" label="Auklės" />}
-        {activeTab === 'bureliai' && <CrudTable itemType="burelis" label="Būreliai" />}
-        {activeTab === 'specialists' && <CrudTable itemType="specialist" label="Specialistai" />}
-        {activeTab === 'reviews' && <ReviewModeration />}
+        </div>
+        <div className="grid lg:grid-cols-2 gap-4">
+          <div className="h-64 bg-gray-200 rounded-xl animate-pulse" />
+          <div className="h-64 bg-gray-200 rounded-xl animate-pulse" />
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-// ─── Dashboard ───
-
-function Dashboard({ stats, error }: { readonly stats: Stats | null; readonly error?: boolean }) {
-  if (error) return <p className="text-red-500 dark:text-red-400">Nepavyko užkrauti statistikos. Perkraukite puslapį.</p>;
-  if (!stats) return <p className="text-gray-400">Kraunama...</p>;
+  const totalEntities = stats.kindergartenCount + stats.aukleCount + stats.burelisCount + stats.specialistCount;
 
   const cards = [
-    { label: 'Darželiai', count: stats.kindergartens, icon: '\u{1F3EB}', color: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800', textColor: 'text-blue-700 dark:text-blue-300', iconBg: 'bg-blue-100 dark:bg-blue-900/50' },
-    { label: 'Auklės', count: stats.aukles, icon: '\u{1F469}‍\u{1F467}', color: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800', textColor: 'text-green-700 dark:text-green-300', iconBg: 'bg-green-100 dark:bg-green-900/50' },
-    { label: 'Būreliai', count: stats.bureliai, icon: '\u{1F3A8}', color: 'bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800', textColor: 'text-orange-700 dark:text-orange-300', iconBg: 'bg-orange-100 dark:bg-orange-900/50' },
-    { label: 'Specialistai', count: stats.specialists, icon: '\u{1F468}‍⚕️', color: 'bg-teal-50 dark:bg-teal-900/30 border-teal-200 dark:border-teal-800', textColor: 'text-teal-700 dark:text-teal-300', iconBg: 'bg-teal-100 dark:bg-teal-900/50' },
-    { label: 'Atsiliepimai', count: stats.reviews, icon: '\u{1F4AC}', color: 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800', textColor: 'text-purple-700 dark:text-purple-300', iconBg: 'bg-purple-100 dark:bg-purple-900/50' },
-    { label: 'Laukia patvirtinimo', count: stats.pendingReviews, icon: '\u{23F3}', color: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800', textColor: 'text-red-700 dark:text-red-300', iconBg: 'bg-red-100 dark:bg-red-900/50' },
+    { icon: '▣', label: 'Darželiai', count: stats.kindergartenCount, color: 'blue' as const },
+    { icon: '♀', label: 'Auklės', count: stats.aukleCount, color: 'green' as const },
+    { icon: '◈', label: 'Būreliai', count: stats.burelisCount, color: 'orange' as const },
+    { icon: '✚', label: 'Specialistai', count: stats.specialistCount, color: 'teal' as const },
+    { icon: '★', label: 'Atsiliepimai', count: stats.reviewCount, color: 'purple' as const },
+    { icon: '⏳', label: 'Laukia patvirtinimo', count: stats.pendingReviewCount, color: 'red' as const },
+    { icon: '◬', label: 'Forumo įrašai', count: stats.forumPostCount ?? 0, color: 'blue' as const },
+    { icon: '∑', label: 'Viso įstaigų', count: totalEntities, color: 'teal' as const },
   ];
+
+  // Bar chart dimensions
+  const chartHeight = 140;
+
+  // Reviews per day chart
+  const reviewDays = stats.reviewsPerDay ?? [];
+  const maxReviewCount = Math.max(...reviewDays.map((d) => d.count), 1);
+
+  // Entities per week chart
+  const entityWeeks = stats.entitiesPerWeek ?? [];
+  const maxEntityCount = Math.max(...entityWeeks.map((w) => w.count), 1);
+
+  // Recent activity
+  const recentReviews = stats.recentReviews ?? [];
+  const recentPosts = stats.recentForumPosts ?? [];
+
+  // Merge and sort recent activity
+  const recentActivity = [
+    ...recentReviews.map((r) => ({
+      id: r.id,
+      type: 'review' as const,
+      title: `${r.authorName} — ${r.rating}★`,
+      subtitle: r.text.slice(0, 80) + (r.text.length > 80 ? '...' : ''),
+      badge: r.isApproved ? 'Patvirtintas' : 'Laukia',
+      badgeColor: r.isApproved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700',
+      date: r.createdAt,
+    })),
+    ...recentPosts.map((p) => ({
+      id: p.id,
+      type: 'forum' as const,
+      title: p.title,
+      subtitle: p.authorName,
+      badge: 'Forumas',
+      badgeColor: 'bg-blue-100 text-blue-700',
+      date: p.createdAt,
+    })),
+  ]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 10);
 
   const exportData = async (format: 'json' | 'csv') => {
     const res = await fetch(`/api/admin/export?format=${format}`);
@@ -253,536 +145,133 @@ function Dashboard({ stats, error }: { readonly stats: Stats | null; readonly er
   };
 
   return (
-    <div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+    <div className="space-y-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((c) => (
-          <div key={c.label} className={`rounded-xl p-4 border ${c.color} flex items-start gap-3`}>
-            <div className={`rounded-lg p-2 text-xl ${c.iconBg}`}>
-              {c.icon}
-            </div>
-            <div>
-              <p className={`text-2xl font-bold ${c.textColor}`}>{c.count}</p>
-              <p className={`text-sm ${c.textColor} opacity-80`}>{c.label}</p>
-            </div>
-          </div>
+          <StatsCard key={c.label} icon={c.icon} label={c.label} count={c.count} color={c.color} />
         ))}
       </div>
-      <div className="flex gap-2">
-        <button onClick={() => exportData('json')} className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+
+      {/* Quick Actions */}
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href="/admin/atsiliepimai"
+          className="px-4 py-2.5 text-sm bg-[#2d6a4f] text-white rounded-lg hover:bg-[#40916c] font-medium transition-colors inline-flex items-center gap-2"
+        >
+          <span>★</span> Tvirtinti atsiliepimus
+          {stats.pendingReviewCount > 0 && (
+            <span className="bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full">
+              {stats.pendingReviewCount}
+            </span>
+          )}
+        </Link>
+        <Link
+          href="/admin/forumas"
+          className="px-4 py-2.5 text-sm bg-slate-700 text-white rounded-lg hover:bg-slate-600 font-medium transition-colors inline-flex items-center gap-2"
+        >
+          <span>◬</span> Moderuoti forumą
+        </Link>
+        <button
+          onClick={() => exportData('json')}
+          className="px-4 py-2.5 text-sm bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+        >
           Eksportuoti JSON
         </button>
-        <button onClick={() => exportData('csv')} className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+        <button
+          onClick={() => exportData('csv')}
+          className="px-4 py-2.5 text-sm bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+        >
           Eksportuoti CSV
         </button>
       </div>
-    </div>
-  );
-}
 
-// ─── Item Form (Create / Edit) with validation ───
-
-interface ItemFormProps {
-  readonly itemType: ItemType;
-  readonly editItem?: Record<string, unknown> | null;
-  readonly onSave: () => void;
-  readonly onCancel: () => void;
-}
-
-function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
-  const fields = FIELDS[itemType];
-  const isEdit = !!editItem;
-
-  const getInitial = () => {
-    const data: Record<string, string> = {};
-    for (const f of fields) {
-      data[f.key] = editItem ? String(editItem[f.key] ?? '') : (f.type === 'select' && f.options ? f.options[0].value : '');
-    }
-    return data;
-  };
-
-  const [form, setForm] = useState<Record<string, string>>(getInitial);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-
-  const handleChange = (key: string, value: string) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-    // Clear field error on change
-    if (fieldErrors[key]) {
-      setFieldErrors((prev) => {
-        const next = { ...prev };
-        delete next[key];
-        return next;
-      });
-    }
-  };
-
-  const validate = (): boolean => {
-    const errors: Record<string, string> = {};
-
-    for (const f of fields) {
-      const val = form[f.key]?.trim() ?? '';
-
-      // Required field validation
-      if (f.required && !val) {
-        errors[f.key] = `${f.label} yra privalomas laukas`;
-      }
-
-      // Phone validation
-      if (f.key === 'phone' && val && !isValidPhone(val)) {
-        errors[f.key] = 'Telefonas turi prasidėti +370 arba 8 ir turėti 8 skaitmenis (pvz. +37061234567 arba 861234567)';
-      }
-
-      // Rating range validation (for number fields that look like ratings)
-      if (f.key === 'baseRating' && val) {
-        const num = Number(val);
-        if (isNaN(num) || num < 1 || num > 5) {
-          errors[f.key] = 'Įvertinimas turi būti nuo 1 iki 5';
-        }
-      }
-    }
-
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!validate()) return;
-
-    setSaving(true);
-
-    // Build body with proper types
-    const body: Record<string, unknown> = {};
-    for (const f of fields) {
-      const val = form[f.key]?.trim();
-      if (!val) continue;
-      if (f.type === 'number') {
-        body[f.key] = Number(val);
-      } else {
-        body[f.key] = val;
-      }
-    }
-
-    try {
-      const url = isEdit ? `/api/admin/${itemType}/${editItem!.id}` : `/api/admin/${itemType}`;
-      const method = isEdit ? 'PUT' : 'POST';
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok || data.success === false) {
-        setError(data.error || 'Nepavyko išsaugoti');
-        setSaving(false);
-        return;
-      }
-      onSave();
-    } catch {
-      setError('Tinklo klaida');
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 p-5 mb-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-gray-900 dark:text-white">
-          {isEdit ? 'Redaguoti' : 'Pridėti naują'}
-        </h3>
-        <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">Atsaukti</button>
-      </div>
-
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-3" noValidate>
-        {fields.map((f) => (
-          <div key={f.key} className={f.type === 'textarea' ? 'sm:col-span-2' : ''}>
-            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-              {f.label}{f.required && <span className="text-red-500 ml-0.5">*</span>}
-            </label>
-            {f.type === 'select' && f.options ? (
-              <select
-                value={form[f.key] || ''}
-                onChange={(e) => handleChange(f.key, e.target.value)}
-                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-base sm:text-sm`}
-              >
-                {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            ) : f.type === 'textarea' ? (
-              <textarea
-                value={form[f.key] || ''}
-                onChange={(e) => handleChange(f.key, e.target.value)}
-                placeholder={f.placeholder}
-                rows={3}
-                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-base sm:text-sm resize-none`}
-              />
-            ) : (
-              <input
-                type={f.type === 'number' ? 'number' : 'text'}
-                value={form[f.key] || ''}
-                onChange={(e) => handleChange(f.key, e.target.value)}
-                placeholder={f.placeholder}
-                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-base sm:text-sm`}
-              />
-            )}
-            {fieldErrors[f.key] && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1">{fieldErrors[f.key]}</p>
-            )}
-          </div>
-        ))}
-
-        {error && <p className="sm:col-span-2 text-red-500 dark:text-red-400 text-sm">{error}</p>}
-
-        <div className="sm:col-span-2 flex gap-2 pt-2">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
-          >
-            {saving ? 'Saugoma...' : isEdit ? 'Atnaujinti' : 'Pridėti'}
-          </button>
-          <button type="button" onClick={onCancel} className="px-4 py-2 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-            Atsaukti
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-// ─── Sort arrow indicator ───
-
-function SortArrow({ active, direction }: { readonly active: boolean; readonly direction: 'asc' | 'desc' }) {
-  if (!active) {
-    return <span className="text-gray-300 dark:text-gray-600 ml-1">{'↕'}</span>;
-  }
-  return <span className="text-blue-500 ml-1">{direction === 'asc' ? '↑' : '↓'}</span>;
-}
-
-// ─── CRUD Table with Create/Edit, Bulk Actions, Better UX ───
-
-function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: string }) {
-  const [items, setItems] = useState<Record<string, unknown>[]>([]);
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [sortBy, setSortBy] = useState('name');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-  const [showForm, setShowForm] = useState(false);
-  const [editItem, setEditItem] = useState<Record<string, unknown> | null>(null);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const perPage = 20;
-
-  const load = useCallback(async () => {
-    const params = new URLSearchParams({ search, page: String(page), limit: String(perPage), sort: sortBy });
-    const res = await fetch(`/api/admin/${itemType}?${params}`);
-    if (res.ok) {
-      const data = await res.json();
-      setItems(data.items ?? data);
-      setTotal(data.total ?? 0);
-    }
-  }, [search, page, sortBy, itemType]);
-
-  useEffect(() => { load(); }, [load]);
-
-  // Clear selection when data changes
-  useEffect(() => { setSelectedIds(new Set()); }, [items]);
-
-  const deleteItem = async (id: string) => {
-    if (!confirm('Ar tikrai norite ištrinti?')) return;
-    await fetch(`/api/admin/${itemType}/${id}`, { method: 'DELETE' });
-    load();
-  };
-
-  const handleEdit = (item: Record<string, unknown>) => {
-    setEditItem(item);
-    setShowForm(true);
-  };
-
-  const handleFormSave = () => {
-    setShowForm(false);
-    setEditItem(null);
-    load();
-  };
-
-  const handleFormCancel = () => {
-    setShowForm(false);
-    setEditItem(null);
-  };
-
-  const handleColumnSort = (column: string) => {
-    if (sortBy === column) {
-      setSortDir((d) => d === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(column);
-      setSortDir('asc');
-    }
-  };
-
-  // Bulk selection
-  const allSelected = items.length > 0 && items.every((item) => selectedIds.has(String(item.id)));
-
-  const toggleSelectAll = () => {
-    if (allSelected) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(items.map((item) => String(item.id))));
-    }
-  };
-
-  const toggleSelectItem = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  const handleBulkDelete = async () => {
-    if (selectedIds.size === 0) return;
-    if (!confirm(`Ar tikrai norite ištrinti ${selectedIds.size} įrašų?`)) return;
-    const promises = Array.from(selectedIds).map((id) =>
-      fetch(`/api/admin/${itemType}/${id}`, { method: 'DELETE' })
-    );
-    await Promise.all(promises);
-    setSelectedIds(new Set());
-    load();
-  };
-
-  const handleBulkExport = () => {
-    if (selectedIds.size === 0) return;
-    const selectedItems = items.filter((item) => selectedIds.has(String(item.id)));
-    const blob = new Blob([JSON.stringify(selectedItems, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${itemType}-export.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  // Sort items locally for display (API sort is primary, this adds direction)
-  const sortedItems = [...items].sort((a, b) => {
-    const aVal = a[sortBy];
-    const bVal = b[sortBy];
-    if (aVal == null && bVal == null) return 0;
-    if (aVal == null) return 1;
-    if (bVal == null) return -1;
-    const cmp = typeof aVal === 'number' && typeof bVal === 'number'
-      ? aVal - bVal
-      : String(aVal).localeCompare(String(bVal), 'lt');
-    return sortDir === 'asc' ? cmp : -cmp;
-  });
-
-  const totalPages = Math.max(1, Math.ceil(total / perPage));
-
-  return (
-    <div>
-      <div className="flex flex-col sm:flex-row gap-2 mb-4">
-        <input
-          type="text"
-          placeholder="Ieškoti..."
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-base sm:text-sm flex-1 focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          onClick={() => { setEditItem(null); setShowForm(true); }}
-          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap transition-colors"
-        >
-          + Pridėti
-        </button>
-      </div>
-
-      {showForm && (
-        <ItemForm
-          itemType={itemType}
-          editItem={editItem}
-          onSave={handleFormSave}
-          onCancel={handleFormCancel}
-        />
-      )}
-
-      <div className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 overflow-hidden">
-        <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 dark:bg-slate-800 border-b dark:border-slate-700">
-              <tr>
-                <th className="px-4 py-3 text-left w-10">
-                  <input
-                    type="checkbox"
-                    checked={allSelected}
-                    onChange={toggleSelectAll}
-                    className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
-                    aria-label="Pasirinkti visus"
-                  />
-                </th>
-                <th
-                  className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-                  onClick={() => handleColumnSort('name')}
-                >
-                  Pavadinimas
-                  <SortArrow active={sortBy === 'name'} direction={sortDir} />
-                </th>
-                <th
-                  className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-                  onClick={() => handleColumnSort('city')}
-                >
-                  Miestas
-                  <SortArrow active={sortBy === 'city'} direction={sortDir} />
-                </th>
-                <th
-                  className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-                  onClick={() => handleColumnSort('baseRating')}
-                >
-                  Įvertinimas
-                  <SortArrow active={sortBy === 'baseRating'} direction={sortDir} />
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 hidden md:table-cell">Aprašymas</th>
-                <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Veiksmai</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedItems.map((item, index) => (
-                <tr
-                  key={String(item.id)}
-                  className={`border-b border-gray-50 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-700/50 transition-colors cursor-default ${
-                    index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50/50 dark:bg-slate-800/50'
-                  } ${selectedIds.has(String(item.id)) ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
-                >
-                  <td className="px-4 py-2.5">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.has(String(item.id))}
-                      onChange={() => toggleSelectItem(String(item.id))}
-                      className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
-                      aria-label={`Pasirinkti ${String(item.name ?? '')}`}
+      {/* Charts */}
+      <div className="grid lg:grid-cols-2 gap-4">
+        {/* Reviews per day chart */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <h3 className="text-sm font-semibold text-gray-800 mb-4">Atsiliepimai per dieną (7 dienos)</h3>
+          {reviewDays.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-8">Nėra duomenų</p>
+          ) : (
+            <div className="flex items-end gap-2" style={{ height: chartHeight }}>
+              {reviewDays.map((d) => {
+                const barHeight = Math.max(4, (d.count / maxReviewCount) * chartHeight);
+                return (
+                  <div key={d.date} className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-xs text-gray-500 font-medium">{d.count}</span>
+                    <div
+                      className="w-full bg-[#2d6a4f] rounded-t-md transition-all duration-300"
+                      style={{ height: barHeight }}
                     />
-                  </td>
-                  <td className="px-4 py-2.5 text-gray-900 dark:text-white font-medium">{String(item.name ?? '')}</td>
-                  <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{String(item.city ?? '')}</td>
-                  <td className="px-4 py-2.5">
-                    <StarRating rating={Number(item.baseRating ?? 0)} size="sm" />
-                  </td>
-                  <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400 hidden md:table-cell">
-                    <span className="block max-w-xs truncate" title={String(item.description ?? '')}>
-                      {String(item.description ?? '—')}
+                    <span className="text-xs text-gray-400 whitespace-nowrap">
+                      {new Date(d.date).toLocaleDateString('lt-LT', { month: 'short', day: 'numeric' })}
                     </span>
-                  </td>
-                  <td className="px-4 py-2.5 text-right space-x-2 whitespace-nowrap">
-                    <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700 text-sm transition-colors">
-                      Redaguoti
-                    </button>
-                    <button onClick={() => deleteItem(String(item.id))} className="text-red-500 hover:text-red-700 text-sm transition-colors">
-                      Ištrinti
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {items.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Nėra duomenų</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between mt-3">
-        <p className="text-sm text-gray-500 dark:text-gray-400">Viso: {total} | Puslapis {page}/{totalPages}</p>
-        <div className="flex gap-1">
-          <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">{'←'}</button>
-          <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">{'→'}</button>
-        </div>
-      </div>
-
-      {/* Floating bulk action bar */}
-      {selectedIds.size > 0 && (
-        <div className="fixed bottom-4 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-50 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded-xl shadow-lg px-4 py-3 flex flex-wrap items-center justify-center gap-2 sm:gap-4">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Pasirinkta: {selectedIds.size}
-          </span>
-          <button
-            onClick={handleBulkDelete}
-            className="px-3 py-1.5 min-h-[44px] text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
-          >
-            Ištrinti ({selectedIds.size})
-          </button>
-          <button
-            onClick={handleBulkExport}
-            className="px-3 py-1.5 min-h-[44px] text-sm bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 font-medium transition-colors"
-          >
-            Eksportuoti
-          </button>
-          <button
-            onClick={() => setSelectedIds(new Set())}
-            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors min-h-[44px]"
-          >
-            Atsaukti
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Review Moderation ───
-
-function ReviewModeration() {
-  const [reviews, setReviews] = useState<Review[]>([]);
-
-  const load = useCallback(async () => {
-    const res = await fetch('/api/admin/reviews?pending=true');
-    if (res.ok) setReviews(await res.json());
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
-
-  const [actionError, setActionError] = useState('');
-
-  const action = async (id: string, act: 'approve' | 'delete') => {
-    setActionError('');
-    try {
-      const res = act === 'approve'
-        ? await fetch(`/api/admin/reviews/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isApproved: true }) })
-        : await fetch(`/api/admin/reviews/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error(`Klaida: ${res.status}`);
-      load();
-    } catch {
-      setActionError('Nepavyko atlikti veiksmo. Bandykite dar kartą.');
-    }
-  };
-
-  return (
-    <div className="space-y-3">
-      <h3 className="font-semibold text-gray-900 dark:text-white">Laukiantys patvirtinimo</h3>
-      {actionError && <p className="text-sm text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">{actionError}</p>}
-      {reviews.length === 0 && <p className="text-sm text-gray-400">Nėra laukiančių atsiliepimuų.</p>}
-      {reviews.map((r) => (
-        <div key={r.id} className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="font-medium text-gray-900 dark:text-white">{r.authorName}</span>
-              <span className="text-xs text-gray-400 ml-2">{r.itemType} {'·'} {new Date(r.createdAt).toLocaleDateString('lt-LT')}</span>
+                  </div>
+                );
+              })}
             </div>
-            <StarRating rating={r.rating} size="sm" />
-          </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{r.text}</p>
-          <div className="flex gap-2 mt-3">
-            <button onClick={() => action(r.id, 'approve')} className="px-3 py-1 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-              Patvirtinti
-            </button>
-            <button onClick={() => action(r.id, 'delete')} className="px-3 py-1 text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-              Ištrinti
-            </button>
-          </div>
+          )}
         </div>
-      ))}
+
+        {/* Entities per week chart */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <h3 className="text-sm font-semibold text-gray-800 mb-4">Nauji įrašai per savaitę (4 savaitės)</h3>
+          {entityWeeks.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-8">Nėra duomenų</p>
+          ) : (
+            <div className="flex items-end gap-3" style={{ height: chartHeight }}>
+              {entityWeeks.map((w) => {
+                const barHeight = Math.max(4, (w.count / maxEntityCount) * chartHeight);
+                return (
+                  <div key={w.week} className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-xs text-gray-500 font-medium">{w.count}</span>
+                    <div
+                      className="w-full bg-teal-500 rounded-t-md transition-all duration-300"
+                      style={{ height: barHeight }}
+                    />
+                    <span className="text-xs text-gray-400 whitespace-nowrap">{w.week}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="bg-white rounded-xl border border-gray-200">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h3 className="text-sm font-semibold text-gray-800">Naujausia veikla</h3>
+        </div>
+        {recentActivity.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-8">Nėra naujausios veiklos</p>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {recentActivity.map((item) => (
+              <div key={`${item.type}-${item.id}`} className="px-5 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${
+                  item.type === 'review' ? 'bg-purple-50 text-purple-600' : 'bg-blue-50 text-blue-600'
+                }`}>
+                  {item.type === 'review' ? '★' : '◬'}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-medium text-gray-800 truncate">{item.title}</p>
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${item.badgeColor}`}>
+                      {item.badge}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 truncate mt-0.5">{item.subtitle}</p>
+                </div>
+                <time className="text-xs text-gray-400 flex-shrink-0 whitespace-nowrap">
+                  {new Date(item.date).toLocaleDateString('lt-LT', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </time>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
