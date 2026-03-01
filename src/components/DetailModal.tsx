@@ -1,11 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import type { Kindergarten, Aukle, Burelis, Specialist, ItemType } from '@/types';
 import StarRating from './StarRating';
 import ReviewList from './ReviewList';
 import ReviewForm from './ReviewForm';
 import { addToRecentlyViewed } from './RecentlyViewed';
+
+const DIACRITICS: Record<string, string> = { ą: 'a', č: 'c', ę: 'e', ė: 'e', į: 'i', š: 's', ų: 'u', ū: 'u', ž: 'z' };
+function citySlug(name: string): string {
+  return name.toLowerCase().replace(/[ąčęėįšųūž]/g, (c) => DIACRITICS[c] ?? c);
+}
 
 type DetailItem = Kindergarten | Aukle | Burelis | Specialist;
 
@@ -28,6 +34,9 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handler);
     document.body.style.overflow = 'hidden';
+    // Focus the close button when the modal opens
+    const closeBtn = document.querySelector<HTMLButtonElement>('[data-modal-close]');
+    closeBtn?.focus();
     return () => {
       document.removeEventListener('keydown', handler);
       document.body.style.overflow = '';
@@ -112,13 +121,14 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label={item.name} onClick={onClose}>
       <div className="fixed inset-0 bg-black/40" />
       <div
         onClick={(e) => e.stopPropagation()}
         className="relative bg-white dark:bg-slate-800 w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-5 animate-slide-up"
       >
         <button
+          data-modal-close
           onClick={onClose}
           className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-500"
           aria-label="Uždaryti"
@@ -129,7 +139,13 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
         </button>
 
         <h2 className="text-xl font-bold text-gray-900 dark:text-white pr-8">{item.name}</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{item.city}</p>
+        <Link
+          href={`/${citySlug(item.city)}`}
+          onClick={onClose}
+          className="inline-block text-sm text-gray-500 dark:text-gray-400 mt-0.5 hover:text-primary dark:hover:text-primary-light transition-colors"
+        >
+          {item.city} &rarr;
+        </Link>
 
         <div className="flex items-center gap-2 mt-2">
           <StarRating rating={item.baseRating} />

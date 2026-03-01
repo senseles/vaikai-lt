@@ -9,10 +9,25 @@ interface SearchPageProps {
 
 export async function generateMetadata({ searchParams }: SearchPageProps) {
   const q = searchParams.q ?? '';
+  const title = q ? `\u201E${q}\u201C \u2014 Paie\u0161ka | Vaikai.lt` : 'Paie\u0161ka | Vaikai.lt';
+  const description = 'Ie\u0161kokite dar\u017eeli\u0173, aukli\u0173, b\u016breli\u0173 ir specialist\u0173 visoje Lietuvoje.';
   return {
-    title: q ? `„${q}" — Paieška | Vaikai.lt` : 'Paieška | Vaikai.lt',
-    description: 'Ieškokite darželių, auklių, būrelių ir specialistų visoje Lietuvoje.',
+    title,
+    description,
     alternates: { canonical: 'https://vaikai.lt/paieska' },
+    openGraph: {
+      title,
+      description,
+      url: 'https://vaikai.lt/paieska',
+      siteName: 'Vaikai.lt',
+      locale: 'lt_LT',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image' as const,
+      title,
+      description,
+    },
   };
 }
 

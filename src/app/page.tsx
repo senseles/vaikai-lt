@@ -60,8 +60,24 @@ export default async function HomePage() {
     { label: "Atsiliepimai", value: s.reviews.toLocaleString('lt-LT'), emoji: "⭐" },
   ];
 
+  const searchActionJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Vaikai.lt',
+    url: 'https://vaikai.lt',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: 'https://vaikai.lt/paieska?q={search_term_string}',
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(searchActionJsonLd) }}
+      />
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-primary-bg via-white to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-16 md:py-24 overflow-hidden">
         {/* Decorative background elements */}
