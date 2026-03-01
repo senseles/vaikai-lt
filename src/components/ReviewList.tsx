@@ -12,6 +12,7 @@ interface ReviewListProps {
 export default function ReviewList({ itemId, itemType }: ReviewListProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -20,7 +21,11 @@ export default function ReviewList({ itemId, itemType }: ReviewListProps) {
         if (res.ok) {
           const data = await res.json();
           setReviews(data);
+        } else {
+          setError(true);
         }
+      } catch {
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -30,12 +35,20 @@ export default function ReviewList({ itemId, itemType }: ReviewListProps) {
 
   if (loading) return <p className="text-sm text-gray-400 dark:text-gray-500">Kraunami atsiliepimai...</p>;
 
+  if (error) {
+    return (
+      <p className="text-sm text-red-500 dark:text-red-400 py-4 text-center">
+        Nepavyko u\u017ekrauti atsiliepimu\u0173. Pabandykite v\u0117liau.
+      </p>
+    );
+  }
+
   if (reviews.length === 0) {
     return (
       <div className="text-center py-6">
         <p className="text-gray-400 dark:text-gray-500 text-2xl mb-2">{'\u{1F4AC}'}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Atsiliepimu dar nera.</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Bukite pirmas ir pasidalinkite savo patirtimi!</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Atsiliepimu\u0173 dar n\u0117ra.</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">B\u016bkite pirmas ir pasidalinkite savo patirtimi!</p>
       </div>
     );
   }
@@ -98,18 +111,18 @@ function ReviewItem({ review }: { readonly review: Review }) {
           <button
             onClick={handleReport}
             className="text-xs text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1"
-            title="Pranesti apie atsiliepima"
+            title="Prane\u0161ti apie atsiliepimu\u0105"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2z" />
             </svg>
-            Pranesti
+            Prane\u0161ti
           </button>
         )}
 
         {reportState === 'confirming' && (
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-gray-500 dark:text-gray-400">Ar tikrai norite pranesti apie si atsiliepima?</span>
+            <span className="text-gray-500 dark:text-gray-400">Ar tikrai norite prane\u0161ti apie \u0161\u012f atsiliepimu\u0105?</span>
             <button
               onClick={handleReport}
               className="text-red-500 hover:text-red-700 font-medium transition-colors"
@@ -126,15 +139,15 @@ function ReviewItem({ review }: { readonly review: Review }) {
         )}
 
         {reportState === 'sending' && (
-          <span className="text-xs text-gray-400">Siunciama...</span>
+          <span className="text-xs text-gray-400">Siun\u010diama...</span>
         )}
 
         {reportState === 'sent' && (
-          <span className="text-xs text-green-600 dark:text-green-400">Aciu! Jusu pranesimas bus perzeturetas.</span>
+          <span className="text-xs text-green-600 dark:text-green-400">A\u010di\u016b! J\u016bsu\u0173 prane\u0161imas bus per\u017ei\u016br\u0117tas.</span>
         )}
 
         {reportState === 'error' && (
-          <span className="text-xs text-red-500">Nepavyko issiusti. Bandykite veliau.</span>
+          <span className="text-xs text-red-500">Nepavyko i\u0161si\u0173sti. Bandykite v\u0117liau.</span>
         )}
       </div>
     </div>
