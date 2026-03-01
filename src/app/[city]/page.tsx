@@ -79,7 +79,6 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   const sub = searchParams.sub ?? '';
   const spec = searchParams.spec ?? '';
   const area = searchParams.area ?? '';
-  const price = searchParams.price ?? '';
 
   // Apply area filter to all categories
   if (area) kindergartenWhere.area = area;
