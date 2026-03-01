@@ -159,12 +159,12 @@ export default function AdminPage() {
   }
 
   const tabs: { key: Tab; label: string; icon: string }[] = [
-    { key: 'dashboard', label: 'Suvestin\u0117', icon: '\u{1F4CA}' },
-    { key: 'kindergartens', label: 'Dar\u017eeliai', icon: '\u{1F3EB}' },
-    { key: 'aukles', label: 'Aukl\u0117s', icon: '\u{1F469}\u200D\u{1F467}' },
-    { key: 'bureliai', label: 'B\u016breliai', icon: '\u{1F3A8}' },
-    { key: 'specialists', label: 'Specialistai', icon: '\u{1F468}\u200D\u2695\uFE0F' },
-    { key: 'reviews', label: 'Atsiliepimai', icon: '\u2B50' },
+    { key: 'dashboard', label: 'Suvestinė', icon: '\u{1F4CA}' },
+    { key: 'kindergartens', label: 'Darželiai', icon: '\u{1F3EB}' },
+    { key: 'aukles', label: 'Auklės', icon: '\u{1F469}‍\u{1F467}' },
+    { key: 'bureliai', label: 'Būreliai', icon: '\u{1F3A8}' },
+    { key: 'specialists', label: 'Specialistai', icon: '\u{1F468}‍⚕️' },
+    { key: 'reviews', label: 'Atsiliepimai', icon: '⭐' },
   ];
 
   return (
@@ -181,7 +181,7 @@ export default function AdminPage() {
       <div className="max-w-6xl mx-auto px-4 py-4">
         {/* Breadcrumb */}
         <nav className="text-sm text-gray-500 dark:text-gray-400 mb-4" aria-label="Navigacija">
-          <Link href="/" className="hover:text-primary transition-colors">Prad\u017eia</Link>
+          <Link href="/" className="hover:text-primary transition-colors">Pradžia</Link>
           <span className="mx-2">/</span>
           <span className="text-gray-800 dark:text-gray-200 font-medium">Administravimas</span>
         </nav>
@@ -202,9 +202,9 @@ export default function AdminPage() {
         </nav>
 
         {activeTab === 'dashboard' && <Dashboard stats={stats} />}
-        {activeTab === 'kindergartens' && <CrudTable itemType="kindergarten" label="Dar\u017eeliai" />}
-        {activeTab === 'aukles' && <CrudTable itemType="aukle" label="Aukl\u0117s" />}
-        {activeTab === 'bureliai' && <CrudTable itemType="burelis" label="B\u016breliai" />}
+        {activeTab === 'kindergartens' && <CrudTable itemType="kindergarten" label="Darželiai" />}
+        {activeTab === 'aukles' && <CrudTable itemType="aukle" label="Auklės" />}
+        {activeTab === 'bureliai' && <CrudTable itemType="burelis" label="Būreliai" />}
         {activeTab === 'specialists' && <CrudTable itemType="specialist" label="Specialistai" />}
         {activeTab === 'reviews' && <ReviewModeration />}
       </div>
@@ -218,10 +218,10 @@ function Dashboard({ stats }: { readonly stats: Stats | null }) {
   if (!stats) return <p className="text-gray-400">Kraunama...</p>;
 
   const cards = [
-    { label: 'Dar\u017eeliai', count: stats.kindergartens, icon: '\u{1F3EB}', color: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800', textColor: 'text-blue-700 dark:text-blue-300', iconBg: 'bg-blue-100 dark:bg-blue-900/50' },
-    { label: 'Aukl\u0117s', count: stats.aukles, icon: '\u{1F469}\u200D\u{1F467}', color: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800', textColor: 'text-green-700 dark:text-green-300', iconBg: 'bg-green-100 dark:bg-green-900/50' },
-    { label: 'B\u016breliai', count: stats.bureliai, icon: '\u{1F3A8}', color: 'bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800', textColor: 'text-orange-700 dark:text-orange-300', iconBg: 'bg-orange-100 dark:bg-orange-900/50' },
-    { label: 'Specialistai', count: stats.specialists, icon: '\u{1F468}\u200D\u2695\uFE0F', color: 'bg-teal-50 dark:bg-teal-900/30 border-teal-200 dark:border-teal-800', textColor: 'text-teal-700 dark:text-teal-300', iconBg: 'bg-teal-100 dark:bg-teal-900/50' },
+    { label: 'Darželiai', count: stats.kindergartens, icon: '\u{1F3EB}', color: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800', textColor: 'text-blue-700 dark:text-blue-300', iconBg: 'bg-blue-100 dark:bg-blue-900/50' },
+    { label: 'Auklės', count: stats.aukles, icon: '\u{1F469}‍\u{1F467}', color: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800', textColor: 'text-green-700 dark:text-green-300', iconBg: 'bg-green-100 dark:bg-green-900/50' },
+    { label: 'Būreliai', count: stats.bureliai, icon: '\u{1F3A8}', color: 'bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800', textColor: 'text-orange-700 dark:text-orange-300', iconBg: 'bg-orange-100 dark:bg-orange-900/50' },
+    { label: 'Specialistai', count: stats.specialists, icon: '\u{1F468}‍⚕️', color: 'bg-teal-50 dark:bg-teal-900/30 border-teal-200 dark:border-teal-800', textColor: 'text-teal-700 dark:text-teal-300', iconBg: 'bg-teal-100 dark:bg-teal-900/50' },
     { label: 'Atsiliepimai', count: stats.reviews, icon: '\u{1F4AC}', color: 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800', textColor: 'text-purple-700 dark:text-purple-300', iconBg: 'bg-purple-100 dark:bg-purple-900/50' },
     { label: 'Laukia patvirtinimo', count: stats.pendingReviews, icon: '\u{23F3}', color: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800', textColor: 'text-red-700 dark:text-red-300', iconBg: 'bg-red-100 dark:bg-red-900/50' },
   ];
@@ -316,14 +316,14 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
 
       // Phone validation
       if (f.key === 'phone' && val && !isValidPhone(val)) {
-        errors[f.key] = 'Telefonas turi prasid\u0117ti +370 arba 8 ir tur\u0117ti 8 skaitmenis (pvz. +37061234567 arba 861234567)';
+        errors[f.key] = 'Telefonas turi prasidėti +370 arba 8 ir turėti 8 skaitmenis (pvz. +37061234567 arba 861234567)';
       }
 
       // Rating range validation (for number fields that look like ratings)
       if (f.key === 'baseRating' && val) {
         const num = Number(val);
         if (isNaN(num) || num < 1 || num > 5) {
-          errors[f.key] = '\u012evertinimas turi b\u016bti nuo 1 iki 5';
+          errors[f.key] = 'Įvertinimas turi būti nuo 1 iki 5';
         }
       }
     }
@@ -362,7 +362,7 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
       });
       const data = await res.json();
       if (!res.ok || data.success === false) {
-        setError(data.error || 'Nepavyko i\u0161saugoti');
+        setError(data.error || 'Nepavyko išsaugoti');
         setSaving(false);
         return;
       }
@@ -377,7 +377,7 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
     <div className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 p-5 mb-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-900 dark:text-white">
-          {isEdit ? 'Redaguoti' : 'Prid\u0117ti nauj\u0105'}
+          {isEdit ? 'Redaguoti' : 'Pridėti naują'}
         </h3>
         <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">Atsaukti</button>
       </div>
@@ -427,7 +427,7 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
             disabled={saving}
             className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
           >
-            {saving ? 'Saugoma...' : isEdit ? 'Atnaujinti' : 'Prid\u0117ti'}
+            {saving ? 'Saugoma...' : isEdit ? 'Atnaujinti' : 'Pridėti'}
           </button>
           <button type="button" onClick={onCancel} className="px-4 py-2 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
             Atsaukti
@@ -442,9 +442,9 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
 
 function SortArrow({ active, direction }: { readonly active: boolean; readonly direction: 'asc' | 'desc' }) {
   if (!active) {
-    return <span className="text-gray-300 dark:text-gray-600 ml-1">{'\u2195'}</span>;
+    return <span className="text-gray-300 dark:text-gray-600 ml-1">{'↕'}</span>;
   }
-  return <span className="text-blue-500 ml-1">{direction === 'asc' ? '\u2191' : '\u2193'}</span>;
+  return <span className="text-blue-500 ml-1">{direction === 'asc' ? '↑' : '↓'}</span>;
 }
 
 // ─── CRUD Table with Create/Edit, Bulk Actions, Better UX ───
@@ -477,7 +477,7 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
   useEffect(() => { setSelectedIds(new Set()); }, [items]);
 
   const deleteItem = async (id: string) => {
-    if (!confirm('Ar tikrai norite i\u0161trinti?')) return;
+    if (!confirm('Ar tikrai norite ištrinti?')) return;
     await fetch(`/api/admin/${itemType}/${id}`, { method: 'DELETE' });
     load();
   };
@@ -532,7 +532,7 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
 
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
-    if (!confirm(`Ar tikrai norite i\u0161trinti ${selectedIds.size} \u012fra\u0161\u0173?`)) return;
+    if (!confirm(`Ar tikrai norite ištrinti ${selectedIds.size} įrašų?`)) return;
     const promises = Array.from(selectedIds).map((id) =>
       fetch(`/api/admin/${itemType}/${id}`, { method: 'DELETE' })
     );
@@ -573,7 +573,7 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
       <div className="flex flex-col sm:flex-row gap-2 mb-4">
         <input
           type="text"
-          placeholder="Ie\u0161koti..."
+          placeholder="Ieškoti..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           className="border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm flex-1 focus:ring-2 focus:ring-blue-500"
@@ -582,7 +582,7 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
           onClick={() => { setEditItem(null); setShowForm(true); }}
           className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap transition-colors"
         >
-          + Prid\u0117ti
+          + Pridėti
         </button>
       </div>
 
@@ -627,10 +627,10 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
                   className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
                   onClick={() => handleColumnSort('baseRating')}
                 >
-                  \u012evertinimas
+                  Įvertinimas
                   <SortArrow active={sortBy === 'baseRating'} direction={sortDir} />
                 </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 hidden md:table-cell">Apra\u0161ymas</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 hidden md:table-cell">Aprašymas</th>
                 <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Veiksmai</th>
               </tr>
             </thead>
@@ -658,7 +658,7 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
                   </td>
                   <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400 hidden md:table-cell">
                     <span className="block max-w-xs truncate" title={String(item.description ?? '')}>
-                      {String(item.description ?? '\u2014')}
+                      {String(item.description ?? '—')}
                     </span>
                   </td>
                   <td className="px-4 py-2.5 text-right space-x-2 whitespace-nowrap">
@@ -666,13 +666,13 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
                       Redaguoti
                     </button>
                     <button onClick={() => deleteItem(String(item.id))} className="text-red-500 hover:text-red-700 text-sm transition-colors">
-                      I\u0161trinti
+                      Ištrinti
                     </button>
                   </td>
                 </tr>
               ))}
               {items.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">N\u0117ra duomen\u0173</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Nėra duomenų</td></tr>
               )}
             </tbody>
           </table>
@@ -682,8 +682,8 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
       <div className="flex items-center justify-between mt-3">
         <p className="text-sm text-gray-500 dark:text-gray-400">Viso: {total} | Puslapis {page}/{totalPages}</p>
         <div className="flex gap-1">
-          <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">{'\u2190'}</button>
-          <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">{'\u2192'}</button>
+          <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">{'←'}</button>
+          <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">{'→'}</button>
         </div>
       </div>
 
@@ -697,7 +697,7 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
             onClick={handleBulkDelete}
             className="px-4 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
           >
-            I\u0161trinti ({selectedIds.size})
+            Ištrinti ({selectedIds.size})
           </button>
           <button
             onClick={handleBulkExport}
@@ -740,7 +740,7 @@ function ReviewModeration() {
       if (!res.ok) throw new Error(`Klaida: ${res.status}`);
       load();
     } catch {
-      setActionError('Nepavyko atlikti veiksmo. Bandykite dar kart\u0105.');
+      setActionError('Nepavyko atlikti veiksmo. Bandykite dar kartą.');
     }
   };
 
@@ -748,13 +748,13 @@ function ReviewModeration() {
     <div className="space-y-3">
       <h3 className="font-semibold text-gray-900 dark:text-white">Laukiantys patvirtinimo</h3>
       {actionError && <p className="text-sm text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">{actionError}</p>}
-      {reviews.length === 0 && <p className="text-sm text-gray-400">N\u0117ra laukian\u010di\u0173 atsiliepimu\u0173.</p>}
+      {reviews.length === 0 && <p className="text-sm text-gray-400">Nėra laukiančių atsiliepimuų.</p>}
       {reviews.map((r) => (
         <div key={r.id} className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 p-4">
           <div className="flex items-center justify-between">
             <div>
               <span className="font-medium text-gray-900 dark:text-white">{r.authorName}</span>
-              <span className="text-xs text-gray-400 ml-2">{r.itemType} {'\u00B7'} {new Date(r.createdAt).toLocaleDateString('lt-LT')}</span>
+              <span className="text-xs text-gray-400 ml-2">{r.itemType} {'·'} {new Date(r.createdAt).toLocaleDateString('lt-LT')}</span>
             </div>
             <StarRating rating={r.rating} size="sm" />
           </div>
@@ -764,7 +764,7 @@ function ReviewModeration() {
               Patvirtinti
             </button>
             <button onClick={() => action(r.id, 'delete')} className="px-3 py-1 text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-              I\u0161trinti
+              Ištrinti
             </button>
           </div>
         </div>

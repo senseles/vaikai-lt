@@ -46,7 +46,7 @@ export default function CompareTable({ items, onClose }: CompareTableProps) {
         </div>
 
         <div className="overflow-x-auto -mx-5 px-5">
-        <table className="w-full text-sm min-w-[400px]">
+        <table className="w-full text-sm min-w-[320px]">
           <thead>
             <tr>
               <th scope="col" className="text-left py-2 pr-4 text-gray-500 dark:text-gray-400 font-medium" />

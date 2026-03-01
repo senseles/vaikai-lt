@@ -112,7 +112,7 @@ export default function CitySelector() {
         </div>
 
         {/* Regional cities */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
           {Object.entries(regionCities).map(([region, cities]) => (
             <div key={region}>
               <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">

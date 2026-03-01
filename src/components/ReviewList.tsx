@@ -60,7 +60,7 @@ export default function ReviewList({ itemId, itemType }: ReviewListProps) {
 
   return (
     <div className="space-y-3">
-      <h4 className="font-semibold text-gray-900 dark:text-white">Atsiliepimai ({reviews.length})</h4>
+      <h4 className="font-semibold text-gray-900 dark:text-white">Visi atsiliepimai ({reviews.length})</h4>
       {reviews.map((review) => (
         <ReviewItem key={review.id} review={review} />
       ))}

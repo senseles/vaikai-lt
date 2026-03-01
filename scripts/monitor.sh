@@ -47,5 +47,13 @@ while true; do
     fi
   fi
   
+  # Check Cloudflare tunnel
+  if ! pgrep -f cloudflared > /dev/null 2>&1; then
+    echo "[$(date)] Tunnel DOWN. Restarting..." >> "$LOG"
+    /tmp/cloudflared tunnel --url http://localhost:$PORT > /tmp/cf.log 2>&1 &
+    sleep 5
+    echo "[$(date)] Tunnel restarted" >> "$LOG"
+  fi
+
   sleep 15
 done

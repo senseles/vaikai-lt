@@ -9,8 +9,8 @@ interface SearchPageProps {
 
 export async function generateMetadata({ searchParams }: SearchPageProps) {
   const q = searchParams.q ?? '';
-  const title = q ? `\u201E${q}\u201C \u2014 Paie\u0161ka | Vaikai.lt` : 'Paie\u0161ka | Vaikai.lt';
-  const description = 'Ie\u0161kokite dar\u017eeli\u0173, aukli\u0173, b\u016breli\u0173 ir specialist\u0173 visoje Lietuvoje.';
+  const title = q ? `„${q}“ — Paieška | Vaikai.lt` : 'Paieška | Vaikai.lt';
+  const description = 'Ieškokite darželių, auklių, būrelių ir specialistų visoje Lietuvoje.';
   return {
     title,
     description,

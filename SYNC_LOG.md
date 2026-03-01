@@ -126,3 +126,47 @@
 1. **Build broken** — unused import `notifyNewReview` in `src/app/api/reviews/route.ts`. Quick fix: remove or prefix with `_`. Devs should fix next cycle.
 
 **Notes:** DB counts unchanged from last sync — no new data ingestion. Feature velocity strong (search suggestions, mobile nav, auth, animations, admin UX, Lighthouse, favicons all landed). Language switcher still placeholder.
+
+---
+
+## SYNC 2026-03-01 12:20 (ET)
+
+**Commits since last sync:** 1 new (`cd1bd4c` — admin review error handling, hamburger a11y)
+**Build:** ✅ Clean (exit 0, no errors)
+**DB:** KG: 1437 | Auklės: 150 | Būreliai: 164 | Specialists: 124 | Reviews: 243
+**Blockers:** None — previous build blocker (unused import) resolved in `cd1bd4c`.
+
+**Notes:** Previous build error fixed. DB counts stable — no new data ingestion since last sync. Project in good shape, all pages building successfully. Language switcher still placeholder.
+
+---
+
+### SYNC 2026-03-01 13:00 (ET)
+
+**Commits since last:** 2 new — `b6a8eea` (dynamic OG image, diverse review seed, build config fix), `6458b13` (SEO fixes, privacy policy, dark mode, GDPR compliance)
+**Build:** ✅ Clean (exit 0, no errors)
+**DB:** KG: 1437 | Auklės: 150 | Būreliai: 164 | Specialists: 124 | Reviews: 390
+**Blockers:** None.
+
+**Notes:** Reviews jumped 243→390 (seed data refresh in b6a8eea). SEO and GDPR compliance work landed. Dynamic OG images added. Project stable, no action items.
+
+---
+
+### SYNC 2026-03-01 13:40 (ET)
+
+**Commits (last 20):** 20 shown, all post-sprint-3. Latest: `3015655` — remove unused deps, harden API routes, complete geolocation.
+**Build:** ✅ Clean (exit 0, no errors)
+**DB:** KG: 1437 | Auklės: 150 | Būreliai: 164 | Specialists: 124 | Reviews: 411
+**Blockers:** None.
+
+**Notes:** Reviews 390→411 (+21). Recent work focused on SEO (structured data, canonical URLs, sitemap tuning), accessibility hardening, geolocation nearest-city feature, and visual polish. Build stable, no regressions.
+
+---
+
+### SYNC 2026-03-01 14:20 EST (Sunday)
+
+**Commits (last 20):** Fixes & polish — AbortController cleanup, search ratings, RecentlyViewed pruning, semantic HTML, mobile menu, slug cache, FAQ a11y, ErrorBoundary, centralized city data, React.memo, Lithuanian diacritics, middleware hardening, accessibility (skip-to-content, focus rings, aria-live, dialog roles), SEO (admin noindex, SearchAction, BreadcrumbList, FAQPage JSON-LD, canonical URLs), geolocation nearest city, visual micro-interactions, performance optimization, dynamic OG image.
+**Build:** ✅ Clean (exit 0, no errors)
+**DB:** KG: 1437 | Auklės: 150 | Būreliai: 164 | Specialists: 124 | Reviews: 411
+**Blockers:** None.
+
+**Notes:** DB counts unchanged from last sync — no new data ingestion this cycle. All 20 recent commits are quality/polish: a11y, SEO structured data, performance (React.memo, cache headers), and UX fixes. Build remains stable. Project is in a solid polishing phase.

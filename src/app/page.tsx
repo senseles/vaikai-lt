@@ -13,7 +13,7 @@ const Testimonials = dynamic(() => import("@/components/Testimonials"), {
     <div className="py-12 md:py-16 animate-pulse">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="h-8 w-64 bg-gray-200 dark:bg-slate-700 rounded mx-auto mb-8" />
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => <div key={i} className="h-40 bg-gray-200 dark:bg-slate-700 rounded-xl" />)}
         </div>
       </div>
@@ -79,7 +79,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(searchActionJsonLd) }}
       />
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-primary-bg via-white to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-16 md:py-24 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-bg via-white to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 md:py-24 overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl" />
@@ -91,12 +91,12 @@ export default async function HomePage() {
             <p className="inline-block text-sm font-medium text-primary dark:text-green-400 bg-primary/10 dark:bg-green-900/30 px-4 py-1.5 rounded-full mb-6">
               Didžiausia vaikų paslaugų platforma Lietuvoje
             </p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-5 leading-tight">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-5 leading-tight">
               Raskite geriausią darželį,{" "}
               <span className="text-primary dark:text-green-400">auklę ar būrelį</span>{" "}
               savo vaikui
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
               Atsiliepimai, vertinimai ir palyginimas — viskas vienoje vietoje.
               Patikima informacija iš tikrų tėvelių.
             </p>
@@ -104,15 +104,15 @@ export default async function HomePage() {
           <SearchBar />
 
           {/* Stats */}
-          <div className="mt-14 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <div className="mt-10 sm:mt-14 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-6">
             {stats.map((stat, i) => (
               <div
                 key={stat.label}
                 className={`flex flex-col items-center min-h-[5rem] animate-fade-in-up stagger-${i + 1}`}
               >
-                <span className="text-3xl mb-1.5" role="img" aria-hidden="true">{stat.emoji}</span>
-                <span className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</span>
+                <span className="text-2xl sm:text-3xl mb-1" role="img" aria-hidden="true">{stat.emoji}</span>
+                <span className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</span>
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{stat.label}</span>
               </div>
             ))}
           </div>

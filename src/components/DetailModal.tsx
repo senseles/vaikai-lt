@@ -155,7 +155,7 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
           </svg>
         </button>
 
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white pr-8">{item.name}</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white pr-8 break-words">{item.name}</h2>
         <Link
           href={`/${toSlug(item.city)}`}
           onClick={onClose}
@@ -168,7 +168,7 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
           <div className="flex items-center gap-2 mt-2">
             <StarRating rating={item.baseRating} />
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              ({item.baseReviewCount} {item.baseReviewCount === 1 ? 'atsiliepimas' : 'atsiliepimai'})
+              {item.baseRating.toFixed(1)} ({item.baseReviewCount} {item.baseReviewCount === 1 ? 'atsiliepimas' : 'atsiliepimai'})
             </span>
           </div>
         )}

@@ -127,7 +127,7 @@ export default function RecentlyViewed({ onItemClick }: RecentlyViewedProps) {
                 key={item.id}
                 type="button"
                 onClick={() => onItemClick?.(item)}
-                className="flex-shrink-0 w-48 min-h-[7rem] rounded-xl border border-gray-200 dark:border-gray-700
+                className="flex-shrink-0 w-40 sm:w-48 min-h-[7rem] rounded-xl border border-gray-200 dark:border-gray-700
                   bg-white dark:bg-slate-800 p-3 text-left shadow-sm
                   hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600
                   transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
