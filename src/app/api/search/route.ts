@@ -12,35 +12,35 @@ export async function GET(request: NextRequest) {
     const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
       prisma.kindergarten.findMany({
         where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { address: { contains: q } }] },
-        select: { name: true, city: true, slug: true },
+        select: { name: true, city: true, slug: true, baseRating: true },
         take: 3,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.aukle.findMany({
         where: { OR: [{ name: { contains: q } }, { city: { contains: q } }] },
-        select: { name: true, city: true, slug: true },
+        select: { name: true, city: true, slug: true, baseRating: true },
         take: 2,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.burelis.findMany({
         where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { category: { contains: q } }] },
-        select: { name: true, city: true, slug: true, category: true },
+        select: { name: true, city: true, slug: true, category: true, baseRating: true },
         take: 2,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.specialist.findMany({
         where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { specialty: { contains: q } }] },
-        select: { name: true, city: true, slug: true, specialty: true },
+        select: { name: true, city: true, slug: true, specialty: true, baseRating: true },
         take: 2,
         orderBy: { baseRating: 'desc' },
       }),
     ]);
 
     const suggestions = [
-      ...kindergartens.map(i => ({ name: i.name, city: i.city, type: 'darzeliai' as const })),
-      ...aukles.map(i => ({ name: i.name, city: i.city, type: 'aukles' as const })),
-      ...bureliai.map(i => ({ name: i.name, city: i.city, type: 'bureliai' as const })),
-      ...specialists.map(i => ({ name: i.name, city: i.city, type: 'specialistai' as const })),
+      ...kindergartens.map(i => ({ name: i.name, city: i.city, type: 'darzeliai' as const, rating: i.baseRating })),
+      ...aukles.map(i => ({ name: i.name, city: i.city, type: 'aukles' as const, rating: i.baseRating })),
+      ...bureliai.map(i => ({ name: i.name, city: i.city, type: 'bureliai' as const, rating: i.baseRating })),
+      ...specialists.map(i => ({ name: i.name, city: i.city, type: 'specialistai' as const, rating: i.baseRating })),
     ].slice(0, 8);
 
     return NextResponse.json({ suggestions }, {

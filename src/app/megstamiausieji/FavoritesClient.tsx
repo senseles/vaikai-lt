@@ -35,6 +35,7 @@ export default function FavoritesClient() {
   const [selectedItemType, setSelectedItemType] = useState<ItemType>('kindergarten');
 
   useEffect(() => {
+    const controller = new AbortController();
     const favorites = getFavoritesFromStorage();
     if (favorites.length === 0) {
       setLoading(false);
@@ -47,7 +48,9 @@ export default function FavoritesClient() {
       ids.forEach((id) => params.append('ids', id));
       const apiPath = type === 'kindergarten' ? 'kindergartens' : type === 'aukle' ? 'aukles' : type === 'burelis' ? 'bureliai' : 'specialists';
       try {
-        const res = await fetch(`/api/${apiPath}?${params.toString()}`);
+        const res = await fetch(`/api/${apiPath}?${params.toString()}`, {
+          signal: controller.signal,
+        });
         if (!res.ok) return [];
         const data = await res.json();
         return data.data ?? data ?? [];
@@ -67,6 +70,7 @@ export default function FavoritesClient() {
       fetchByType('burelis', grouped['burelis'] ?? []),
       fetchByType('specialist', grouped['specialist'] ?? []),
     ]).then(([k, a, b, s]) => {
+      if (controller.signal.aborted) return;
       setKindergartens(k);
       setAukles(a);
       setBureliai(b);
@@ -85,6 +89,8 @@ export default function FavoritesClient() {
         try { localStorage.setItem('vaikai-favorites', JSON.stringify(cleaned)); } catch { /* ignore */ }
       }
     });
+
+    return () => controller.abort();
   }, []);
 
   const openDetail = (item: AnyItem, itemType: ItemType) => {

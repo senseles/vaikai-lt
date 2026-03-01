@@ -117,7 +117,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!authenticated) return;
-    fetch('/api/admin/stats')
+    const controller = new AbortController();
+    fetch('/api/admin/stats', { signal: controller.signal })
       .then((r) => r.json())
       .then((res) => {
         if (res.success && res.data) {
@@ -133,6 +134,7 @@ export default function AdminPage() {
         }
       })
       .catch(() => {});
+    return () => controller.abort();
   }, [authenticated]);
 
   if (!authenticated) {

@@ -5,6 +5,7 @@ import StarRating from './StarRating';
 
 const STORAGE_KEY = 'recently-viewed';
 const MAX_ITEMS = 10;
+const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export interface RecentlyViewedItem {
   id: string;
@@ -47,7 +48,14 @@ function getRecentlyViewed(): RecentlyViewedItem[] {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed: RecentlyViewedItem[] = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    // Prune items older than MAX_AGE_MS
+    const now = Date.now();
+    const fresh = parsed.filter((i) => now - new Date(i.viewedAt).getTime() < MAX_AGE_MS);
+    if (fresh.length < parsed.length) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh)); } catch { /* ignore */ }
+    }
+    return fresh;
   } catch {
     return [];
   }
@@ -90,14 +98,27 @@ export default function RecentlyViewed({ onItemClick }: RecentlyViewedProps) {
     setItems(getRecentlyViewed());
   }, []);
 
+  const clearHistory = () => {
+    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+    setItems([]);
+  };
+
   if (items.length === 0) return null;
 
   return (
     <section className="px-4 sm:px-6 py-6">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-          Neseniai peržiūrėti
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            Neseniai peržiūrėti
+          </h2>
+          <button
+            onClick={clearHistory}
+            className="text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+          >
+            Išvalyti
+          </button>
+        </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
           {items.map((item) => {
             const badge = badgeConfig[item.itemType] ?? badgeConfig.kindergarten;

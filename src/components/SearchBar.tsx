@@ -7,6 +7,7 @@ interface Suggestion {
   name: string;
   city: string;
   type: 'darzeliai' | 'aukles' | 'bureliai' | 'specialistai';
+  rating: number;
 }
 
 const typeLabels: Record<string, string> = {
@@ -50,16 +51,19 @@ export default function SearchBar() {
   // Fetch suggestions with debounce
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    const controller = new AbortController();
 
     if (query.trim().length < 2) {
       setSuggestions([]);
       setShowSuggestions(false);
-      return;
+      return () => controller.abort();
     }
 
     debounceRef.current = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`, {
+          signal: controller.signal,
+        });
         if (res.ok) {
           const data = await res.json();
           setSuggestions(data.suggestions || []);
@@ -67,12 +71,13 @@ export default function SearchBar() {
           setSelectedIdx(-1);
         }
       } catch {
-        // Silently fail for suggestions
+        // Silently fail for suggestions (including abort)
       }
     }, 250);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      controller.abort();
     };
   }, [query]);
 
@@ -176,7 +181,10 @@ export default function SearchBar() {
                 <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
                   {highlightMatch(s.name, query)}
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">{s.city}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  {s.city}
+                  {s.rating > 0 && <span className="ml-1.5 text-amber-500">{'★'} {s.rating.toFixed(1)}</span>}
+                </div>
               </div>
               <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${typeColors[s.type]}`}>
                 {typeLabels[s.type]}

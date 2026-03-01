@@ -15,9 +15,12 @@ export default function ReviewList({ itemId, itemType }: ReviewListProps) {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    const controller = new AbortController();
     const load = async () => {
       try {
-        const res = await fetch(`/api/reviews?itemId=${itemId}&itemType=${itemType}`);
+        const res = await fetch(`/api/reviews?itemId=${itemId}&itemType=${itemType}`, {
+          signal: controller.signal,
+        });
         if (res.ok) {
           const data = await res.json();
           setReviews(data);
@@ -25,12 +28,14 @@ export default function ReviewList({ itemId, itemType }: ReviewListProps) {
           setError(true);
         }
       } catch {
+        if (controller.signal.aborted) return;
         setError(true);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
     load();
+    return () => controller.abort();
   }, [itemId, itemType]);
 
   if (loading) return <p className="text-sm text-gray-400 dark:text-gray-500">Kraunami atsiliepimai...</p>;
