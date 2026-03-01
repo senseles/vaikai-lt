@@ -727,18 +727,25 @@ function ReviewModeration() {
 
   useEffect(() => { load(); }, [load]);
 
+  const [actionError, setActionError] = useState('');
+
   const action = async (id: string, act: 'approve' | 'delete') => {
-    if (act === 'approve') {
-      await fetch(`/api/admin/reviews/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isApproved: true }) });
-    } else {
-      await fetch(`/api/admin/reviews/${id}`, { method: 'DELETE' });
+    setActionError('');
+    try {
+      const res = act === 'approve'
+        ? await fetch(`/api/admin/reviews/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isApproved: true }) })
+        : await fetch(`/api/admin/reviews/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`Klaida: ${res.status}`);
+      load();
+    } catch {
+      setActionError('Nepavyko atlikti veiksmo. Bandykite dar karta.');
     }
-    load();
   };
 
   return (
     <div className="space-y-3">
       <h3 className="font-semibold text-gray-900 dark:text-white">Laukiantys patvirtinimo</h3>
+      {actionError && <p className="text-sm text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">{actionError}</p>}
       {reviews.length === 0 && <p className="text-sm text-gray-400">Nera laukianciu atsiliepimu.</p>}
       {reviews.map((r) => (
         <div key={r.id} className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 p-4">

@@ -81,7 +81,7 @@ export default function Header() {
             aria-label={t('nav.openMenu')}
             aria-expanded={mobileOpen}
           >
-            <div className="flex flex-col gap-1.5 w-5">
+            <div className="flex flex-col gap-1.5 w-5" aria-hidden="true">
               <span className={`block h-0.5 bg-gray-700 dark:bg-gray-300 rounded transition-all ${mobileOpen ? "rotate-45 translate-y-2" : ""}`} />
               <span className={`block h-0.5 bg-gray-700 dark:bg-gray-300 rounded transition-all ${mobileOpen ? "opacity-0" : ""}`} />
               <span className={`block h-0.5 bg-gray-700 dark:bg-gray-300 rounded transition-all ${mobileOpen ? "-rotate-45 -translate-y-2" : ""}`} />
