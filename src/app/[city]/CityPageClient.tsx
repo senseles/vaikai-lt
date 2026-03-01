@@ -12,6 +12,7 @@ import CompareTable from '@/components/CompareTable';
 import TypeFilter from '@/components/TypeFilter';
 import SortSelect from '@/components/SortSelect';
 import PriceFilter from '@/components/PriceFilter';
+import EmptyState from '@/components/EmptyState';
 
 type Category = 'darzeliai' | 'aukles' | 'bureliai' | 'specialistai';
 
@@ -202,26 +203,37 @@ export default function CityPageClient({
 
       {/* Cards */}
       {items.length === 0 ? (
-        <p className="text-center text-gray-400 py-12">Nerasta rezultatų šiame mieste.</p>
+        <EmptyState
+          icon="filter"
+          title="Nerasta rezultatų"
+          description="Šiame mieste su pasirinktais filtrais rezultatų nerasta. Pabandykite pakeisti filtrus."
+        />
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {category === 'darzeliai' && kindergartens.map((item) => (
-            <KindergartenCard
-              key={item.id}
-              item={item}
-              onSelect={(i) => openDetail(i, 'kindergarten')}
-              compareSelected={compareIds.has(item.id)}
-              onCompareToggle={toggleCompare}
-            />
+          {category === 'darzeliai' && kindergartens.map((item, i) => (
+            <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${i * 50}ms`, animationFillMode: 'both' }}>
+              <KindergartenCard
+                item={item}
+                onSelect={(it) => openDetail(it, 'kindergarten')}
+                compareSelected={compareIds.has(item.id)}
+                onCompareToggle={toggleCompare}
+              />
+            </div>
           ))}
-          {category === 'aukles' && aukles.map((item) => (
-            <AukleCard key={item.id} item={item} onSelect={(i) => openDetail(i, 'aukle')} />
+          {category === 'aukles' && (filterByPrice(aukles) as Aukle[]).map((item, i) => (
+            <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${i * 50}ms`, animationFillMode: 'both' }}>
+              <AukleCard item={item} onSelect={(it) => openDetail(it, 'aukle')} />
+            </div>
           ))}
-          {category === 'bureliai' && bureliai.map((item) => (
-            <BurelisCard key={item.id} item={item} onSelect={(i) => openDetail(i, 'burelis')} />
+          {category === 'bureliai' && bureliai.map((item, i) => (
+            <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${i * 50}ms`, animationFillMode: 'both' }}>
+              <BurelisCard item={item} onSelect={(it) => openDetail(it, 'burelis')} />
+            </div>
           ))}
-          {category === 'specialistai' && specialists.map((item) => (
-            <SpecialistCard key={item.id} item={item} onSelect={(i) => openDetail(i, 'specialist')} />
+          {category === 'specialistai' && (filterByPrice(specialists) as Specialist[]).map((item, i) => (
+            <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${i * 50}ms`, animationFillMode: 'both' }}>
+              <SpecialistCard item={item} onSelect={(it) => openDetail(it, 'specialist')} />
+            </div>
           ))}
         </div>
       )}

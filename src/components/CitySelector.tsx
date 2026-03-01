@@ -45,7 +45,7 @@ export default function CitySelector() {
             <Link
               key={city.slug}
               href={`/${city.slug}`}
-              className="flex flex-col items-center gap-2 p-5 rounded-xl bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 hover:border-primary dark:hover:border-primary-light hover:shadow-lg transition-all group"
+              className="flex flex-col items-center gap-2 p-5 rounded-xl bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 hover:border-primary dark:hover:border-primary-light hover:shadow-lg transition-all group min-h-[6rem]"
             >
               <span className="text-3xl group-hover:scale-110 transition-transform">{city.emoji}</span>
               <span className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-primary dark:group-hover:text-primary-light transition-colors">

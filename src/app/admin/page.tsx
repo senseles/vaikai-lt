@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import type { Review, ItemType } from '@/types';
 import StarRating from '@/components/StarRating';
 
@@ -77,6 +78,19 @@ const FIELDS: Record<ItemType, FieldDef[]> = {
   ],
 };
 
+// ─── Phone validation helper ───
+
+function isValidPhone(phone: string): boolean {
+  if (!phone) return true; // phone is optional
+  const trimmed = phone.trim();
+  // +370XXXXXXXX or 8XXXXXXXX format
+  const internationalPattern = /^\+370\d{8}$/;
+  const localPattern = /^8\d{8}$/;
+  // Also allow formatted versions with spaces/dashes
+  const cleaned = trimmed.replace(/[\s\-()]/g, '');
+  return internationalPattern.test(cleaned) || localPattern.test(cleaned);
+}
+
 // ─── Main Admin Page ───
 
 export default function AdminPage() {
@@ -142,13 +156,13 @@ export default function AdminPage() {
     );
   }
 
-  const tabs: { key: Tab; label: string }[] = [
-    { key: 'dashboard', label: 'Suvestinė' },
-    { key: 'kindergartens', label: 'Darželiai' },
-    { key: 'aukles', label: 'Auklės' },
-    { key: 'bureliai', label: 'Būreliai' },
-    { key: 'specialists', label: 'Specialistai' },
-    { key: 'reviews', label: 'Atsiliepimai' },
+  const tabs: { key: Tab; label: string; icon: string }[] = [
+    { key: 'dashboard', label: 'Suvestine', icon: '\u{1F4CA}' },
+    { key: 'kindergartens', label: 'Darzeliai', icon: '\u{1F3EB}' },
+    { key: 'aukles', label: 'Aukles', icon: '\u{1F469}\u200D\u{1F467}' },
+    { key: 'bureliai', label: 'Bureliai', icon: '\u{1F3A8}' },
+    { key: 'specialists', label: 'Specialistai', icon: '\u{1F468}\u200D\u2695\uFE0F' },
+    { key: 'reviews', label: 'Atsiliepimai', icon: '\u2B50' },
   ];
 
   return (
@@ -163,24 +177,32 @@ export default function AdminPage() {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 py-4">
+        {/* Breadcrumb */}
+        <nav className="text-sm text-gray-500 dark:text-gray-400 mb-4" aria-label="Navigacija">
+          <Link href="/" className="hover:text-primary transition-colors">Pradzia</Link>
+          <span className="mx-2">/</span>
+          <span className="text-gray-800 dark:text-gray-200 font-medium">Administravimas</span>
+        </nav>
+
         <nav className="flex gap-1 overflow-x-auto mb-6">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-3 py-2 text-sm rounded-lg whitespace-nowrap transition-colors ${
+              className={`px-3 py-2 text-sm rounded-lg whitespace-nowrap transition-colors flex items-center gap-1.5 ${
                 activeTab === tab.key ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800'
               }`}
             >
+              <span>{tab.icon}</span>
               {tab.label}
             </button>
           ))}
         </nav>
 
         {activeTab === 'dashboard' && <Dashboard stats={stats} />}
-        {activeTab === 'kindergartens' && <CrudTable itemType="kindergarten" label="Darželiai" />}
-        {activeTab === 'aukles' && <CrudTable itemType="aukle" label="Auklės" />}
-        {activeTab === 'bureliai' && <CrudTable itemType="burelis" label="Būreliai" />}
+        {activeTab === 'kindergartens' && <CrudTable itemType="kindergarten" label="Darzeliai" />}
+        {activeTab === 'aukles' && <CrudTable itemType="aukle" label="Aukles" />}
+        {activeTab === 'bureliai' && <CrudTable itemType="burelis" label="Bureliai" />}
         {activeTab === 'specialists' && <CrudTable itemType="specialist" label="Specialistai" />}
         {activeTab === 'reviews' && <ReviewModeration />}
       </div>
@@ -194,12 +216,12 @@ function Dashboard({ stats }: { readonly stats: Stats | null }) {
   if (!stats) return <p className="text-gray-400">Kraunama...</p>;
 
   const cards = [
-    { label: 'Darželiai', count: stats.kindergartens, color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' },
-    { label: 'Auklės', count: stats.aukles, color: 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300' },
-    { label: 'Būreliai', count: stats.bureliai, color: 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300' },
-    { label: 'Specialistai', count: stats.specialists, color: 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300' },
-    { label: 'Atsiliepimai', count: stats.reviews, color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' },
-    { label: 'Laukia patvirtinimo', count: stats.pendingReviews, color: 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300' },
+    { label: 'Darzeliai', count: stats.kindergartens, icon: '\u{1F3EB}', color: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800', textColor: 'text-blue-700 dark:text-blue-300', iconBg: 'bg-blue-100 dark:bg-blue-900/50' },
+    { label: 'Aukles', count: stats.aukles, icon: '\u{1F469}\u200D\u{1F467}', color: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800', textColor: 'text-green-700 dark:text-green-300', iconBg: 'bg-green-100 dark:bg-green-900/50' },
+    { label: 'Bureliai', count: stats.bureliai, icon: '\u{1F3A8}', color: 'bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800', textColor: 'text-orange-700 dark:text-orange-300', iconBg: 'bg-orange-100 dark:bg-orange-900/50' },
+    { label: 'Specialistai', count: stats.specialists, icon: '\u{1F468}\u200D\u2695\uFE0F', color: 'bg-teal-50 dark:bg-teal-900/30 border-teal-200 dark:border-teal-800', textColor: 'text-teal-700 dark:text-teal-300', iconBg: 'bg-teal-100 dark:bg-teal-900/50' },
+    { label: 'Atsiliepimai', count: stats.reviews, icon: '\u{1F4AC}', color: 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-800', textColor: 'text-purple-700 dark:text-purple-300', iconBg: 'bg-purple-100 dark:bg-purple-900/50' },
+    { label: 'Laukia patvirtinimo', count: stats.pendingReviews, icon: '\u{23F3}', color: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800', textColor: 'text-red-700 dark:text-red-300', iconBg: 'bg-red-100 dark:bg-red-900/50' },
   ];
 
   const exportData = async (format: 'json' | 'csv') => {
@@ -216,19 +238,24 @@ function Dashboard({ stats }: { readonly stats: Stats | null }) {
 
   return (
     <div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
         {cards.map((c) => (
-          <div key={c.label} className={`rounded-xl p-4 ${c.color}`}>
-            <p className="text-2xl font-bold">{c.count}</p>
-            <p className="text-sm">{c.label}</p>
+          <div key={c.label} className={`rounded-xl p-4 border ${c.color} flex items-start gap-3`}>
+            <div className={`rounded-lg p-2 text-xl ${c.iconBg}`}>
+              {c.icon}
+            </div>
+            <div>
+              <p className={`text-2xl font-bold ${c.textColor}`}>{c.count}</p>
+              <p className={`text-sm ${c.textColor} opacity-80`}>{c.label}</p>
+            </div>
           </div>
         ))}
       </div>
       <div className="flex gap-2">
-        <button onClick={() => exportData('json')} className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
+        <button onClick={() => exportData('json')} className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
           Eksportuoti JSON
         </button>
-        <button onClick={() => exportData('csv')} className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
+        <button onClick={() => exportData('csv')} className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
           Eksportuoti CSV
         </button>
       </div>
@@ -236,7 +263,7 @@ function Dashboard({ stats }: { readonly stats: Stats | null }) {
   );
 }
 
-// ─── Item Form (Create / Edit) ───
+// ─── Item Form (Create / Edit) with validation ───
 
 interface ItemFormProps {
   readonly itemType: ItemType;
@@ -260,15 +287,56 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
   const [form, setForm] = useState<Record<string, string>>(getInitial);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleChange = (key: string, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+    // Clear field error on change
+    if (fieldErrors[key]) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    }
+  };
+
+  const validate = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    for (const f of fields) {
+      const val = form[f.key]?.trim() ?? '';
+
+      // Required field validation
+      if (f.required && !val) {
+        errors[f.key] = `${f.label} yra privalomas laukas`;
+      }
+
+      // Phone validation
+      if (f.key === 'phone' && val && !isValidPhone(val)) {
+        errors[f.key] = 'Telefonas turi prasideti +370 arba 8 ir tureti 8 skaitmenys (pvz. +37061234567 arba 861234567)';
+      }
+
+      // Rating range validation (for number fields that look like ratings)
+      if (f.key === 'baseRating' && val) {
+        const num = Number(val);
+        if (isNaN(num) || num < 1 || num > 5) {
+          errors[f.key] = 'Ivertinimas turi buti nuo 1 iki 5';
+        }
+      }
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
     setError('');
+
+    if (!validate()) return;
+
+    setSaving(true);
 
     // Build body with proper types
     const body: Record<string, unknown> = {};
@@ -292,7 +360,7 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
       });
       const data = await res.json();
       if (!res.ok || data.success === false) {
-        setError(data.error || 'Nepavyko išsaugoti');
+        setError(data.error || 'Nepavyko issaugoti');
         setSaving(false);
         return;
       }
@@ -307,12 +375,12 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
     <div className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 p-5 mb-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-900 dark:text-white">
-          {isEdit ? 'Redaguoti' : 'Pridėti naują'}
+          {isEdit ? 'Redaguoti' : 'Prideti nauja'}
         </h3>
-        <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">Atšaukti</button>
+        <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">Atsaukti</button>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-3" noValidate>
         {fields.map((f) => (
           <div key={f.key} className={f.type === 'textarea' ? 'sm:col-span-2' : ''}>
             <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
@@ -322,7 +390,7 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
               <select
                 value={form[f.key] || ''}
                 onChange={(e) => handleChange(f.key, e.target.value)}
-                className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm"
+                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm`}
               >
                 {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
@@ -332,7 +400,7 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
                 onChange={(e) => handleChange(f.key, e.target.value)}
                 placeholder={f.placeholder}
                 rows={3}
-                className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm resize-none"
+                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm resize-none`}
               />
             ) : (
               <input
@@ -340,9 +408,11 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
                 value={form[f.key] || ''}
                 onChange={(e) => handleChange(f.key, e.target.value)}
                 placeholder={f.placeholder}
-                required={f.required}
-                className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm"
+                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm`}
               />
+            )}
+            {fieldErrors[f.key] && (
+              <p className="text-red-500 text-xs mt-1">{fieldErrors[f.key]}</p>
             )}
           </div>
         ))}
@@ -353,12 +423,12 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
           <button
             type="submit"
             disabled={saving}
-            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
           >
-            {saving ? 'Saugoma...' : isEdit ? 'Atnaujinti' : 'Pridėti'}
+            {saving ? 'Saugoma...' : isEdit ? 'Atnaujinti' : 'Prideti'}
           </button>
-          <button type="button" onClick={onCancel} className="px-4 py-2 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
-            Atšaukti
+          <button type="button" onClick={onCancel} className="px-4 py-2 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            Atsaukti
           </button>
         </div>
       </form>
@@ -366,7 +436,16 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
   );
 }
 
-// ─── CRUD Table with Create/Edit ───
+// ─── Sort arrow indicator ───
+
+function SortArrow({ active, direction }: { readonly active: boolean; readonly direction: 'asc' | 'desc' }) {
+  if (!active) {
+    return <span className="text-gray-300 dark:text-gray-600 ml-1">{'\u2195'}</span>;
+  }
+  return <span className="text-blue-500 ml-1">{direction === 'asc' ? '\u2191' : '\u2193'}</span>;
+}
+
+// ─── CRUD Table with Create/Edit, Bulk Actions, Better UX ───
 
 function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly label: string }) {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
@@ -374,8 +453,10 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('name');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState<Record<string, unknown> | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const perPage = 20;
 
   const load = useCallback(async () => {
@@ -390,8 +471,11 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
 
   useEffect(() => { load(); }, [load]);
 
+  // Clear selection when data changes
+  useEffect(() => { setSelectedIds(new Set()); }, [items]);
+
   const deleteItem = async (id: string) => {
-    if (!confirm('Ar tikrai norite ištrinti?')) return;
+    if (!confirm('Ar tikrai norite istrinti?')) return;
     await fetch(`/api/admin/${itemType}/${id}`, { method: 'DELETE' });
     load();
   };
@@ -412,6 +496,74 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
     setEditItem(null);
   };
 
+  const handleColumnSort = (column: string) => {
+    if (sortBy === column) {
+      setSortDir((d) => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(column);
+      setSortDir('asc');
+    }
+  };
+
+  // Bulk selection
+  const allSelected = items.length > 0 && items.every((item) => selectedIds.has(String(item.id)));
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(items.map((item) => String(item.id))));
+    }
+  };
+
+  const toggleSelectItem = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Ar tikrai norite istrinti ${selectedIds.size} irasu?`)) return;
+    const promises = Array.from(selectedIds).map((id) =>
+      fetch(`/api/admin/${itemType}/${id}`, { method: 'DELETE' })
+    );
+    await Promise.all(promises);
+    setSelectedIds(new Set());
+    load();
+  };
+
+  const handleBulkExport = () => {
+    if (selectedIds.size === 0) return;
+    const selectedItems = items.filter((item) => selectedIds.has(String(item.id)));
+    const blob = new Blob([JSON.stringify(selectedItems, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${itemType}-export.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Sort items locally for display (API sort is primary, this adds direction)
+  const sortedItems = [...items].sort((a, b) => {
+    const aVal = a[sortBy];
+    const bVal = b[sortBy];
+    if (aVal == null && bVal == null) return 0;
+    if (aVal == null) return 1;
+    if (bVal == null) return -1;
+    const cmp = typeof aVal === 'number' && typeof bVal === 'number'
+      ? aVal - bVal
+      : String(aVal).localeCompare(String(bVal), 'lt');
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+
   const totalPages = Math.max(1, Math.ceil(total / perPage));
 
   return (
@@ -419,21 +571,16 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
       <div className="flex flex-col sm:flex-row gap-2 mb-4">
         <input
           type="text"
-          placeholder="Ieškoti..."
+          placeholder="Ieskoti..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           className="border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm flex-1 focus:ring-2 focus:ring-blue-500"
         />
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white">
-          <option value="name">Pavadinimas</option>
-          <option value="city">Miestas</option>
-          <option value="baseRating">Įvertinimas</option>
-        </select>
         <button
           onClick={() => { setEditItem(null); setShowForm(true); }}
-          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap"
+          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap transition-colors"
         >
-          + Pridėti {label.toLowerCase().slice(0, -1) === 'darželiai'.slice(0, -1) ? '' : ''}
+          + Prideti
         </button>
       </div>
 
@@ -451,32 +598,79 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
           <table className="w-full text-sm">
             <thead className="bg-gray-50 dark:bg-slate-800 border-b dark:border-slate-700">
               <tr>
-                <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Pavadinimas</th>
-                <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Miestas</th>
-                <th className="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Įvertinimas</th>
-                <th className="text-right px-4 py-2 font-medium text-gray-500 dark:text-gray-400">Veiksmai</th>
+                <th className="px-4 py-3 text-left w-10">
+                  <input
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={toggleSelectAll}
+                    className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+                    aria-label="Pasirinkti visus"
+                  />
+                </th>
+                <th
+                  className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                  onClick={() => handleColumnSort('name')}
+                >
+                  Pavadinimas
+                  <SortArrow active={sortBy === 'name'} direction={sortDir} />
+                </th>
+                <th
+                  className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                  onClick={() => handleColumnSort('city')}
+                >
+                  Miestas
+                  <SortArrow active={sortBy === 'city'} direction={sortDir} />
+                </th>
+                <th
+                  className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                  onClick={() => handleColumnSort('baseRating')}
+                >
+                  Ivertinimas
+                  <SortArrow active={sortBy === 'baseRating'} direction={sortDir} />
+                </th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 hidden md:table-cell">Aprasymas</th>
+                <th className="text-right px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Veiksmai</th>
               </tr>
             </thead>
             <tbody>
-              {items.map((item) => (
-                <tr key={String(item.id)} className="border-b border-gray-50 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700">
-                  <td className="px-4 py-2 text-gray-900 dark:text-white">{String(item.name ?? '')}</td>
-                  <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{String(item.city ?? '')}</td>
-                  <td className="px-4 py-2">
+              {sortedItems.map((item, index) => (
+                <tr
+                  key={String(item.id)}
+                  className={`border-b border-gray-50 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-700/50 transition-colors cursor-default ${
+                    index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50/50 dark:bg-slate-800/50'
+                  } ${selectedIds.has(String(item.id)) ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                >
+                  <td className="px-4 py-2.5">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(String(item.id))}
+                      onChange={() => toggleSelectItem(String(item.id))}
+                      className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+                      aria-label={`Pasirinkti ${String(item.name ?? '')}`}
+                    />
+                  </td>
+                  <td className="px-4 py-2.5 text-gray-900 dark:text-white font-medium">{String(item.name ?? '')}</td>
+                  <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{String(item.city ?? '')}</td>
+                  <td className="px-4 py-2.5">
                     <StarRating rating={Number(item.baseRating ?? 0)} size="sm" />
                   </td>
-                  <td className="px-4 py-2 text-right space-x-2">
-                    <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700 text-sm">
+                  <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                    <span className="block max-w-xs truncate" title={String(item.description ?? '')}>
+                      {String(item.description ?? '\u2014')}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 text-right space-x-2 whitespace-nowrap">
+                    <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700 text-sm transition-colors">
                       Redaguoti
                     </button>
-                    <button onClick={() => deleteItem(String(item.id))} className="text-red-500 hover:text-red-700 text-sm">
-                      Ištrinti
+                    <button onClick={() => deleteItem(String(item.id))} className="text-red-500 hover:text-red-700 text-sm transition-colors">
+                      Istrinti
                     </button>
                   </td>
                 </tr>
               ))}
               {items.length === 0 && (
-                <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400">Nėra duomenų</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Nera duomenu</td></tr>
               )}
             </tbody>
           </table>
@@ -486,10 +680,37 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
       <div className="flex items-center justify-between mt-3">
         <p className="text-sm text-gray-500 dark:text-gray-400">Viso: {total} | Puslapis {page}/{totalPages}</p>
         <div className="flex gap-1">
-          <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30">←</button>
-          <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30">→</button>
+          <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">{'\u2190'}</button>
+          <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="px-3 py-1 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">{'\u2192'}</button>
         </div>
       </div>
+
+      {/* Floating bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded-xl shadow-lg px-6 py-3 flex items-center gap-4">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Pasirinkta: {selectedIds.size}
+          </span>
+          <button
+            onClick={handleBulkDelete}
+            className="px-4 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
+          >
+            Istrinti ({selectedIds.size})
+          </button>
+          <button
+            onClick={handleBulkExport}
+            className="px-4 py-1.5 text-sm bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 font-medium transition-colors"
+          >
+            Eksportuoti
+          </button>
+          <button
+            onClick={() => setSelectedIds(new Set())}
+            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+          >
+            Atsaukti
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -518,23 +739,23 @@ function ReviewModeration() {
   return (
     <div className="space-y-3">
       <h3 className="font-semibold text-gray-900 dark:text-white">Laukiantys patvirtinimo</h3>
-      {reviews.length === 0 && <p className="text-sm text-gray-400">Nėra laukiančių atsiliepimų.</p>}
+      {reviews.length === 0 && <p className="text-sm text-gray-400">Nera laukianciu atsiliepimu.</p>}
       {reviews.map((r) => (
         <div key={r.id} className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 p-4">
           <div className="flex items-center justify-between">
             <div>
               <span className="font-medium text-gray-900 dark:text-white">{r.authorName}</span>
-              <span className="text-xs text-gray-400 ml-2">{r.itemType} · {new Date(r.createdAt).toLocaleDateString('lt-LT')}</span>
+              <span className="text-xs text-gray-400 ml-2">{r.itemType} {'\u00B7'} {new Date(r.createdAt).toLocaleDateString('lt-LT')}</span>
             </div>
             <StarRating rating={r.rating} size="sm" />
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{r.text}</p>
           <div className="flex gap-2 mt-3">
-            <button onClick={() => action(r.id, 'approve')} className="px-3 py-1 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <button onClick={() => action(r.id, 'approve')} className="px-3 py-1 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
               Patvirtinti
             </button>
-            <button onClick={() => action(r.id, 'delete')} className="px-3 py-1 text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50">
-              Ištrinti
+            <button onClick={() => action(r.id, 'delete')} className="px-3 py-1 text-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+              Istrinti
             </button>
           </div>
         </div>

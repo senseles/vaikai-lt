@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import dynamic from "next/dynamic";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
-import CookieConsent from "@/components/CookieConsent";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { LanguageProvider } from "@/lib/LanguageContext";
+
+const CookieConsent = dynamic(() => import("@/components/CookieConsent"), {
+  ssr: false,
+});
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -51,7 +56,11 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👶</text></svg>",
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: '/apple-touch-icon.png',
   },
   manifest: "/manifest.json",
   other: {
@@ -67,6 +76,14 @@ export default function RootLayout({
   return (
     <html lang="lt" className={inter.variable} suppressHydrationWarning>
       <head>
+        {/* Preconnect to external domains for faster resource loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="https://www.google.com" />
+        <link rel="dns-prefetch" href="https://plausible.io" />
+
         {/* Analytics — uncomment and set domain when going live */}
         {/* <script defer data-domain="vaikai.lt" src="https://plausible.io/js/script.js" /> */}
         {/* Prevent FOUC for dark mode */}
@@ -99,8 +116,9 @@ export default function RootLayout({
         />
         <LanguageProvider>
           <Header />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 pb-16 md:pb-0">{children}</main>
           <Footer />
+          <MobileBottomNav />
           <CookieConsent />
           <BackToTop />
         </LanguageProvider>

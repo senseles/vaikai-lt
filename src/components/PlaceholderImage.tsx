@@ -30,9 +30,9 @@ const categoryConfig: Record<PlaceholderCategory, { from: string; to: string; ic
 };
 
 const sizeClasses: Record<NonNullable<PlaceholderImageProps['size']>, string> = {
-  sm: 'h-28',
-  md: 'h-36',
-  lg: 'h-44',
+  sm: 'h-28 min-h-[7rem]',
+  md: 'h-36 min-h-[9rem]',
+  lg: 'h-44 min-h-[11rem]',
 };
 
 export default function PlaceholderImage({ category, name, size = 'sm' }: PlaceholderImageProps) {
@@ -41,7 +41,7 @@ export default function PlaceholderImage({ category, name, size = 'sm' }: Placeh
   const gradientId = `grad-${category}-${name.replace(/\s/g, '').slice(0, 8)}`;
 
   return (
-    <div className={`relative w-full ${sizeClasses[size]} rounded-t-xl overflow-hidden select-none`}>
+    <div className={`relative w-full ${sizeClasses[size]} rounded-t-xl overflow-hidden select-none`} style={{ aspectRatio: '400/180' }}>
       <svg
         className="absolute inset-0 w-full h-full"
         viewBox="0 0 400 180"

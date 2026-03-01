@@ -43,7 +43,7 @@ export default function Testimonials() {
           {testimonials.map((t) => (
             <div
               key={t.author}
-              className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm"
+              className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm min-h-[10rem]"
             >
               <p className="italic text-gray-700 dark:text-gray-300 mb-4">
                 &ldquo;{t.quote}&rdquo;
