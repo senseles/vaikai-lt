@@ -7,10 +7,10 @@ interface PriceFilterProps {
 
 const ranges = [
   { value: '', label: 'Visos kainos' },
-  { value: '0-100', label: 'Iki 100 €' },
-  { value: '100-300', label: '100–300 €' },
-  { value: '300-500', label: '300–500 €' },
-  { value: '500+', label: 'Virš 500 €' },
+  { value: '0-5', label: 'Iki 5 €/val.' },
+  { value: '5-10', label: '5–10 €/val.' },
+  { value: '10-15', label: '10–15 €/val.' },
+  { value: '15+', label: 'Virš 15 €/val.' },
 ] as const;
 
 export default function PriceFilter({ value, onChange }: PriceFilterProps) {

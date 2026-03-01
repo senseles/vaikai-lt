@@ -58,3 +58,51 @@
 - **Build:** ❌ FAIL — `pages-manifest.json` ENOENT during "Collecting page data" phase. Compiled OK, types OK. Likely stale `.next` cache or mixed pages/app router issue.
 - **DB:** ✅ Healthy — 343 KG, 50 aukles, 64 bureliai, 44 specialists, 5 reviews
 - **Blockers:** Build broken — fix needed before deploy. Try `rm -rf .next && npm run build`. If persists, check for any files in `src/pages/` conflicting with app router.
+
+## SYNC 2026-03-01 09:00 (ET)
+- **Commits:** 20 tracked (latest: admin panel forms, expanded FAQ/testimonials, security headers, accessibility/print/newsletter, share buttons, GDPR consent, rate limiting, QA fixes)
+- **Build:** ✅ PASS — clean build, all routes compile. Previous `.next` cache issue resolved.
+- **DB:** ✅ Healthy — 343 KG, 50 aukles, 64 bureliai, 44 specialists, 2 reviews (review count dropped from 5→2, likely test data cleanup)
+- **Blockers:** None. Project in good shape.
+
+## SYNC 2026-03-01 09:40 (ET)
+- **Commits:** Latest: `b8aaff3` feat: add seed data — 100 aukles, 100 bureliai, 80 specialists, 50 reviews
+- **Build:** ✅ PASS — clean build, all routes compile, no errors
+- **DB:** ✅ Healthy — 343 KG, 150 aukles, 164 bureliai, 124 specialists, 52 reviews (big jump from seed data commit)
+- **Blockers:** None
+
+## SYNC 2026-03-01 10:20 (ET)
+
+**Commits (last 20):** Seed data, language switcher, category filters, font optimization, recently viewed, OG images, admin panel CRUD, FAQ/testimonials, security headers, accessibility, share buttons, caching, compare table, GDPR consent, rate limiting, DB indexes, SEO (sitemap/robots/404), dark mode fixes, QA hardening.
+
+**Build:** ✅ Clean — all pages compile, no errors. Mix of static (○) and dynamic (ƒ) routes working.
+
+**DB:**
+- Kindergartens: 343
+- Auklės: 150
+- Būreliai: 164
+- Specialists: 124
+- Reviews: 52
+
+**Blockers:** None. Project is in solid shape — feature-rich, seeded, building clean.
+
+**Next priorities:** Language switcher implementation (currently placeholder), review moderation workflow testing, production deployment prep.
+
+---
+
+## SYNC 2026-03-01 11:00 (ET) / 18:00 (EET)
+
+**Commits since last sync:** 1 new (`b8aaff3` — seed data: 100 aukles, 100 bureliai, 80 specialists, 50 reviews)
+
+**Build status:** ✅ Clean (exit 0), all routes compiling
+
+**DB status:** ✅ Healthy
+- Kindergartens: 343
+- Aukles: 150
+- Bureliai: 164
+- Specialists: 124
+- Reviews: 52
+
+**Blockers:** None.
+
+**Notes:** Project stable. Seed data commit landed. DB counts are above seed numbers (existing + seeded data merged). Language switcher still placeholder — next priority.

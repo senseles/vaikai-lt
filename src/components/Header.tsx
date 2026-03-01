@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/LanguageContext";
+import type { Locale } from "@/lib/i18n";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dark, setDark] = useState(false);
+  const { locale, setLocale, t } = useLanguage();
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -23,10 +26,14 @@ export default function Header() {
   };
 
   const navLinks = [
-    { href: "/#miestai", label: "Miestai" },
-    { href: "/megstamiausieji", label: "Mėgstamiausieji" },
-    { href: "/#duk", label: "D.U.K." },
-  ] as const;
+    { href: "/#miestai", label: t('nav.cities') },
+    { href: "/megstamiausieji", label: t('nav.favorites') },
+    { href: "/#duk", label: t('nav.faq') },
+  ];
+
+  const handleLocaleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLocale(e.target.value as Locale);
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 shadow-sm">
@@ -51,17 +58,17 @@ export default function Header() {
             ))}
             <select
               className="text-xs font-medium border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1.5 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 cursor-pointer"
-              defaultValue="lt"
-              aria-label="Pasirinkti kalbą"
+              value={locale}
+              onChange={handleLocaleChange}
+              aria-label={t('nav.language')}
             >
               <option value="lt">LT</option>
-              <option value="en" disabled>EN</option>
-              <option value="ru" disabled>RU</option>
+              <option value="en">EN</option>
             </select>
             <button
               onClick={toggleDark}
               className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-gray-200 dark:border-slate-600 hover:border-primary dark:hover:border-primary-light transition-all text-lg"
-              aria-label="Perjungti tamsų režimą"
+              aria-label={t('nav.darkMode')}
             >
               {dark ? "☀️" : "🌙"}
             </button>
@@ -71,7 +78,7 @@ export default function Header() {
           <button
             className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Atidaryti meniu"
+            aria-label={t('nav.openMenu')}
             aria-expanded={mobileOpen}
           >
             <div className="flex flex-col gap-1.5 w-5">
@@ -98,17 +105,17 @@ export default function Header() {
             <div className="flex items-center gap-2 mt-2 ml-3">
               <select
                 className="text-xs font-medium border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1.5 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300"
-                defaultValue="lt"
-                aria-label="Pasirinkti kalbą"
+                value={locale}
+                onChange={handleLocaleChange}
+                aria-label={t('nav.language')}
               >
                 <option value="lt">LT</option>
-                <option value="en" disabled>EN</option>
-                <option value="ru" disabled>RU</option>
+                <option value="en">EN</option>
               </select>
               <button
                 onClick={toggleDark}
                 className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-gray-200 dark:border-slate-600 text-lg"
-                aria-label="Perjungti tamsų režimą"
+                aria-label={t('nav.darkMode')}
               >
                 {dark ? "☀️" : "🌙"}
               </button>

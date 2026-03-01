@@ -3,6 +3,7 @@
 import type { Burelis } from '@/types';
 import StarRating from './StarRating';
 import FavoriteButton from './FavoriteButton';
+import PlaceholderImage from './PlaceholderImage';
 
 interface BurelisCardProps {
   readonly item: Burelis;
@@ -16,8 +17,10 @@ export default function BurelisCard({ item, onSelect }: BurelisCardProps) {
       tabIndex={0}
       onClick={() => onSelect(item)}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(item); } }}
-      className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 hover:shadow-md transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+      className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden"
     >
+      <PlaceholderImage category="bureliai" name={item.name} />
+      <div className="p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-gray-900 dark:text-white truncate">{item.name}</h3>
@@ -41,6 +44,7 @@ export default function BurelisCard({ item, onSelect }: BurelisCardProps) {
           <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount})</span>
         </div>
         {item.price && <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.price}</span>}
+      </div>
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import DetailModal from '@/components/DetailModal';
 import CompareTable from '@/components/CompareTable';
 import TypeFilter from '@/components/TypeFilter';
 import SortSelect from '@/components/SortSelect';
+import PriceFilter from '@/components/PriceFilter';
 
 type Category = 'darzeliai' | 'aukles' | 'bureliai' | 'specialistai';
 
@@ -32,6 +33,7 @@ interface CityPageClientProps {
   readonly initialSort: string;
   readonly totalPages: Record<Category, number>;
   readonly currentPage: number;
+  readonly areas: string[];
 }
 
 type AnyItem = Kindergarten | Aukle | Burelis | Specialist;
@@ -47,6 +49,7 @@ export default function CityPageClient({
   initialSort,
   totalPages,
   currentPage,
+  areas,
 }: CityPageClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -85,12 +88,37 @@ export default function CityPageClient({
     });
   }, []);
 
+  // Extract numeric price from string fields like "8 €/val.", "10", "25 €"
+  const extractPrice = (val: string | null | undefined): number | null => {
+    if (!val) return null;
+    const match = val.match(/(\d+(?:[.,]\d+)?)/);
+    return match ? parseFloat(match[1].replace(',', '.')) : null;
+  };
+
+  const priceParam = searchParams.get('price') ?? '';
+
+  const filterByPrice = <T extends { hourlyRate?: string | null; price?: string | null }>(items: T[]): T[] => {
+    if (!priceParam) return items;
+    const [minStr, maxStr] = priceParam.split('-');
+    const isPlus = minStr.endsWith('+');
+    const min = parseFloat(isPlus ? minStr.slice(0, -1) : minStr);
+    const max = maxStr ? parseFloat(maxStr) : null;
+
+    return items.filter((item) => {
+      const p = extractPrice(item.hourlyRate ?? item.price ?? null);
+      if (p === null) return false;
+      if (isPlus) return p >= min;
+      if (max !== null) return p >= min && p <= max;
+      return true;
+    });
+  };
+
   const itemsForCategory = () => {
     switch (category) {
       case 'darzeliai': return kindergartens;
-      case 'aukles': return aukles;
+      case 'aukles': return filterByPrice(aukles);
       case 'bureliai': return bureliai;
-      case 'specialistai': return specialists;
+      case 'specialistai': return filterByPrice(specialists);
     }
   };
 
@@ -146,6 +174,26 @@ export default function CityPageClient({
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
+        )}
+        {/* Area / district filter — shown when city has areas */}
+        {areas.length > 0 && (
+          <select
+            value={searchParams.get('area') ?? ''}
+            onChange={(e) => updateParams({ area: e.target.value })}
+            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white"
+          >
+            <option value="">Visi rajonai</option>
+            {areas.map((a) => (
+              <option key={a} value={a}>{a}</option>
+            ))}
+          </select>
+        )}
+        {/* Price range filter — shown for aukles and specialists */}
+        {(category === 'aukles' || category === 'specialistai') && (
+          <PriceFilter
+            value={searchParams.get('price') ?? ''}
+            onChange={(v) => updateParams({ price: v })}
+          />
         )}
         <div className="ml-auto">
           <SortSelect value={sort} onChange={(v) => updateParams({ sort: v })} />

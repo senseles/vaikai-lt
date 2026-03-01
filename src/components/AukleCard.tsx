@@ -3,6 +3,7 @@
 import type { Aukle } from '@/types';
 import StarRating from './StarRating';
 import FavoriteButton from './FavoriteButton';
+import PlaceholderImage from './PlaceholderImage';
 
 interface AukleCardProps {
   readonly item: Aukle;
@@ -16,8 +17,10 @@ export default function AukleCard({ item, onSelect }: AukleCardProps) {
       tabIndex={0}
       onClick={() => onSelect(item)}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(item); } }}
-      className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 hover:shadow-md transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+      className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden"
     >
+      <PlaceholderImage category="aukles" name={item.name} />
+      <div className="p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-gray-900 dark:text-white truncate">{item.name}</h3>
@@ -45,6 +48,7 @@ export default function AukleCard({ item, onSelect }: AukleCardProps) {
           {item.hourlyRate && <span>{item.hourlyRate}</span>}
           {item.phone && <span>{item.phone}</span>}
         </div>
+      </div>
       </div>
     </div>
   );

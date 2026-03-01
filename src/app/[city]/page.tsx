@@ -5,7 +5,7 @@ import CityPageClient from './CityPageClient';
 
 interface CityPageProps {
   readonly params: { city: string };
-  readonly searchParams: { category?: string; type?: string; sort?: string; page?: string; sub?: string; spec?: string };
+  readonly searchParams: { category?: string; type?: string; sort?: string; page?: string; sub?: string; spec?: string; area?: string; price?: string };
 }
 
 const cityNames: Record<string, string> = {
@@ -32,13 +32,15 @@ export function generateStaticParams() {
 }
 export const dynamicParams = false;
 
-type SortField = 'rating' | 'name' | 'reviews';
+type SortField = 'rating' | 'name' | 'reviews' | 'price_asc' | 'price_desc';
 
 function getOrderBy(sort: SortField): Record<string, 'asc' | 'desc'> {
   switch (sort) {
     case 'rating': return { baseRating: 'desc' };
     case 'reviews': return { baseReviewCount: 'desc' };
     case 'name': return { name: 'asc' };
+    case 'price_asc': return { baseRating: 'asc' };  // fallback — price is string, sorted client-side
+    case 'price_desc': return { baseRating: 'desc' };
     default: return { baseRating: 'desc' };
   }
 }
@@ -76,19 +78,39 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
 
   const sub = searchParams.sub ?? '';
   const spec = searchParams.spec ?? '';
+  const area = searchParams.area ?? '';
+  const price = searchParams.price ?? '';
 
-  const cityWhere = { city: cityName };
+  // Apply area filter to all categories
+  if (area) kindergartenWhere.area = area;
+
+  const aukleWhere: Record<string, unknown> = { city: cityName };
+  if (area) aukleWhere.area = area;
+
   const burelisWhere: Record<string, unknown> = { city: cityName };
   if (sub) burelisWhere.category = sub;
+  if (area) burelisWhere.area = area;
+
   const specialistWhere: Record<string, unknown> = { city: cityName };
   if (spec) specialistWhere.specialty = { contains: spec };
+  if (area) specialistWhere.area = area;
+
+  // Fetch distinct areas for this city (from all entity types)
+  const [kgAreas, aukleAreas, burelisAreas, specAreas] = await Promise.all([
+    prisma.kindergarten.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
+    prisma.aukle.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
+    prisma.burelis.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
+    prisma.specialist.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
+  ]);
+  const areaSet = new Set([...kgAreas, ...aukleAreas, ...burelisAreas, ...specAreas].map(a => a.area).filter(Boolean) as string[]);
+  const allAreas = Array.from(areaSet).sort((a, b) => a.localeCompare(b, 'lt'));
 
   // Fetch data for ALL categories so every tab has data ready
   const [kindergartens, kindergartenTotal, aukles, aukleTotal, bureliai, burelisTotal, specialists, specialistTotal] = await Promise.all([
     prisma.kindergarten.findMany({ where: kindergartenWhere, orderBy, skip: category === 'darzeliai' ? skip : 0, take: PER_PAGE }),
     prisma.kindergarten.count({ where: kindergartenWhere }),
-    prisma.aukle.findMany({ where: cityWhere, orderBy, skip: category === 'aukles' ? skip : 0, take: PER_PAGE }),
-    prisma.aukle.count({ where: cityWhere }),
+    prisma.aukle.findMany({ where: aukleWhere, orderBy, skip: category === 'aukles' ? skip : 0, take: PER_PAGE }),
+    prisma.aukle.count({ where: aukleWhere }),
     prisma.burelis.findMany({ where: burelisWhere, orderBy, skip: category === 'bureliai' ? skip : 0, take: PER_PAGE }),
     prisma.burelis.count({ where: burelisWhere }),
     prisma.specialist.findMany({ where: specialistWhere, orderBy, skip: category === 'specialistai' ? skip : 0, take: PER_PAGE }),
@@ -166,6 +188,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
         initialSort={sort}
         totalPages={totalPages}
         currentPage={page}
+        areas={allAreas}
       />
     </div>
   );

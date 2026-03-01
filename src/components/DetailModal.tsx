@@ -36,6 +36,15 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
 
   if (!item) return null;
 
+  const getAddress = (): string | null => {
+    if (itemType === 'kindergarten') {
+      return (item as Kindergarten).address ?? null;
+    }
+    return null;
+  };
+
+  const address = getAddress();
+
   const renderDetails = () => {
     switch (itemType) {
       case 'kindergarten': {
@@ -104,7 +113,7 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
       <div className="fixed inset-0 bg-black/40" />
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white dark:bg-slate-800 w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[90vh] overflow-y-auto p-5 animate-slide-up"
+        className="relative bg-white dark:bg-slate-800 w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-5 animate-slide-up"
       >
         <button
           onClick={onClose}
@@ -121,10 +130,14 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
 
         <div className="flex items-center gap-2 mt-2">
           <StarRating rating={item.baseRating} />
-          <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount} atsiliepimai)</span>
+          {item.baseReviewCount > 0 && (
+            <span className="text-sm text-gray-500 dark:text-gray-400">Reitingas</span>
+          )}
         </div>
 
         <div className="mt-4 space-y-2">{renderDetails()}</div>
+
+        {address && <MapLink address={address} city={item.city} />}
 
         <hr className="my-5 border-gray-200 dark:border-slate-700" />
         <ReviewList itemId={item.id} itemType={itemType} />
@@ -223,16 +236,75 @@ function ShareButtons({ itemName }: { readonly itemName: string }) {
   );
 }
 
+function MapLink({ address, city }: { readonly address: string; readonly city: string }) {
+  const query = encodeURIComponent(`${address}, ${city}, Lithuania`);
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+
+  return (
+    <div className="mt-4">
+      <a
+        href={mapsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group block rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
+      >
+        {/* Map placeholder with gradient background */}
+        <div className="relative h-32 bg-gradient-to-br from-blue-50 to-green-50 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center">
+          {/* Decorative grid lines to suggest a map */}
+          <svg
+            className="absolute inset-0 w-full h-full opacity-10 dark:opacity-5"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <defs>
+              <pattern id="map-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-gray-400 dark:text-gray-300" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#map-grid)" />
+          </svg>
+
+          {/* Map pin icon */}
+          <div className="relative flex flex-col items-center gap-1">
+            <svg
+              className="w-10 h-10 text-red-500 dark:text-red-400 drop-shadow-md group-hover:scale-110 transition-transform"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z" />
+            </svg>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300 bg-white/80 dark:bg-slate-800/80 px-2 py-0.5 rounded-full backdrop-blur-sm">
+              {address}, {city}
+            </span>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="flex items-center justify-between px-3 py-2.5 bg-white dark:bg-slate-800">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-base" aria-hidden="true">&#x1F4CD;</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{address}, {city}</span>
+          </div>
+          <span className="shrink-0 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+            Žiūrėti žemėlapyje
+          </span>
+        </div>
+      </a>
+    </div>
+  );
+}
+
 function InfoRow({ label, value, link = false }: { readonly label: string; readonly value: string; readonly link?: boolean }) {
   return (
-    <div className="flex gap-2 text-sm">
+    <div className="flex gap-2 text-sm min-w-0">
       <span className="text-gray-500 dark:text-gray-400 shrink-0">{label}:</span>
       {link ? (
-        <a href={value.startsWith('http') ? value : `https://${value}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline truncate">
+        <a href={value.startsWith('http') ? value : `https://${value}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline truncate min-w-0">
           {value}
         </a>
       ) : (
-        <span className="text-gray-900 dark:text-gray-200">{value}</span>
+        <span className="text-gray-900 dark:text-gray-200 break-words min-w-0">{value}</span>
       )}
     </div>
   );

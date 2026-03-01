@@ -9,6 +9,8 @@ const options = [
   { value: 'rating', label: 'Pagal įvertinimą' },
   { value: 'name', label: 'Pagal pavadinimą' },
   { value: 'reviews', label: 'Pagal atsiliepimus' },
+  { value: 'price_asc', label: 'Kaina: mažiausia' },
+  { value: 'price_desc', label: 'Kaina: didžiausia' },
 ] as const;
 
 export default function SortSelect({ value, onChange }: SortSelectProps) {
