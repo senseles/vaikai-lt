@@ -4,15 +4,34 @@ import CitySelector from "@/components/CitySelector";
 import prisma from "@/lib/prisma";
 
 const RecentlyViewed = dynamic(() => import("@/components/RecentlyViewed"), {
+  ssr: false,
   loading: () => <div className="h-32" />,
 });
 
 const Testimonials = dynamic(() => import("@/components/Testimonials"), {
-  loading: () => <div className="h-32" />,
+  loading: () => (
+    <div className="py-12 md:py-16 animate-pulse">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="h-8 w-64 bg-gray-200 dark:bg-slate-700 rounded mx-auto mb-8" />
+        <div className="grid md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => <div key={i} className="h-40 bg-gray-200 dark:bg-slate-700 rounded-xl" />)}
+        </div>
+      </div>
+    </div>
+  ),
 });
 
 const FaqAccordion = dynamic(() => import("@/components/FaqAccordion"), {
-  loading: () => <div className="h-32" />,
+  loading: () => (
+    <div className="py-12 md:py-16 bg-gray-50 dark:bg-slate-800/50 animate-pulse">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6">
+        <div className="h-8 w-72 bg-gray-200 dark:bg-slate-700 rounded mx-auto mb-8" />
+        <div className="space-y-3">
+          {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-14 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700" />)}
+        </div>
+      </div>
+    </div>
+  ),
 });
 
 async function getStats() {

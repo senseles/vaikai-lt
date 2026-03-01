@@ -24,12 +24,16 @@ export async function GET(request: NextRequest) {
     return errorResponse(`itemType must be one of: ${VALID_ITEM_TYPES.join(', ')}`, 400);
   }
 
-  const reviews = await prisma.review.findMany({
-    where: { itemId, itemType, isApproved: true },
-    orderBy: { createdAt: 'desc' },
-  });
+  try {
+    const reviews = await prisma.review.findMany({
+      where: { itemId, itemType, isApproved: true },
+      orderBy: { createdAt: 'desc' },
+    });
 
-  return jsonResponse(reviews);
+    return jsonResponse(reviews);
+  } catch {
+    return errorResponse('Vidinė serverio klaida', 500);
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -78,25 +82,29 @@ export async function POST(request: NextRequest) {
     return errorResponse('authorName must be 100 characters or less', 400);
   }
 
-  const review = await prisma.review.create({
-    data: {
-      itemId: itemId as string,
-      itemType: itemType as string,
-      authorName: cleanAuthor,
-      rating: rating as number,
-      text: cleanText,
-      isApproved: false,
-    },
-  });
+  try {
+    const review = await prisma.review.create({
+      data: {
+        itemId: itemId as string,
+        itemType: itemType as string,
+        authorName: cleanAuthor,
+        rating: rating as number,
+        text: cleanText,
+        isApproved: false,
+      },
+    });
 
-  // Send email notification to admin (non-blocking)
-  notifyNewReview({
-    authorName: review.authorName,
-    rating: review.rating,
-    text: review.text,
-    itemType: review.itemType,
-    itemId: review.itemId,
-  }).catch(() => { /* notification failure should not block review creation */ });
+    // Send email notification to admin (non-blocking)
+    notifyNewReview({
+      authorName: review.authorName,
+      rating: review.rating,
+      text: review.text,
+      itemType: review.itemType,
+      itemId: review.itemId,
+    }).catch(() => { /* notification failure should not block review creation */ });
 
-  return jsonResponse(review, 201);
+    return jsonResponse(review, 201);
+  } catch {
+    return errorResponse('Nepavyko išsaugoti atsiliepimo', 500);
+  }
 }
