@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import type { Kindergarten, Aukle, Burelis, Specialist, ItemType } from '@/types';
 import StarRating from './StarRating';
@@ -18,7 +18,27 @@ interface DetailModalProps {
   readonly onClose: () => void;
 }
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export default function DetailModal({ item, itemType, onClose }: DetailModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') { onClose(); return; }
+    if (e.key !== 'Tab' || !modalRef.current) return;
+    const focusable = modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE);
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }, [onClose]);
+
   useEffect(() => {
     if (!item) return;
     addToRecentlyViewed({
@@ -28,17 +48,16 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
       itemType,
       baseRating: item.baseRating,
     });
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
+    document.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
     // Focus the close button when the modal opens
-    const closeBtn = document.querySelector<HTMLButtonElement>('[data-modal-close]');
+    const closeBtn = modalRef.current?.querySelector<HTMLButtonElement>('[data-modal-close]');
     closeBtn?.focus();
     return () => {
-      document.removeEventListener('keydown', handler);
+      document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
     };
-  }, [item, itemType, onClose]);
+  }, [item, itemType, handleKeyDown]);
 
   if (!item) return null;
 
@@ -121,13 +140,14 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label={item.name} onClick={onClose}>
       <div className="fixed inset-0 bg-black/40" />
       <div
+        ref={modalRef}
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white dark:bg-slate-800 w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-5 animate-slide-up"
+        className="relative bg-white dark:bg-slate-800 w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-5 animate-slide-up"
       >
         <button
           data-modal-close
           onClick={onClose}
-          className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-500"
+          className="absolute top-2 right-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-500"
           aria-label="Uždaryti"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,12 +164,14 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
           {item.city} &rarr;
         </Link>
 
-        <div className="flex items-center gap-2 mt-2">
-          <StarRating rating={item.baseRating} />
-          {item.baseReviewCount > 0 && (
-            <span className="text-sm text-gray-500 dark:text-gray-400">Reitingas</span>
-          )}
-        </div>
+        {item.baseRating > 0 && (
+          <div className="flex items-center gap-2 mt-2">
+            <StarRating rating={item.baseRating} />
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              ({item.baseReviewCount} {item.baseReviewCount === 1 ? 'atsiliepimas' : 'atsiliepimai'})
+            </span>
+          </div>
+        )}
 
         <div className="mt-4 space-y-2">{renderDetails()}</div>
 
@@ -215,7 +237,7 @@ function ShareButtons({ itemName }: { readonly itemName: string }) {
         <div className="relative">
           <button
             onClick={handleCopyLink}
-            className="w-9 h-9 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+            className="w-11 h-11 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
             aria-label="Kopijuoti nuorodą"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,7 +255,7 @@ function ShareButtons({ itemName }: { readonly itemName: string }) {
         {/* Facebook */}
         <button
           onClick={handleFacebookShare}
-          className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors"
+          className="w-11 h-11 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors"
           aria-label="Dalintis Facebook"
         >
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -244,7 +266,7 @@ function ShareButtons({ itemName }: { readonly itemName: string }) {
         {/* Email */}
         <button
           onClick={handleEmailShare}
-          className="w-9 h-9 rounded-full bg-gray-500 text-white flex items-center justify-center hover:bg-gray-600 transition-colors"
+          className="w-11 h-11 rounded-full bg-gray-500 text-white flex items-center justify-center hover:bg-gray-600 transition-colors"
           aria-label="Siųsti el. paštu"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -324,8 +346,8 @@ function MapEmbed({ address, city }: { readonly address: string; readonly city: 
             </svg>
             <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{address}, {city}</span>
           </div>
-          <span className="shrink-0 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full group-hover/link:bg-blue-100 dark:group-hover/link:bg-blue-900/50 transition-colors">
-            Atidaryti Google Maps
+          <span className="shrink-0 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 sm:px-2.5 py-1 rounded-full group-hover/link:bg-blue-100 dark:group-hover/link:bg-blue-900/50 transition-colors whitespace-nowrap">
+            Google Maps
           </span>
         </a>
       </div>
@@ -335,10 +357,10 @@ function MapEmbed({ address, city }: { readonly address: string; readonly city: 
 
 function InfoRow({ label, value, link = false }: { readonly label: string; readonly value: string; readonly link?: boolean }) {
   return (
-    <div className="flex gap-2 text-sm min-w-0">
+    <div className="flex flex-col xs:flex-row gap-0.5 xs:gap-2 text-sm min-w-0">
       <span className="text-gray-500 dark:text-gray-400 shrink-0">{label}:</span>
       {link ? (
-        <a href={value.startsWith('http') ? value : `https://${value}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline truncate min-w-0">
+        <a href={value.startsWith('http') ? value : `https://${value}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline break-all min-w-0">
           {value}
         </a>
       ) : (

@@ -102,6 +102,7 @@ export default function AuthPage() {
               <input
                 id="name"
                 type="text"
+                autoComplete="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Jūsų vardas"
@@ -118,6 +119,7 @@ export default function AuthPage() {
               id="email"
               type="email"
               required
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="jus@pavyzdys.lt"
@@ -134,6 +136,7 @@ export default function AuthPage() {
               type="password"
               required
               minLength={6}
+              autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={mode === 'register' ? 'Mažiausiai 6 simboliai' : '••••••••'}

@@ -75,6 +75,7 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
         <input
           id="review-author"
           type="text"
+          autoComplete="name"
           placeholder="Jūsų vardas"
           value={authorName}
           onChange={(e) => setAuthorName(e.target.value)}
