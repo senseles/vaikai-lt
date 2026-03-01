@@ -67,8 +67,9 @@ export default function RootLayout({
   return (
     <html lang="lt" className={inter.variable} suppressHydrationWarning>
       <head>
-        {/* dns-prefetch for external domains used in the app */}
+        {/* dns-prefetch / preconnect for external domains used in the app */}
         <link rel="dns-prefetch" href="https://www.google.com" />
+        <link rel="preconnect" href="https://www.google.com" crossOrigin="anonymous" />
 
         {/* Analytics — uncomment and set domain when going live */}
         {/* <script defer data-domain="vaikai.lt" src="https://plausible.io/js/script.js" /> */}
@@ -106,6 +107,11 @@ export default function RootLayout({
             }),
           }}
         />
+        <noscript>
+          <div style={{ padding: '2rem', textAlign: 'center', background: '#fef3c7', color: '#92400e' }}>
+            Ši svetainė reikalauja JavaScript. Prašome įjungti JavaScript savo naršyklėje.
+          </div>
+        </noscript>
         <LanguageProvider>
           <Header />
           <main id="main-content" className="flex-1 pb-16 md:pb-0">{children}</main>

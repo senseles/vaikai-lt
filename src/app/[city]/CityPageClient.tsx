@@ -250,25 +250,27 @@ export default function CityPageClient({
 
       {/* Pagination */}
       {tp > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-8">
+        <nav aria-label="Puslapių navigacija" className="flex items-center justify-center gap-2 mt-8">
           <button
             disabled={page <= 1}
             onClick={() => updateParams({ page: String(page - 1) })}
-            className="px-4 py-2 text-sm border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700"
+            className="px-4 py-2 text-sm border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label={`Ankstesnis puslapis (${page - 1})`}
           >
-            ← Ankstesnis
+            &larr; Ankstesnis
           </button>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-gray-500 dark:text-gray-400" aria-current="page">
             {page} / {tp}
           </span>
           <button
             disabled={page >= tp}
             onClick={() => updateParams({ page: String(page + 1) })}
-            className="px-4 py-2 text-sm border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700"
+            className="px-4 py-2 text-sm border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label={`Kitas puslapis (${page + 1})`}
           >
-            Kitas →
+            Kitas &rarr;
           </button>
-        </div>
+        </nav>
       )}
 
       {/* Compare bar */}
