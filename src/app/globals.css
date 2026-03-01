@@ -75,6 +75,30 @@
   .stagger-4 { animation-delay: 200ms; }
   .stagger-5 { animation-delay: 250ms; }
   .stagger-6 { animation-delay: 300ms; }
+  .stagger-7 { animation-delay: 350ms; }
+  .stagger-8 { animation-delay: 400ms; }
+
+  /* Snap scroll for carousels */
+  .snap-x-mandatory {
+    scroll-snap-type: x mandatory;
+  }
+  .snap-start {
+    scroll-snap-align: start;
+  }
+
+  /* Gradient text */
+  .text-gradient-primary {
+    background: linear-gradient(135deg, #2d6a4f 0%, #40916c 50%, #52b788 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .dark .text-gradient-primary {
+    background: linear-gradient(135deg, #52b788 0%, #74c69d 50%, #95d5b2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
   @keyframes slide-up {
     from { transform: translateY(100%); opacity: 0; }

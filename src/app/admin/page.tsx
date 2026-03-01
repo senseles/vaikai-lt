@@ -406,7 +406,7 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
               <select
                 value={form[f.key] || ''}
                 onChange={(e) => handleChange(f.key, e.target.value)}
-                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm`}
+                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-base sm:text-sm`}
               >
                 {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
@@ -416,7 +416,7 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
                 onChange={(e) => handleChange(f.key, e.target.value)}
                 placeholder={f.placeholder}
                 rows={3}
-                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm resize-none`}
+                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-base sm:text-sm resize-none`}
               />
             ) : (
               <input
@@ -424,7 +424,7 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
                 value={form[f.key] || ''}
                 onChange={(e) => handleChange(f.key, e.target.value)}
                 placeholder={f.placeholder}
-                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm`}
+                className={`w-full border ${fieldErrors[f.key] ? 'border-red-400 dark:border-red-500' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-base sm:text-sm`}
               />
             )}
             {fieldErrors[f.key] && (
@@ -590,7 +590,7 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
           placeholder="Ieškoti..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm flex-1 focus:ring-2 focus:ring-blue-500"
+          className="border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-base sm:text-sm flex-1 focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={() => { setEditItem(null); setShowForm(true); }}
@@ -610,7 +610,7 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
       )}
 
       <div className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
           <table className="w-full text-sm">
             <thead className="bg-gray-50 dark:bg-slate-800 border-b dark:border-slate-700">
               <tr>
