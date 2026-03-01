@@ -26,6 +26,12 @@ const cityNames: Record<string, string> = {
   sakiai: 'Šakiai',
 };
 
+/** Tell Next.js which city slugs are valid — unknown slugs get 404 before rendering */
+export function generateStaticParams() {
+  return Object.keys(cityNames).map((city) => ({ city }));
+}
+export const dynamicParams = false;
+
 type SortField = 'rating' | 'name' | 'reviews';
 
 function getOrderBy(sort: SortField): Record<string, 'asc' | 'desc'> {

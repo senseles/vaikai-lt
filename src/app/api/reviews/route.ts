@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       authorName: stripHtml((authorName as string).trim()),
       rating: rating as number,
       text: stripHtml((text as string).trim()),
-      isApproved: true,
+      isApproved: false,
     },
   });
 

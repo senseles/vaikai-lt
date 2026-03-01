@@ -1,35 +1,81 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-/**
- * Middleware for admin API route protection.
- * All /api/admin/* routes (except /api/admin/login) require authentication.
- */
+/** All valid city slugs — must match cityNames in [city]/page.tsx */
+const VALID_CITY_SLUGS = new Set([
+  'vilnius', 'kaunas', 'klaipeda', 'siauliai', 'panevezys', 'palanga',
+  'silute', 'taurage', 'telsiai', 'mazeikiai', 'kedainiai', 'marijampole',
+  'utena', 'alytus', 'jonava', 'visaginas', 'druskininkai', 'elektrenai',
+  'ukmerge', 'akmene', 'anyksciai', 'birzai', 'ignalina', 'joniskis',
+  'jurbarkas', 'kaisiadorys', 'kelme', 'kretinga', 'kupiskis', 'lazdijai',
+  'moletai', 'pakruojis', 'pasvalys', 'plunge', 'prienai', 'radviliskis',
+  'raseiniai', 'rokiskis', 'trakai', 'varena', 'vilkaviskis', 'zarasai',
+  'sakiai',
+]);
+
+/** Known top-level routes that are NOT city slugs */
+const KNOWN_ROUTES = new Set(['', 'megstamiausieji', 'paieska', 'admin']);
+
+/** Minimal 404 HTML — styled to match the site */
+const NOT_FOUND_HTML = `<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>404 — Puslapis nerastas | Vaikai.lt</title>
+<meta name="robots" content="noindex"/>
+<style>
+body{font-family:Inter,system-ui,sans-serif;margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f9fafb;color:#111827;text-align:center}
+.c{max-width:28rem;padding:2rem}
+.n{font-size:4rem;font-weight:700;color:#2d6a4f;margin-bottom:1rem}
+h1{font-size:1.5rem;font-weight:700;margin-bottom:.75rem}
+p{color:#6b7280;margin-bottom:2rem}
+a{display:inline-block;background:#2d6a4f;color:#fff;font-weight:600;padding:.75rem 1.5rem;border-radius:.5rem;text-decoration:none}
+a:hover{background:#40916c}
+</style>
+</head>
+<body><div class="c"><div class="n">404</div><h1>Puslapis nerastas</h1><p>Atsiprašome, bet šis puslapis neegzistuoja arba buvo perkeltas.</p><a href="/">Grįžti į pradžią</a></div></body>
+</html>`;
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip login route — it's public
-  if (pathname === '/api/admin/login') {
-    return NextResponse.next();
+  // --- City slug validation ---
+  // Check root-level single-segment paths (e.g., /vilnius, /nonexistent)
+  const slug = pathname.slice(1); // remove leading /
+  if (slug && !slug.includes('/') && !slug.includes('.') && !slug.startsWith('api') && !slug.startsWith('_next')) {
+    if (!KNOWN_ROUTES.has(slug) && !VALID_CITY_SLUGS.has(slug)) {
+      return new NextResponse(NOT_FOUND_HTML, {
+        status: 404,
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      });
+    }
   }
 
-  // Check for admin token in cookie or Authorization header
-  const cookieToken = request.cookies.get('admin_token')?.value;
-  const authHeader = request.headers.get('authorization');
-  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  const token = cookieToken || bearerToken;
+  // --- Admin API auth ---
+  if (pathname.startsWith('/api/admin')) {
+    if (pathname === '/api/admin/login') {
+      return NextResponse.next();
+    }
 
-  if (!token) {
-    return NextResponse.json(
-      { success: false, error: 'Neautorizuota. Prisijunkite.' },
-      { status: 401 },
-    );
+    const cookieToken = request.cookies.get('admin_token')?.value;
+    const authHeader = request.headers.get('authorization');
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    const token = cookieToken || bearerToken;
+
+    if (!token) {
+      return NextResponse.json(
+        { success: false, error: 'Neautorizuota. Prisijunkite.' },
+        { status: 401 },
+      );
+    }
   }
 
-  // Token exists — allow through.
-  // In production, validate token against DB/Redis here.
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: '/api/admin/:path*',
+  matcher: [
+    '/api/admin/:path*',
+    '/((?!api|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.json|icons|og-image).*)',
+  ],
 };
