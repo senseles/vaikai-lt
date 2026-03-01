@@ -132,6 +132,7 @@ export default function SearchBar() {
             autoComplete="off"
             role="combobox"
             aria-expanded={showSuggestions}
+            aria-controls="search-suggestions"
             aria-haspopup="listbox"
           />
           <button
@@ -149,6 +150,7 @@ export default function SearchBar() {
       {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
         <ul
+          id="search-suggestions"
           className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl shadow-lg overflow-hidden"
           role="listbox"
         >

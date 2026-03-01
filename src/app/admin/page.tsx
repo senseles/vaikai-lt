@@ -447,7 +447,7 @@ function SortArrow({ active, direction }: { readonly active: boolean; readonly d
 
 // ─── CRUD Table with Create/Edit, Bulk Actions, Better UX ───
 
-function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly label: string }) {
+function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: string }) {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);

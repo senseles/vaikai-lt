@@ -76,13 +76,8 @@ export default function RootLayout({
   return (
     <html lang="lt" className={inter.variable} suppressHydrationWarning>
       <head>
-        {/* Preconnect to external domains for faster resource loading */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        {/* dns-prefetch for external domains used in the app */}
         <link rel="dns-prefetch" href="https://www.google.com" />
-        <link rel="dns-prefetch" href="https://plausible.io" />
 
         {/* Analytics — uncomment and set domain when going live */}
         {/* <script defer data-domain="vaikai.lt" src="https://plausible.io/js/script.js" /> */}

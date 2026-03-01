@@ -7,8 +7,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ suggestions: [] });
   }
 
-  const query = q.toLocaleLowerCase('lt');
-
   // Search across all entity types for suggestions (limit to 8 total)
   const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
     prisma.kindergarten.findMany({
