@@ -30,24 +30,26 @@ function timeAgo(date: string | Date): string {
   return d.toLocaleDateString('lt-LT');
 }
 
-// ===== Vote Button =====
+// ===== Vote Buttons =====
 interface VoteButtonsProps {
   postId?: string;
   commentId?: string;
   upvotes: number;
   downvotes: number;
+  disabled?: boolean;
 }
 
-export function VoteButtons({ postId, commentId, upvotes, downvotes }: VoteButtonsProps) {
+export function VoteButtons({ postId, commentId, upvotes, downvotes, disabled }: VoteButtonsProps) {
   const [up, setUp] = useState(upvotes);
   const [down, setDown] = useState(downvotes);
   const [myVote, setMyVote] = useState<1 | -1 | null>(null);
   const [loading, setLoading] = useState(false);
 
   const score = up - down;
+  const isDisabled = disabled || loading;
 
   const vote = async (value: 1 | -1) => {
-    if (loading) return;
+    if (isDisabled) return;
     setLoading(true);
 
     try {
@@ -66,12 +68,10 @@ export function VoteButtons({ postId, commentId, upvotes, downvotes }: VoteButto
       const data = await res.json();
 
       if (data.action === 'removed') {
-        // Vote was toggled off
         if (value === 1) setUp((prev) => prev - 1);
         else setDown((prev) => prev - 1);
         setMyVote(null);
       } else if (data.action === 'changed') {
-        // Vote was changed
         if (value === 1) {
           setUp((prev) => prev + 1);
           setDown((prev) => prev - 1);
@@ -81,7 +81,6 @@ export function VoteButtons({ postId, commentId, upvotes, downvotes }: VoteButto
         }
         setMyVote(value);
       } else {
-        // New vote
         if (value === 1) setUp((prev) => prev + 1);
         else setDown((prev) => prev + 1);
         setMyVote(value);
@@ -94,36 +93,55 @@ export function VoteButtons({ postId, commentId, upvotes, downvotes }: VoteButto
   };
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-0.5">
+      {/* Upvote button — min 44px touch target */}
       <button
         onClick={() => vote(1)}
-        disabled={loading}
-        className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${
-          myVote === 1
-            ? 'bg-green-100 dark:bg-green-900/40 text-[#2d6a4f] dark:text-green-400'
-            : 'hover:bg-gray-100 dark:hover:bg-slate-700 text-slate-400'
+        disabled={isDisabled}
+        className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-150 ${
+          isDisabled && disabled
+            ? 'opacity-40 cursor-not-allowed text-slate-300 dark:text-slate-600'
+            : myVote === 1
+              ? 'bg-green-500 dark:bg-green-600 text-white shadow-sm'
+              : 'hover:bg-green-50 dark:hover:bg-green-900/30 text-slate-400 hover:text-green-600 dark:hover:text-green-400 active:bg-green-100 dark:active:bg-green-900/50'
         }`}
         aria-label="Balsuoti už"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+        <svg className="w-5 h-5" fill={myVote === 1 ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
         </svg>
       </button>
-      <span className={`text-sm font-bold ${score > 0 ? 'text-[#2d6a4f] dark:text-green-400' : score < 0 ? 'text-red-500' : 'text-slate-500'}`}>
+
+      {/* Score */}
+      <span
+        className={`text-sm font-bold tabular-nums leading-tight ${
+          isDisabled && disabled
+            ? 'text-slate-300 dark:text-slate-600'
+            : score > 0
+              ? 'text-green-600 dark:text-green-400'
+              : score < 0
+                ? 'text-red-500 dark:text-red-400'
+                : 'text-slate-500 dark:text-slate-400'
+        }`}
+      >
         {score}
       </span>
+
+      {/* Downvote button — min 44px touch target */}
       <button
         onClick={() => vote(-1)}
-        disabled={loading}
-        className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${
-          myVote === -1
-            ? 'bg-red-100 dark:bg-red-900/40 text-red-500'
-            : 'hover:bg-gray-100 dark:hover:bg-slate-700 text-slate-400'
+        disabled={isDisabled}
+        className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-150 ${
+          isDisabled && disabled
+            ? 'opacity-40 cursor-not-allowed text-slate-300 dark:text-slate-600'
+            : myVote === -1
+              ? 'bg-red-500 dark:bg-red-600 text-white shadow-sm'
+              : 'hover:bg-red-50 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 dark:hover:text-red-400 active:bg-red-100 dark:active:bg-red-900/50'
         }`}
         aria-label="Balsuoti prieš"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        <svg className="w-5 h-5" fill={myVote === -1 ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
     </div>
@@ -150,32 +168,57 @@ interface CommentProps {
   onCommentAdded: () => void;
 }
 
+/**
+ * Max indent on mobile is 2 levels (to prevent content becoming too narrow at 393px).
+ * On desktop, allow up to 3 levels of visual nesting.
+ */
 function Comment({ comment, depth, postId, onCommentAdded }: CommentProps) {
   const [showReply, setShowReply] = useState(false);
 
+  // Limit visual indent: on mobile max 2 levels, use left-border for depth indicator
+  // ml-3 on mobile (12px), ml-6 on sm+ (24px) — much less aggressive than ml-4/ml-8
+  const indentClass = depth > 0
+    ? 'ml-3 sm:ml-6 pl-3 sm:pl-4 border-l-2 border-green-200 dark:border-slate-600'
+    : '';
+
   return (
-    <div className={`${depth > 0 ? 'ml-4 sm:ml-8 border-l-2 border-gray-200 dark:border-slate-700 pl-4' : ''}`}>
-      <div className="flex items-start gap-3 py-3">
-        <VoteButtons commentId={comment.id} upvotes={comment.upvotes} downvotes={comment.downvotes} />
+    <div className={indentClass}>
+      <div className="flex items-start gap-2 sm:gap-3 py-3">
+        {/* Vote buttons — smaller for comments */}
+        <div className="shrink-0">
+          <VoteButtons commentId={comment.id} upvotes={comment.upvotes} downvotes={comment.downvotes} />
+        </div>
+
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1">
-            <span className="font-semibold text-slate-700 dark:text-slate-300">{comment.authorName}</span>
-            <span aria-hidden="true">·</span>
-            <time>{timeAgo(comment.createdAt)}</time>
+          {/* Author + timestamp: stack vertically on very narrow screens */}
+          <div className="flex flex-col xs:flex-row xs:items-center gap-0.5 xs:gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1.5">
+            <span className="font-semibold text-slate-700 dark:text-slate-300">
+              {comment.authorName}
+            </span>
+            <span className="hidden xs:inline" aria-hidden="true">·</span>
+            <time className="text-slate-400 dark:text-slate-500">
+              {timeAgo(comment.createdAt)}
+            </time>
           </div>
-          <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap break-words">
+
+          {/* Comment content */}
+          <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap break-words leading-relaxed">
             {comment.content}
           </p>
+
+          {/* Reply button — 44px touch target */}
           {depth < 2 && (
             <button
               onClick={() => setShowReply(!showReply)}
-              className="text-xs text-slate-500 dark:text-slate-400 hover:text-[#2d6a4f] dark:hover:text-green-400 mt-2 font-medium transition-colors"
+              className="text-xs text-slate-500 dark:text-slate-400 hover:text-green-700 dark:hover:text-green-400 mt-2 font-medium transition-colors min-h-[44px] flex items-center"
             >
               {showReply ? 'Atšaukti' : 'Atsakyti'}
             </button>
           )}
+
+          {/* Reply form — full-width on mobile */}
           {showReply && (
-            <div className="mt-3">
+            <div className="mt-2">
               <CommentForm
                 postId={postId}
                 parentId={comment.id}
@@ -273,51 +316,75 @@ function CommentForm({ postId, parentId, onSubmit, compact }: CommentFormProps) 
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className={`space-y-3 ${compact ? '' : 'bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700'}`}>
-      {!compact && (
-        <h3 className="font-semibold text-slate-800 dark:text-white">Pridėti komentarą</h3>
-      )}
-      <div className={compact ? 'flex gap-2' : ''}>
-        <input
-          type="text"
-          value={authorName}
-          onChange={(e) => setAuthorName(e.target.value)}
-          placeholder="Jūsų vardas"
-          maxLength={50}
-          className={`${compact ? 'w-1/3' : 'w-full'} px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] dark:focus:ring-green-400 placeholder:text-slate-400`}
-        />
-        {compact && (
+  if (compact) {
+    // Compact reply form — stacks vertically on mobile, full-width
+    return (
+      <form onSubmit={handleSubmit} className="space-y-2">
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input
+            type="text"
+            value={authorName}
+            onChange={(e) => setAuthorName(e.target.value)}
+            placeholder="Jūsų vardas"
+            maxLength={50}
+            className="w-full sm:w-40 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 placeholder:text-slate-400"
+          />
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Jūsų atsakymas..."
             maxLength={2000}
             rows={2}
-            className="flex-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] dark:focus:ring-green-400 resize-none placeholder:text-slate-400"
+            className="w-full flex-1 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 resize-none placeholder:text-slate-400"
           />
-        )}
-      </div>
-      {!compact && (
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Rašykite komentarą..."
-          maxLength={2000}
-          rows={4}
-          className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] dark:focus:ring-green-400 resize-none placeholder:text-slate-400"
-        />
-      )}
-      {error && (
-        <p className="text-red-500 text-xs">{error}</p>
-      )}
+        </div>
+        {error && <p className="text-red-500 text-xs">{error}</p>}
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium px-4 py-2.5 rounded-lg text-sm transition-colors min-h-[44px]"
+          >
+            {submitting ? 'Siunčiama...' : 'Atsakyti'}
+          </button>
+        </div>
+      </form>
+    );
+  }
+
+  // Full comment form
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 space-y-3"
+    >
+      <h3 className="font-semibold text-slate-800 dark:text-white text-base">
+        Pridėti komentarą
+      </h3>
+      <input
+        type="text"
+        value={authorName}
+        onChange={(e) => setAuthorName(e.target.value)}
+        placeholder="Jūsų vardas"
+        maxLength={50}
+        className="w-full px-3 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 placeholder:text-slate-400"
+      />
+      <textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Rašykite komentarą..."
+        maxLength={2000}
+        rows={4}
+        className="w-full px-3 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 resize-y placeholder:text-slate-400"
+      />
+      {error && <p className="text-red-500 text-xs">{error}</p>}
       <div className="flex justify-end">
         <button
           type="submit"
           disabled={submitting}
-          className="bg-[#2d6a4f] hover:bg-[#40916c] disabled:opacity-50 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors"
+          className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium px-5 py-2.5 rounded-lg text-sm transition-colors min-h-[44px]"
         >
-          {submitting ? 'Siunčiama...' : compact ? 'Atsakyti' : 'Komentuoti'}
+          {submitting ? 'Siunčiama...' : 'Komentuoti'}
         </button>
       </div>
     </form>
@@ -345,7 +412,7 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
 
       {/* Comments */}
       <div>
-        <h3 className="font-semibold text-slate-800 dark:text-white mb-4">
+        <h3 className="font-semibold text-slate-800 dark:text-white mb-4 text-base">
           Komentarai ({countComments(comments)})
         </h3>
         {comments.length === 0 ? (
@@ -353,7 +420,7 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
             Dar nėra komentarų. Būkite pirmas!
           </p>
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-1 divide-y divide-gray-100 dark:divide-slate-700/50">
             {comments.map((comment) => (
               <Comment
                 key={comment.id}

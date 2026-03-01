@@ -2,11 +2,7 @@ import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 import { jsonResponse, errorResponse, getPagination } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
-
-/** Strip HTML tags from user input to prevent stored XSS */
-function stripHtml(input: string): string {
-  return input.replace(/<[^>]*>/g, '');
-}
+import { checkCsrf, checkHoneypot, checkSubmitTiming, stripHtml } from '@/lib/security';
 
 /** Generate a URL-safe slug from a Lithuanian title */
 function slugify(text: string): string {
@@ -140,7 +136,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.REVIEW_POST);
+  // CSRF protection
+  const csrfResponse = checkCsrf(request);
+  if (csrfResponse) return csrfResponse;
+
+  // Rate limiting: 3 posts per 5 minutes
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.FORUM_POST);
   if (rateLimitResponse) return rateLimitResponse;
 
   let body: unknown;
@@ -150,8 +151,17 @@ export async function POST(request: NextRequest) {
     return errorResponse('Netinkamas JSON formatas', 400);
   }
 
-  const { title: rawTitle, content: rawContent, authorName: rawAuthor, categorySlug, city } =
-    body as Record<string, unknown>;
+  const parsed = body as Record<string, unknown>;
+
+  // Honeypot check — bots fill hidden fields
+  const honeypotResponse = checkHoneypot(parsed);
+  if (honeypotResponse) return honeypotResponse;
+
+  // Timing check — reject submissions faster than 3 seconds
+  const timingResponse = checkSubmitTiming(parsed, 3);
+  if (timingResponse) return timingResponse;
+
+  const { title: rawTitle, content: rawContent, authorName: rawAuthor, categorySlug, city } = parsed;
 
   // Validate categorySlug
   if (!categorySlug || typeof categorySlug !== 'string') {

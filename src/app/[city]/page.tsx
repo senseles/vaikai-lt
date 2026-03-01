@@ -101,6 +101,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   const [
     kgAreas, aukleAreas, burelisAreas, specAreas,
     kindergartens, kindergartenTotal, aukles, aukleTotal, bureliai, burelisTotal, specialists, specialistTotal,
+    forumPostCount,
   ] = await Promise.all([
     prisma.kindergarten.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
     prisma.aukle.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
@@ -114,6 +115,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
     prisma.burelis.count({ where: burelisWhere }),
     prisma.specialist.findMany({ where: specialistWhere, orderBy, skip: category === 'specialistai' ? skip : 0, take: PER_PAGE }),
     prisma.specialist.count({ where: specialistWhere }),
+    prisma.forumPost.count({ where: { city: cityName } }),
   ]);
   const areaSet = new Set([...kgAreas, ...aukleAreas, ...burelisAreas, ...specAreas].map(a => a.area).filter(Boolean) as string[]);
   const allAreas = Array.from(areaSet).sort((a, b) => a.localeCompare(b, 'lt'));
@@ -190,6 +192,23 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
       <p className="text-gray-500 dark:text-gray-400 mb-6">
         Darželiai: {kindergartenTotal} · Auklės: {aukleTotal} · Būreliai: {burelisTotal} · Specialistai: {specialistTotal}
       </p>
+
+      {forumPostCount > 0 && (
+        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+          <Link
+            href={`/forumas?city=${encodeURIComponent(cityName)}`}
+            className="inline-flex items-center gap-2 text-[#2d6a4f] dark:text-green-400 font-medium hover:underline"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+            </svg>
+            Diskusijos apie {cityName}
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              ({forumPostCount} {forumPostCount === 1 ? 'įrašas' : forumPostCount < 10 ? 'įrašai' : 'įrašų'} forume)
+            </span>
+          </Link>
+        </div>
+      )}
 
       <CityPageClient
         citySlug={citySlug}

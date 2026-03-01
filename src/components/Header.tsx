@@ -32,8 +32,11 @@ export default function Header() {
     localStorage.setItem("theme", next ? "dark" : "light");
   };
 
+  const isForumActive = pathname.startsWith('/forumas');
+
   const navLinks = [
     { href: "/#miestai", label: t('nav.cities') },
+    { href: "/forumas", label: "Forumas" },
     { href: "/megstamiausieji", label: t('nav.favorites') },
     { href: "/#duk", label: t('nav.faq') },
   ];
@@ -54,15 +57,30 @@ export default function Header() {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-6" aria-label="Pagrindinė navigacija">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-gray-700 dark:text-gray-300 font-medium text-sm hover:text-primary dark:hover:text-primary-light transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const active = link.href === '/forumas' ? isForumActive : pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`font-medium text-sm transition-colors ${
+                    active
+                      ? 'text-primary dark:text-primary-light'
+                      : 'text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light'
+                  }`}
+                >
+                  {link.href === '/forumas' && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      {link.label}
+                    </span>
+                  )}
+                  {link.href !== '/forumas' && link.label}
+                </Link>
+              );
+            })}
             <select
               className="text-xs font-medium border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1.5 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 cursor-pointer"
               value={locale}
@@ -99,16 +117,28 @@ export default function Header() {
         {/* Mobile nav */}
         {mobileOpen && (
           <nav className="md:hidden flex flex-col gap-1 pb-4 border-t border-gray-200 dark:border-slate-700 pt-3 animate-slide-down" aria-label="Mobilusis meniu">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="px-3 py-3 min-h-[44px] flex items-center rounded-lg text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200 dark:active:bg-slate-700 transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const active = link.href === '/forumas' ? isForumActive : pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-3 py-3 min-h-[44px] flex items-center gap-2 rounded-lg font-medium transition-colors ${
+                    active
+                      ? 'text-primary dark:text-primary-light bg-primary/5 dark:bg-primary-light/5'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 active:bg-gray-200 dark:active:bg-slate-700'
+                  }`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {link.href === '/forumas' && (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  )}
+                  {link.label}
+                </Link>
+              );
+            })}
             <div className="flex items-center gap-3 mt-2 px-3">
               <select
                 className="text-base font-medium border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 min-h-[44px] bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300"

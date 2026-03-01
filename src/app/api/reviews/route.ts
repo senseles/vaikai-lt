@@ -3,13 +3,9 @@ import prisma from '@/lib/prisma';
 import { jsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { notifyNewReview } from '@/lib/notifications';
+import { checkCsrf, stripHtml } from '@/lib/security';
 
 const VALID_ITEM_TYPES = ['kindergarten', 'aukle', 'burelis', 'specialist'] as const;
-
-/** Strip HTML tags from user input to prevent stored XSS */
-function stripHtml(input: string): string {
-  return input.replace(/<[^>]*>/g, '');
-}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -37,6 +33,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // CSRF protection
+  const csrfResponse = checkCsrf(request);
+  if (csrfResponse) return csrfResponse;
+
   const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.REVIEW_POST);
   if (rateLimitResponse) return rateLimitResponse;
 

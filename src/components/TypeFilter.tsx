@@ -19,7 +19,7 @@ export default function TypeFilter({ value, onChange }: TypeFilterProps) {
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
-          className={`px-3 py-2 min-h-[40px] text-sm rounded-md transition-colors active:scale-[0.97] ${
+          className={`px-3 py-2.5 min-h-[44px] text-sm rounded-md transition-colors active:scale-[0.97] ${
             value === opt.value ? 'bg-white dark:bg-slate-700 shadow-sm font-medium text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >

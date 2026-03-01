@@ -15,6 +15,7 @@ export async function GET() {
       pendingReviewCount,
       userCount,
       forumPostCount,
+      forumCommentCount,
     ] = await Promise.all([
       prisma.kindergarten.count(),
       prisma.aukle.count(),
@@ -24,6 +25,7 @@ export async function GET() {
       prisma.review.count({ where: { isApproved: false } }),
       prisma.user.count(),
       prisma.forumPost.count(),
+      prisma.forumComment.count(),
     ]);
 
     // Reviews per day (last 7 days)
@@ -124,6 +126,7 @@ export async function GET() {
       pendingReviewCount,
       userCount,
       forumPostCount,
+      forumCommentCount,
       reviewsPerDay,
       entitiesPerWeek: weekBuckets,
       recentReviews,

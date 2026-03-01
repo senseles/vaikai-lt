@@ -68,6 +68,35 @@ export async function middleware(request: NextRequest) {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)');
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+
+  // Content-Security-Policy
+  const csp = [
+    "default-src 'self'",
+    // Scripts: self only, no eval, no inline (Next.js uses nonces internally)
+    "script-src 'self' 'unsafe-inline'",
+    // Styles: self + inline needed for Tailwind CSS and component styles
+    "style-src 'self' 'unsafe-inline'",
+    // Images: self, data: URIs, and HTTPS sources (e.g., map tiles)
+    "img-src 'self' data: https:",
+    // Fonts: self and data: URIs
+    "font-src 'self' data:",
+    // Connect: self for API calls
+    "connect-src 'self'",
+    // Frames: only Google Maps embeds
+    "frame-src https://www.google.com https://maps.google.com",
+    // Objects: none (block Flash, Java, etc.)
+    "object-src 'none'",
+    // Base URI: self only (prevent <base> tag hijacking)
+    "base-uri 'self'",
+    // Form actions: self only
+    "form-action 'self'",
+    // Frame ancestors: none (equivalent to X-Frame-Options: DENY)
+    "frame-ancestors 'none'",
+    // Block mixed content
+    "upgrade-insecure-requests",
+  ].join('; ');
+  response.headers.set('Content-Security-Policy', csp);
+
   return response;
 }
 

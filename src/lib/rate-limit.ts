@@ -61,8 +61,14 @@ export const RATE_LIMITS = {
   PUBLIC_GET: { maxRequests: 30, windowSeconds: 15, identifier: 'public-get' } satisfies RateLimitOptions,
   /** Review POST: 5 requests per 15 seconds */
   REVIEW_POST: { maxRequests: 5, windowSeconds: 15, identifier: 'review-post' } satisfies RateLimitOptions,
-  /** Admin login: 10 requests per 60 seconds */
-  ADMIN_LOGIN: { maxRequests: 10, windowSeconds: 60, identifier: 'admin-login' } satisfies RateLimitOptions,
+  /** Admin login: 5 attempts per 15 minutes */
+  ADMIN_LOGIN: { maxRequests: 5, windowSeconds: 900, identifier: 'admin-login' } satisfies RateLimitOptions,
+  /** Forum post creation: 3 posts per 5 minutes */
+  FORUM_POST: { maxRequests: 3, windowSeconds: 300, identifier: 'forum-post' } satisfies RateLimitOptions,
+  /** Forum comment creation: 10 comments per 5 minutes */
+  FORUM_COMMENT: { maxRequests: 10, windowSeconds: 300, identifier: 'forum-comment' } satisfies RateLimitOptions,
+  /** Forum voting: 30 votes per minute */
+  FORUM_VOTE: { maxRequests: 30, windowSeconds: 60, identifier: 'forum-vote' } satisfies RateLimitOptions,
 } as const;
 
 const RATE_LIMIT_MESSAGE = 'Per daug užklausų. Bandykite vėliau.';

@@ -33,11 +33,11 @@ export default memo(function KindergartenCard({ item, onSelect, compareSelected 
       <div className="p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-gray-900 dark:text-white truncate">{item.name}</h3>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${badge.cls}`}>{badge.label}</span>
+          <div className="flex items-center gap-2 mb-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 dark:text-white truncate min-w-0">{item.name}</h3>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${badge.cls}`}>{badge.label}</span>
           </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{item.city}{item.address ? `, ${item.address}` : ''}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{item.city}{item.address ? `, ${item.address}` : ''}</p>
         </div>
         <FavoriteButton itemId={item.id} itemType="kindergarten" />
       </div>

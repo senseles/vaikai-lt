@@ -70,6 +70,8 @@ export default function RootLayout({
         {/* dns-prefetch / preconnect for external domains used in the app */}
         <link rel="dns-prefetch" href="https://www.google.com" />
         <link rel="preconnect" href="https://www.google.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
 
         {/* Analytics — uncomment and set domain when going live */}
         {/* <script defer data-domain="vaikai.lt" src="https://plausible.io/js/script.js" /> */}

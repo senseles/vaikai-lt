@@ -39,12 +39,12 @@ export default memo(function SpecialistCard({ item, onSelect }: SpecialistCardPr
         )}
       </div>
 
-      <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 mt-3 min-w-0">
+        <div className="flex items-center gap-2 shrink-0">
           <StarRating rating={item.baseRating} size="sm" />
           <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount})</span>
         </div>
-        {item.phone && <span className="text-sm text-gray-600 dark:text-gray-400">{item.phone}</span>}
+        {item.phone && <span className="text-sm text-gray-600 dark:text-gray-400 truncate min-w-0">{item.phone}</span>}
       </div>
       </div>
     </div>

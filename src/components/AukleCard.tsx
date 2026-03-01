@@ -40,14 +40,14 @@ export default memo(function AukleCard({ item, onSelect }: AukleCardProps) {
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-2 mt-3">
+      <div className="flex items-center justify-between gap-2 mt-3 min-w-0">
         <div className="flex items-center gap-2 shrink-0">
           <StarRating rating={item.baseRating} size="sm" />
           <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount})</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 truncate min-w-0">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 min-w-0 overflow-hidden">
           {item.hourlyRate && <span className="shrink-0">{item.hourlyRate}</span>}
-          {item.phone && <span className="truncate">{item.phone}</span>}
+          {item.phone && <span className="truncate min-w-0">{item.phone}</span>}
         </div>
       </div>
       </div>

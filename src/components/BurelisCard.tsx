@@ -39,12 +39,12 @@ export default memo(function BurelisCard({ item, onSelect }: BurelisCardProps) {
         )}
       </div>
 
-      <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 mt-3 min-w-0">
+        <div className="flex items-center gap-2 shrink-0">
           <StarRating rating={item.baseRating} size="sm" />
           <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount})</span>
         </div>
-        {item.price && <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.price}</span>}
+        {item.price && <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate min-w-0">{item.price}</span>}
       </div>
       </div>
     </div>

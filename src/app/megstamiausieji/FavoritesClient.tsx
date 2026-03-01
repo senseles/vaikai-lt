@@ -118,7 +118,7 @@ export default function FavoritesClient() {
       {kindergartens.length > 0 && (
         <section className="mb-10">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">🏫 Darželiai ({kindergartens.length})</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {kindergartens.map((item) => (
               <KindergartenCard key={item.id} item={item} onSelect={(i) => openDetail(i, 'kindergarten')} />
             ))}
@@ -129,7 +129,7 @@ export default function FavoritesClient() {
       {aukles.length > 0 && (
         <section className="mb-10">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">👩‍👧 Auklės ({aukles.length})</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {aukles.map((item) => (
               <AukleCard key={item.id} item={item} onSelect={(i) => openDetail(i, 'aukle')} />
             ))}
@@ -140,7 +140,7 @@ export default function FavoritesClient() {
       {bureliai.length > 0 && (
         <section className="mb-10">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">🎨 Būreliai ({bureliai.length})</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {bureliai.map((item) => (
               <BurelisCard key={item.id} item={item} onSelect={(i) => openDetail(i, 'burelis')} />
             ))}
@@ -151,7 +151,7 @@ export default function FavoritesClient() {
       {specialists.length > 0 && (
         <section className="mb-10">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">👨‍⚕️ Specialistai ({specialists.length})</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {specialists.map((item) => (
               <SpecialistCard key={item.id} item={item} onSelect={(i) => openDetail(i, 'specialist')} />
             ))}

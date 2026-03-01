@@ -112,15 +112,15 @@ export default function NewPostPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 md:py-12">
-      <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white mb-2">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white mb-2">
         Naujas įrašas
       </h1>
-      <p className="text-slate-600 dark:text-slate-400 mb-8">
+      <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mb-6 sm:mb-8">
         Pasidalinkite klausimu, patirtimi ar rekomendacija su kitais tėveliais.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
         {/* Category */}
         <div>
           <label htmlFor="category" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
@@ -133,7 +133,7 @@ export default function NewPostPage() {
               setCategorySlug(e.target.value);
               setErrors((prev) => ({ ...prev, category: '' }));
             }}
-            className={`w-full px-4 py-3 rounded-xl border ${errors.category ? 'border-red-400' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] dark:focus:ring-green-400`}
+            className={`w-full px-4 py-3 rounded-xl border ${errors.category ? 'border-red-400' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400`}
           >
             <option value="">— Pasirinkite kategoriją —</option>
             {categories.map((cat) => (
@@ -160,15 +160,15 @@ export default function NewPostPage() {
             }}
             placeholder="Pvz.: Koks darželis geriausias Vilniuje?"
             maxLength={200}
-            className={`w-full px-4 py-3 rounded-xl border ${errors.title ? 'border-red-400' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] dark:focus:ring-green-400 placeholder:text-slate-400`}
+            className={`w-full px-4 py-3 rounded-xl border ${errors.title ? 'border-red-400' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 placeholder:text-slate-400`}
           />
           <div className="flex justify-between mt-1">
-            {errors.title && <p className="text-red-500 text-xs">{errors.title}</p>}
-            <p className="text-xs text-slate-400 ml-auto">{title.length}/200</p>
+            {errors.title ? <p className="text-red-500 text-xs">{errors.title}</p> : <span />}
+            <p className="text-xs text-slate-400 tabular-nums">{title.length}/200</p>
           </div>
         </div>
 
-        {/* Content */}
+        {/* Content — textarea with overflow protection */}
         <div>
           <label htmlFor="content" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
             Turinys <span className="text-red-500">*</span>
@@ -183,11 +183,11 @@ export default function NewPostPage() {
             placeholder="Aprašykite savo klausimą ar temą..."
             maxLength={5000}
             rows={8}
-            className={`w-full px-4 py-3 rounded-xl border ${errors.content ? 'border-red-400' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] dark:focus:ring-green-400 resize-y placeholder:text-slate-400`}
+            className={`w-full px-4 py-3 rounded-xl border ${errors.content ? 'border-red-400' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 resize-y placeholder:text-slate-400 max-w-full`}
           />
           <div className="flex justify-between mt-1">
-            {errors.content && <p className="text-red-500 text-xs">{errors.content}</p>}
-            <p className="text-xs text-slate-400 ml-auto">{content.length}/5000</p>
+            {errors.content ? <p className="text-red-500 text-xs">{errors.content}</p> : <span />}
+            <p className="text-xs text-slate-400 tabular-nums">{content.length}/5000</p>
           </div>
         </div>
 
@@ -206,7 +206,7 @@ export default function NewPostPage() {
             }}
             placeholder="Pvz.: Rūta M."
             maxLength={50}
-            className={`w-full px-4 py-3 rounded-xl border ${errors.authorName ? 'border-red-400' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] dark:focus:ring-green-400 placeholder:text-slate-400`}
+            className={`w-full px-4 py-3 rounded-xl border ${errors.authorName ? 'border-red-400' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 placeholder:text-slate-400`}
           />
           {errors.authorName && <p className="text-red-500 text-xs mt-1">{errors.authorName}</p>}
         </div>
@@ -223,7 +223,7 @@ export default function NewPostPage() {
             onChange={(e) => setCity(e.target.value)}
             placeholder="Pvz.: Vilnius"
             maxLength={100}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] dark:focus:ring-green-400 placeholder:text-slate-400"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 placeholder:text-slate-400"
           />
         </div>
 
@@ -234,21 +234,21 @@ export default function NewPostPage() {
           </div>
         )}
 
-        {/* Buttons */}
-        <div className="flex items-center gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="bg-[#2d6a4f] hover:bg-[#40916c] disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
-          >
-            {submitting ? 'Kuriama...' : 'Sukurti įrašą'}
-          </button>
+        {/* Buttons — stack on mobile */}
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 pt-2">
           <Link
             href="/forumas"
-            className="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium px-4 py-3 rounded-xl transition-colors"
+            className="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium px-4 py-3 rounded-xl transition-colors text-center min-h-[48px] flex items-center justify-center"
           >
             Atšaukti
           </Link>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="bg-[#2d6a4f] hover:bg-[#40916c] active:bg-[#1b4332] disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors min-h-[48px] sm:min-h-[44px] flex-1 sm:flex-none"
+          >
+            {submitting ? 'Kuriama...' : 'Sukurti įrašą'}
+          </button>
         </div>
       </form>
     </div>

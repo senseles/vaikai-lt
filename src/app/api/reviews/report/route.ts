@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { jsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { checkCsrf } from '@/lib/security';
 
 /** Rate limit for report submissions: 3 requests per 60 seconds per IP */
 const REPORT_RATE_LIMIT = {
@@ -10,6 +11,10 @@ const REPORT_RATE_LIMIT = {
 };
 
 export async function POST(request: NextRequest) {
+  // CSRF protection
+  const csrfResponse = checkCsrf(request);
+  if (csrfResponse) return csrfResponse;
+
   // Rate limit to prevent spam
   const rateLimitResponse = checkRateLimit(request, REPORT_RATE_LIMIT);
   if (rateLimitResponse) return rateLimitResponse;

@@ -2,11 +2,7 @@ import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 import { jsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
-
-/** Strip HTML tags from user input to prevent stored XSS */
-function stripHtml(input: string): string {
-  return input.replace(/<[^>]*>/g, '');
-}
+import { checkCsrf, checkHoneypot, checkSubmitTiming, stripHtml } from '@/lib/security';
 
 /** Check nesting depth of a comment by walking up the parent chain */
 async function getCommentDepth(parentId: string): Promise<number> {
@@ -27,7 +23,12 @@ async function getCommentDepth(parentId: string): Promise<number> {
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.REVIEW_POST);
+  // CSRF protection
+  const csrfResponse = checkCsrf(request);
+  if (csrfResponse) return csrfResponse;
+
+  // Rate limiting: 10 comments per 5 minutes
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.FORUM_COMMENT);
   if (rateLimitResponse) return rateLimitResponse;
 
   let body: unknown;
@@ -37,8 +38,17 @@ export async function POST(request: NextRequest) {
     return errorResponse('Netinkamas JSON formatas', 400);
   }
 
-  const { postId, content: rawContent, authorName: rawAuthor, parentId } =
-    body as Record<string, unknown>;
+  const parsed = body as Record<string, unknown>;
+
+  // Honeypot check
+  const honeypotResponse = checkHoneypot(parsed);
+  if (honeypotResponse) return honeypotResponse;
+
+  // Timing check — reject submissions faster than 3 seconds
+  const timingResponse = checkSubmitTiming(parsed, 3);
+  if (timingResponse) return timingResponse;
+
+  const { postId, content: rawContent, authorName: rawAuthor, parentId } = parsed;
 
   // Validate postId
   if (!postId || typeof postId !== 'string') {

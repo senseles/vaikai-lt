@@ -30,7 +30,10 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
     try {
       const res = await fetch('/api/reviews', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
         body: JSON.stringify({ itemId, itemType, rating, text: text.trim(), authorName: authorName.trim() }),
       });
       if (!res.ok) throw new Error('Nepavyko išsaugoti');

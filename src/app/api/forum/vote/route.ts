@@ -2,9 +2,15 @@ import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 import { jsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { checkCsrf } from '@/lib/security';
 
 export async function POST(request: NextRequest) {
-  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.REVIEW_POST);
+  // CSRF protection
+  const csrfResponse = checkCsrf(request);
+  if (csrfResponse) return csrfResponse;
+
+  // Rate limiting: 30 votes per minute
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.FORUM_VOTE);
   if (rateLimitResponse) return rateLimitResponse;
 
   let body: unknown;
@@ -16,9 +22,12 @@ export async function POST(request: NextRequest) {
 
   const { postId, commentId, sessionId, value } = body as Record<string, unknown>;
 
-  // Validate sessionId
+  // Validate sessionId (must be a UUID format)
   if (!sessionId || typeof sessionId !== 'string') {
     return errorResponse('Sesijos ID yra privalomas', 400);
+  }
+  if (sessionId.length > 64 || !/^[a-f0-9-]+$/i.test(sessionId)) {
+    return errorResponse('Netinkamas sesijos ID formatas', 400);
   }
 
   // Validate value

@@ -5,8 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
-        disallow: ['/api/', '/admin/', '/prisijungti'],
+        allow: ['/', '/forumas'],
+        disallow: ['/api/', '/admin/', '/prisijungti', '/forumas/naujas'],
       },
     ],
     sitemap: 'https://vaikai.lt/sitemap.xml',

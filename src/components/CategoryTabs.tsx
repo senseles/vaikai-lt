@@ -22,7 +22,7 @@ export default function CategoryTabs() {
           role="tab"
           aria-selected={active === cat.id}
           onClick={() => setActive(cat.id)}
-          className={`px-4 py-2 text-sm font-semibold rounded-t-lg whitespace-nowrap transition-colors ${
+          className={`px-4 py-2.5 min-h-[44px] text-sm font-semibold rounded-t-lg whitespace-nowrap transition-colors ${
             active === cat.id
               ? "bg-primary text-white"
               : "text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100 dark:hover:bg-slate-800"

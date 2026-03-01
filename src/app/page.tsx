@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import CitySelector from "@/components/CitySelector";
 import prisma from "@/lib/prisma";
@@ -116,6 +117,27 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Forum CTA */}
+      <section className="bg-white dark:bg-slate-800 border-y border-gray-200 dark:border-slate-700">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 md:py-10 text-center">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            Turite klausimų? Prisijunkite prie diskusijų!
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-5 max-w-xl mx-auto">
+            Klauskite kitų tėvelių, dalinkitės patirtimi ir gaukite patarimų apie darželius, aukles ir būrelius.
+          </p>
+          <Link
+            href="/forumas"
+            className="inline-flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#40916c] text-white font-semibold px-6 py-3 rounded-xl transition-colors shadow-md"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+            </svg>
+            Aplankykite tėvų forumą
+          </Link>
         </div>
       </section>
 

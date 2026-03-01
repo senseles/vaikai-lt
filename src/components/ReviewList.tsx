@@ -126,17 +126,17 @@ function ReviewItem({ review }: { readonly review: Review }) {
         )}
 
         {reportState === 'confirming' && (
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-gray-500 dark:text-gray-400">Ar tikrai norite pranešti apie šį atsiliepimą?</span>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+            <span className="text-gray-500 dark:text-gray-400">Pranešti apie atsiliepimą?</span>
             <button
               onClick={handleReport}
-              className="text-red-500 hover:text-red-700 font-medium transition-colors"
+              className="text-red-500 hover:text-red-700 font-medium transition-colors min-h-[32px] px-2"
             >
               Taip
             </button>
             <button
               onClick={cancelReport}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors min-h-[32px] px-2"
             >
               Ne
             </button>
