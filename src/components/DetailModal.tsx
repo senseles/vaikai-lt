@@ -8,6 +8,7 @@ import ReviewList from './ReviewList';
 import ReviewForm from './ReviewForm';
 import { addToRecentlyViewed } from './RecentlyViewed';
 import { toSlug } from '@/lib/utils';
+import ErrorBoundary from './ErrorBoundary';
 
 type DetailItem = Kindergarten | Aukle | Burelis | Specialist;
 
@@ -155,8 +156,12 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
         {address && <MapEmbed address={address} city={item.city} />}
 
         <hr className="my-5 border-gray-200 dark:border-slate-700" />
-        <ReviewList itemId={item.id} itemType={itemType} />
-        <ReviewForm itemId={item.id} itemType={itemType} />
+        <ErrorBoundary>
+          <ReviewList itemId={item.id} itemType={itemType} />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <ReviewForm itemId={item.id} itemType={itemType} />
+        </ErrorBoundary>
 
         <ShareButtons itemName={item.name} />
       </div>

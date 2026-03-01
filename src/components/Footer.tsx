@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer className="bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2 text-lg font-extrabold text-primary mb-3">

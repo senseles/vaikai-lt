@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
     return errorResponse('reason must be a string if provided', 400);
   }
 
-  // Log the report (can be replaced with a Report table later)
-  console.log(`[REVIEW REPORT] reviewId=${reviewId}, reason=${reason ?? '(no reason)'}, timestamp=${new Date().toISOString()}`);
+  // TODO: Store in a Report table when implemented.
+  // For now, report is acknowledged but not persisted beyond the review flag.
 
   return jsonResponse({ success: true, message: 'Report received' }, 200);
 }
