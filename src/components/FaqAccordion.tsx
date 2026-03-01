@@ -101,7 +101,7 @@ export default function FaqAccordion() {
                 <span className={`text-xl transition-transform ${openIndex === i ? "rotate-45" : ""}`}>+</span>
               </button>
               {openIndex === i && (
-                <div className="px-5 pb-4 text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                <div className="px-5 pb-4 text-gray-600 dark:text-gray-400 text-sm leading-relaxed animate-fade-in">
                   {item.answer}
                 </div>
               )}

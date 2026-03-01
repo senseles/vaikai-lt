@@ -142,9 +142,9 @@ export default function CityPageClient({
             role="tab"
             aria-selected={category === tab.id}
             onClick={() => updateParams({ category: tab.id, type: '', sub: '', spec: '', page: '' })}
-            className={`px-4 py-2 text-sm font-semibold rounded-lg whitespace-nowrap transition-colors ${
+            className={`px-4 py-2 text-sm font-semibold rounded-lg whitespace-nowrap transition-all duration-200 ${
               category === tab.id
-                ? 'bg-primary text-white'
+                ? 'bg-primary text-white shadow-sm shadow-primary/25'
                 : 'text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800'
             }`}
           >

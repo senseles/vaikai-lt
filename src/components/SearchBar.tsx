@@ -127,7 +127,7 @@ export default function SearchBar() {
             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
             onKeyDown={handleKeyDown}
             placeholder="Ieškoti darželio, auklės, būrelio..."
-            className="w-full px-5 py-3.5 pr-14 rounded-xl border-2 border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary dark:focus:border-primary-light focus:outline-none transition-colors text-base"
+            className="w-full px-5 py-3.5 pr-14 rounded-xl border-2 border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary dark:focus:border-primary-light focus:ring-4 focus:ring-primary/10 dark:focus:ring-primary/20 focus:outline-none transition-all text-base"
             aria-label="Paieška"
             autoComplete="off"
             role="combobox"
@@ -151,7 +151,7 @@ export default function SearchBar() {
       {showSuggestions && suggestions.length > 0 && (
         <ul
           id="search-suggestions"
-          className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl shadow-lg overflow-hidden"
+          className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl shadow-lg overflow-hidden animate-fade-in"
           role="listbox"
         >
           {suggestions.map((s, i) => (

@@ -91,7 +91,7 @@ export default function Header() {
 
         {/* Mobile nav */}
         {mobileOpen && (
-          <nav className="md:hidden flex flex-col gap-1 pb-4 border-t border-gray-200 dark:border-slate-700 pt-3" aria-label="Mobilusis meniu">
+          <nav className="md:hidden flex flex-col gap-1 pb-4 border-t border-gray-200 dark:border-slate-700 pt-3 animate-fade-in" aria-label="Mobilusis meniu">
             {navLinks.map((link) => (
               <Link
                 key={link.href}

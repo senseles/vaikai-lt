@@ -47,7 +47,8 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
 
   if (success) {
     return (
-      <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm">
+      <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm animate-scale-in flex items-center gap-2">
+        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
         Ačiū už atsiliepimą! Jis bus paskelbtas po peržiūros.
       </div>
     );
@@ -70,7 +71,7 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
           placeholder="Jūsų vardas"
           value={authorName}
           onChange={(e) => setAuthorName(e.target.value)}
-          className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
         />
       </div>
 
@@ -80,10 +81,14 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
           id="review-text"
           placeholder="Jūsų atsiliepimas..."
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => setText(e.target.value.slice(0, 2000))}
           rows={3}
-          className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          maxLength={2000}
+          className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none transition-colors"
         />
+        {text.length > 1800 && (
+          <p className={`text-xs mt-1 ${text.length >= 2000 ? 'text-red-500' : 'text-gray-400'}`}>{text.length}/2000</p>
+        )}
       </div>
 
       {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
@@ -91,7 +96,7 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
       <button
         type="submit"
         disabled={submitting}
-        className="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+        className="w-full bg-primary text-white rounded-lg py-2.5 text-sm font-medium hover:bg-primary-dark disabled:opacity-50 transition-colors"
       >
         {submitting ? 'Siunčiama...' : 'Siųsti atsiliepimą'}
       </button>
