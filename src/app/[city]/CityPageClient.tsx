@@ -106,7 +106,7 @@ export default function CityPageClient({
             key={tab.id}
             role="tab"
             aria-selected={category === tab.id}
-            onClick={() => updateParams({ category: tab.id, type: '', page: '' })}
+            onClick={() => updateParams({ category: tab.id, type: '', sub: '', spec: '', page: '' })}
             className={`px-4 py-2 text-sm font-semibold rounded-lg whitespace-nowrap transition-colors ${
               category === tab.id
                 ? 'bg-primary text-white'
@@ -122,6 +122,30 @@ export default function CityPageClient({
       <div className="flex flex-wrap items-center gap-3 mb-6">
         {category === 'darzeliai' && (
           <TypeFilter value={type} onChange={(v) => updateParams({ type: v })} />
+        )}
+        {category === 'bureliai' && (
+          <select
+            value={searchParams.get('sub') ?? ''}
+            onChange={(e) => updateParams({ sub: e.target.value })}
+            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white"
+          >
+            <option value="">Visos kategorijos</option>
+            {['Menai', 'Sportas', 'Muzika', 'Šokiai', 'Kalbos', 'IT', 'Gamta/Mokslas', 'Kita'].map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        )}
+        {category === 'specialistai' && (
+          <select
+            value={searchParams.get('spec') ?? ''}
+            onChange={(e) => updateParams({ spec: e.target.value })}
+            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white"
+          >
+            <option value="">Visos specializacijos</option>
+            {['Logopedas', 'Psichologas', 'Pediatras', 'Ergoterapeutas', 'Kineziterapeutas', 'Ortodontas', 'Alergologas'].map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
         )}
         <div className="ml-auto">
           <SortSelect value={sort} onChange={(v) => updateParams({ sort: v })} />

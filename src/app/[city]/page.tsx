@@ -5,7 +5,7 @@ import CityPageClient from './CityPageClient';
 
 interface CityPageProps {
   readonly params: { city: string };
-  readonly searchParams: { category?: string; type?: string; sort?: string; page?: string };
+  readonly searchParams: { category?: string; type?: string; sort?: string; page?: string; sub?: string; spec?: string };
 }
 
 const cityNames: Record<string, string> = {
@@ -74,7 +74,14 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   const kindergartenWhere: Record<string, unknown> = { city: cityName };
   if (type) kindergartenWhere.type = type;
 
+  const sub = searchParams.sub ?? '';
+  const spec = searchParams.spec ?? '';
+
   const cityWhere = { city: cityName };
+  const burelisWhere: Record<string, unknown> = { city: cityName };
+  if (sub) burelisWhere.category = sub;
+  const specialistWhere: Record<string, unknown> = { city: cityName };
+  if (spec) specialistWhere.specialty = { contains: spec };
 
   // Fetch data for ALL categories so every tab has data ready
   const [kindergartens, kindergartenTotal, aukles, aukleTotal, bureliai, burelisTotal, specialists, specialistTotal] = await Promise.all([
@@ -82,10 +89,10 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
     prisma.kindergarten.count({ where: kindergartenWhere }),
     prisma.aukle.findMany({ where: cityWhere, orderBy, skip: category === 'aukles' ? skip : 0, take: PER_PAGE }),
     prisma.aukle.count({ where: cityWhere }),
-    prisma.burelis.findMany({ where: cityWhere, orderBy, skip: category === 'bureliai' ? skip : 0, take: PER_PAGE }),
-    prisma.burelis.count({ where: cityWhere }),
-    prisma.specialist.findMany({ where: cityWhere, orderBy, skip: category === 'specialistai' ? skip : 0, take: PER_PAGE }),
-    prisma.specialist.count({ where: cityWhere }),
+    prisma.burelis.findMany({ where: burelisWhere, orderBy, skip: category === 'bureliai' ? skip : 0, take: PER_PAGE }),
+    prisma.burelis.count({ where: burelisWhere }),
+    prisma.specialist.findMany({ where: specialistWhere, orderBy, skip: category === 'specialistai' ? skip : 0, take: PER_PAGE }),
+    prisma.specialist.count({ where: specialistWhere }),
   ]);
 
   // Serialize dates for client component
