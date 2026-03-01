@@ -1,0 +1,22 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+export interface PaginationParams {
+  readonly page: number;
+  readonly limit: number;
+  readonly skip: number;
+}
+
+export function getPagination(searchParams: URLSearchParams): PaginationParams {
+  const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') ?? '20', 10) || 20));
+  const skip = (page - 1) * limit;
+  return { page, limit, skip };
+}
+
+export function jsonResponse(data: unknown, status = 200): NextResponse {
+  return NextResponse.json(data, { status });
+}
+
+export function errorResponse(message: string, status: number): NextResponse {
+  return NextResponse.json({ error: message }, { status });
+}
