@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes, createHash } from 'crypto';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'darzeliai2026';
 
@@ -8,6 +9,9 @@ function json<T>(data: T, status = 200) {
 }
 
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.ADMIN_LOGIN);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const { password } = body as { password?: string };

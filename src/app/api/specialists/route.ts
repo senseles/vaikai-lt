@@ -1,8 +1,12 @@
 import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getPagination, jsonResponse, matchesSearch } from '@/lib/api-utils';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.PUBLIC_GET);
+  if (rateLimitResponse) return rateLimitResponse;
+
   const { searchParams } = request.nextUrl;
   const { page, limit, skip } = getPagination(searchParams);
 

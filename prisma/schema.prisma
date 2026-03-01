@@ -40,6 +40,10 @@ model Kindergarten {
   isUserAdded     Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@index([city])
+  @@index([city, baseRating])
+  @@index([name])
 }
 
 model Aukle {
@@ -63,6 +67,10 @@ model Aukle {
   isUserAdded     Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@index([city])
+  @@index([city, baseRating])
+  @@index([name])
 }
 
 model Burelis {
@@ -85,6 +93,10 @@ model Burelis {
   isUserAdded     Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@index([city])
+  @@index([city, baseRating])
+  @@index([name])
 }
 
 model Specialist {
@@ -106,6 +118,10 @@ model Specialist {
   isUserAdded     Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@index([city])
+  @@index([city, baseRating])
+  @@index([name])
 }
 
 model Review {
@@ -115,10 +131,13 @@ model Review {
   authorName String
   rating     Int      @default(5)
   text       String
-  isApproved Boolean  @default(true)
+  isApproved Boolean  @default(false)
   createdAt  DateTime @default(now())
   userId     String?
   user       User?    @relation(fields: [userId], references: [id])
+
+  @@index([itemId, itemType, isApproved])
+  @@index([isApproved, createdAt])
 }
 
 model Favorite {
