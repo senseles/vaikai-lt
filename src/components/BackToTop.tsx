@@ -24,7 +24,7 @@ export default function BackToTop() {
     <button
       onClick={scrollToTop}
       aria-label="Grįžti į viršų"
-      className={`fixed right-6 bottom-6 z-50 w-12 h-12 rounded-full bg-[#2d6a4f] dark:bg-slate-700 text-white shadow-lg flex items-center justify-center transition-opacity duration-300 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2d6a4f] ${
+      className={`fixed right-6 bottom-20 md:bottom-6 z-40 w-12 h-12 rounded-full bg-primary dark:bg-slate-700 text-white shadow-lg flex items-center justify-center transition-opacity duration-300 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${
         visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
     >
