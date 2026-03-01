@@ -15,6 +15,70 @@ interface Stats {
 
 type Tab = 'dashboard' | 'kindergartens' | 'aukles' | 'bureliai' | 'specialists' | 'reviews';
 
+// ─── Form field definitions per item type ───
+
+interface FieldDef {
+  key: string;
+  label: string;
+  type: 'text' | 'number' | 'select' | 'textarea';
+  required?: boolean;
+  options?: { value: string; label: string }[];
+  placeholder?: string;
+}
+
+const FIELDS: Record<ItemType, FieldDef[]> = {
+  kindergarten: [
+    { key: 'name', label: 'Pavadinimas', type: 'text', required: true, placeholder: 'Darželio pavadinimas' },
+    { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
+    { key: 'type', label: 'Tipas', type: 'select', options: [{ value: 'valstybinis', label: 'Valstybinis' }, { value: 'privatus', label: 'Privatus' }] },
+    { key: 'address', label: 'Adresas', type: 'text', placeholder: 'Gatvė 1' },
+    { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
+    { key: 'website', label: 'Svetainė', type: 'text', placeholder: 'https://...' },
+    { key: 'language', label: 'Kalba', type: 'text', placeholder: 'Lietuvių' },
+    { key: 'ageFrom', label: 'Amžius nuo (metai)', type: 'number' },
+    { key: 'groups', label: 'Grupių skaičius', type: 'number' },
+    { key: 'hours', label: 'Darbo laikas', type: 'text', placeholder: '7:00 – 18:00' },
+    { key: 'description', label: 'Aprašymas', type: 'textarea' },
+  ],
+  aukle: [
+    { key: 'name', label: 'Vardas', type: 'text', required: true, placeholder: 'Vardas Pavardė' },
+    { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
+    { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
+    { key: 'email', label: 'El. paštas', type: 'text', placeholder: 'el@pastas.lt' },
+    { key: 'experience', label: 'Patirtis', type: 'text', placeholder: '5 metai' },
+    { key: 'ageRange', label: 'Amžiaus grupė', type: 'text', placeholder: '1-6 m.' },
+    { key: 'hourlyRate', label: 'Valandinis tarifas', type: 'text', placeholder: '15 €/val.' },
+    { key: 'languages', label: 'Kalbos', type: 'text', placeholder: 'Lietuvių, anglų' },
+    { key: 'availability', label: 'Prieinamumas', type: 'text', placeholder: 'Darbo dienomis' },
+    { key: 'description', label: 'Aprašymas', type: 'textarea' },
+  ],
+  burelis: [
+    { key: 'name', label: 'Pavadinimas', type: 'text', required: true, placeholder: 'Būrelio pavadinimas' },
+    { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
+    { key: 'category', label: 'Kategorija', type: 'text', placeholder: 'Menai, sportas...' },
+    { key: 'subcategory', label: 'Subkategorija', type: 'text', placeholder: 'Piešimas, futbolas...' },
+    { key: 'ageRange', label: 'Amžiaus grupė', type: 'text', placeholder: '5-12 m.' },
+    { key: 'price', label: 'Kaina', type: 'text', placeholder: '50 €/mėn.' },
+    { key: 'schedule', label: 'Tvarkaraštis', type: 'text', placeholder: 'Pirm., Treč. 16:00' },
+    { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
+    { key: 'website', label: 'Svetainė', type: 'text', placeholder: 'https://...' },
+    { key: 'description', label: 'Aprašymas', type: 'textarea' },
+  ],
+  specialist: [
+    { key: 'name', label: 'Vardas', type: 'text', required: true, placeholder: 'Vardas Pavardė' },
+    { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
+    { key: 'specialty', label: 'Specializacija', type: 'text', placeholder: 'Logopedas, psichologas...' },
+    { key: 'clinic', label: 'Klinika', type: 'text', placeholder: 'Klinikos pavadinimas' },
+    { key: 'price', label: 'Kaina', type: 'text', placeholder: '40 €/vizitas' },
+    { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
+    { key: 'website', label: 'Svetainė', type: 'text', placeholder: 'https://...' },
+    { key: 'languages', label: 'Kalbos', type: 'text', placeholder: 'Lietuvių, anglų' },
+    { key: 'description', label: 'Aprašymas', type: 'textarea' },
+  ],
+};
+
+// ─── Main Admin Page ───
+
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
@@ -50,7 +114,7 @@ export default function AdminPage() {
             bureliai: d.burelisCount ?? 0,
             specialists: d.specialistCount ?? 0,
             reviews: d.reviewCount ?? 0,
-            pendingReviews: 0,
+            pendingReviews: d.pendingReviewCount ?? 0,
           });
         }
       })
@@ -124,6 +188,8 @@ export default function AdminPage() {
   );
 }
 
+// ─── Dashboard ───
+
 function Dashboard({ stats }: { readonly stats: Stats | null }) {
   if (!stats) return <p className="text-gray-400">Kraunama...</p>;
 
@@ -170,33 +236,180 @@ function Dashboard({ stats }: { readonly stats: Stats | null }) {
   );
 }
 
+// ─── Item Form (Create / Edit) ───
+
+interface ItemFormProps {
+  readonly itemType: ItemType;
+  readonly editItem?: Record<string, unknown> | null;
+  readonly onSave: () => void;
+  readonly onCancel: () => void;
+}
+
+function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
+  const fields = FIELDS[itemType];
+  const isEdit = !!editItem;
+
+  const getInitial = () => {
+    const data: Record<string, string> = {};
+    for (const f of fields) {
+      data[f.key] = editItem ? String(editItem[f.key] ?? '') : (f.type === 'select' && f.options ? f.options[0].value : '');
+    }
+    return data;
+  };
+
+  const [form, setForm] = useState<Record<string, string>>(getInitial);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (key: string, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+
+    // Build body with proper types
+    const body: Record<string, unknown> = {};
+    for (const f of fields) {
+      const val = form[f.key]?.trim();
+      if (!val) continue;
+      if (f.type === 'number') {
+        body[f.key] = Number(val);
+      } else {
+        body[f.key] = val;
+      }
+    }
+
+    try {
+      const url = isEdit ? `/api/admin/${itemType}/${editItem!.id}` : `/api/admin/${itemType}`;
+      const method = isEdit ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok || data.success === false) {
+        setError(data.error || 'Nepavyko išsaugoti');
+        setSaving(false);
+        return;
+      }
+      onSave();
+    } catch {
+      setError('Tinklo klaida');
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 p-5 mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold text-gray-900 dark:text-white">
+          {isEdit ? 'Redaguoti' : 'Pridėti naują'}
+        </h3>
+        <button onClick={onCancel} className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">Atšaukti</button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {fields.map((f) => (
+          <div key={f.key} className={f.type === 'textarea' ? 'sm:col-span-2' : ''}>
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+              {f.label}{f.required && <span className="text-red-500 ml-0.5">*</span>}
+            </label>
+            {f.type === 'select' && f.options ? (
+              <select
+                value={form[f.key] || ''}
+                onChange={(e) => handleChange(f.key, e.target.value)}
+                className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm"
+              >
+                {f.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            ) : f.type === 'textarea' ? (
+              <textarea
+                value={form[f.key] || ''}
+                onChange={(e) => handleChange(f.key, e.target.value)}
+                placeholder={f.placeholder}
+                rows={3}
+                className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm resize-none"
+              />
+            ) : (
+              <input
+                type={f.type === 'number' ? 'number' : 'text'}
+                value={form[f.key] || ''}
+                onChange={(e) => handleChange(f.key, e.target.value)}
+                placeholder={f.placeholder}
+                required={f.required}
+                className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm"
+              />
+            )}
+          </div>
+        ))}
+
+        {error && <p className="sm:col-span-2 text-red-500 text-sm">{error}</p>}
+
+        <div className="sm:col-span-2 flex gap-2 pt-2">
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+          >
+            {saving ? 'Saugoma...' : isEdit ? 'Atnaujinti' : 'Pridėti'}
+          </button>
+          <button type="button" onClick={onCancel} className="px-4 py-2 text-sm border dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
+            Atšaukti
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// ─── CRUD Table with Create/Edit ───
+
 function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly label: string }) {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  void label; // used for future heading
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('name');
+  const [showForm, setShowForm] = useState(false);
+  const [editItem, setEditItem] = useState<Record<string, unknown> | null>(null);
   const perPage = 20;
-
-  const apiPath = itemType;
 
   const load = useCallback(async () => {
     const params = new URLSearchParams({ search, page: String(page), limit: String(perPage), sort: sortBy });
-    const res = await fetch(`/api/admin/${apiPath}?${params}`);
+    const res = await fetch(`/api/admin/${itemType}?${params}`);
     if (res.ok) {
       const data = await res.json();
       setItems(data.items ?? data);
       setTotal(data.total ?? 0);
     }
-  }, [search, page, sortBy, apiPath]);
+  }, [search, page, sortBy, itemType]);
 
   useEffect(() => { load(); }, [load]);
 
   const deleteItem = async (id: string) => {
     if (!confirm('Ar tikrai norite ištrinti?')) return;
-    await fetch(`/api/admin/${apiPath}/${id}`, { method: 'DELETE' });
+    await fetch(`/api/admin/${itemType}/${id}`, { method: 'DELETE' });
     load();
+  };
+
+  const handleEdit = (item: Record<string, unknown>) => {
+    setEditItem(item);
+    setShowForm(true);
+  };
+
+  const handleFormSave = () => {
+    setShowForm(false);
+    setEditItem(null);
+    load();
+  };
+
+  const handleFormCancel = () => {
+    setShowForm(false);
+    setEditItem(null);
   };
 
   const totalPages = Math.max(1, Math.ceil(total / perPage));
@@ -216,7 +429,22 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
           <option value="city">Miestas</option>
           <option value="baseRating">Įvertinimas</option>
         </select>
+        <button
+          onClick={() => { setEditItem(null); setShowForm(true); }}
+          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap"
+        >
+          + Pridėti {label.toLowerCase().slice(0, -1) === 'darželiai'.slice(0, -1) ? '' : ''}
+        </button>
       </div>
+
+      {showForm && (
+        <ItemForm
+          itemType={itemType}
+          editItem={editItem}
+          onSave={handleFormSave}
+          onCancel={handleFormCancel}
+        />
+      )}
 
       <div className="bg-white dark:bg-slate-800 rounded-xl border dark:border-slate-700 overflow-hidden">
         <div className="overflow-x-auto">
@@ -237,7 +465,10 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
                   <td className="px-4 py-2">
                     <StarRating rating={Number(item.baseRating ?? 0)} size="sm" />
                   </td>
-                  <td className="px-4 py-2 text-right">
+                  <td className="px-4 py-2 text-right space-x-2">
+                    <button onClick={() => handleEdit(item)} className="text-blue-500 hover:text-blue-700 text-sm">
+                      Redaguoti
+                    </button>
                     <button onClick={() => deleteItem(String(item.id))} className="text-red-500 hover:text-red-700 text-sm">
                       Ištrinti
                     </button>
@@ -262,6 +493,8 @@ function CrudTable({ itemType, label }: { readonly itemType: ItemType; readonly 
     </div>
   );
 }
+
+// ─── Review Moderation ───
 
 function ReviewModeration() {
   const [reviews, setReviews] = useState<Review[]>([]);

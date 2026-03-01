@@ -26,25 +26,25 @@
 - [x] ~~Add breadcrumb navigation on all pages~~ (city + search pages have breadcrumbs)
 - [x] ~~Add "back to top" button on long pages~~ (BackToTop component, appears at 400px scroll)
 - [x] ~~Add cookie consent banner (GDPR)~~ (CookieConsent component, localStorage persistence)
-- [ ] Add analytics placeholder (Google Analytics / Plausible)
+- [x] ~~Add analytics placeholder (Google Analytics / Plausible)~~ (Plausible script placeholder in layout.tsx)
 - [ ] Add OpenGraph images per city
-- [ ] Add share buttons on detail modals (in progress)
-- [ ] Add print-friendly styles
-- [ ] Add keyboard navigation support (accessibility)
+- [x] ~~Add share buttons on detail modals~~ (copy link, Facebook, email in DetailModal)
+- [x] ~~Add print-friendly styles~~ (print media query in globals.css)
+- [x] ~~Add keyboard navigation support (accessibility)~~ (Enter/Space on all cards, Escape on modals, focus rings)
 - [x] ~~Add ARIA labels to all interactive elements~~ (header, modal, tabs, buttons)
 - [x] ~~Improve loading animations / transitions~~ (loading.tsx skeletons added)
 - [ ] Add filter by district/area within city
 - [ ] Add sorting by distance (if geolocation available)
 - [ ] Add price range filter for aukles and specialists
 - [ ] Add "recently viewed" section
-- [ ] Add newsletter signup form in footer
-- [ ] Add testimonials section on home page
-- [ ] Improve FAQ section with more questions
+- [x] ~~Add newsletter signup form in footer~~ (NewsletterSignup component in Footer)
+- [x] ~~Add testimonials section on home page~~ (Testimonials component with 3 reviews)
+- [x] ~~Improve FAQ section with more questions~~ (expanded to 14 questions)
 - [ ] Add language switcher (LT/EN/RU) placeholder
 - [x] ~~Add SSL/security headers config~~ (HSTS, X-Frame-Options, X-Content-Type-Options, etc. via next.config.mjs)
 - [x] ~~Add rate limiting on API routes~~ (30 req/15s public, 5 req/15s reviews, 10 req/60s admin login)
 - [x] ~~Add input sanitization/XSS prevention~~ (HTML tag stripping on reviews)
-- [ ] Cache API responses for better performance (in progress)
+- [x] ~~Cache API responses for better performance~~ (src/lib/cache.ts with TTL, applied to all GET routes)
 - [x] ~~Add database indexes for frequent queries~~ (city, baseRating, name indexes on all models)
 - [ ] Optimize images with next/image
 - [ ] Add Lighthouse score improvements (target 90+)

@@ -218,7 +218,7 @@ function ShareButtons({ itemName }: { readonly itemName: string }) {
 function InfoRow({ label, value, link = false }: { readonly label: string; readonly value: string; readonly link?: boolean }) {
   return (
     <div className="flex gap-2 text-sm">
-      <span className="text-gray-500 dark:text-gray-400 min-w-[100px]">{label}:</span>
+      <span className="text-gray-500 dark:text-gray-400 shrink-0">{label}:</span>
       {link ? (
         <a href={value.startsWith('http') ? value : `https://${value}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline truncate">
           {value}

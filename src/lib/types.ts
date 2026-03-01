@@ -53,6 +53,7 @@ export interface AdminStats {
   readonly burelisCount: number;
   readonly specialistCount: number;
   readonly reviewCount: number;
+  readonly pendingReviewCount: number;
   readonly userCount: number;
   readonly dataQuality: {
     readonly kindergartens: number;

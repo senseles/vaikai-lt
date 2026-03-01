@@ -17,12 +17,13 @@ function computeQuality(items: Array<Record<string, unknown>>, requiredFields: s
 
 export async function GET() {
   try {
-    const [kindergartens, aukles, bureliai, specialists, reviewCount, userCount] = await Promise.all([
+    const [kindergartens, aukles, bureliai, specialists, reviewCount, pendingReviewCount, userCount] = await Promise.all([
       prisma.kindergarten.findMany({ select: { name: true, city: true, address: true, phone: true, description: true } }),
       prisma.aukle.findMany({ select: { name: true, city: true, phone: true, description: true, hourlyRate: true } }),
       prisma.burelis.findMany({ select: { name: true, city: true, category: true, description: true, price: true } }),
       prisma.specialist.findMany({ select: { name: true, city: true, specialty: true, description: true, price: true } }),
       prisma.review.count(),
+      prisma.review.count({ where: { isApproved: false } }),
       prisma.user.count(),
     ]);
 
@@ -32,6 +33,7 @@ export async function GET() {
       burelisCount: bureliai.length,
       specialistCount: specialists.length,
       reviewCount,
+      pendingReviewCount,
       userCount,
       dataQuality: {
         kindergartens: computeQuality(kindergartens, ['name', 'city', 'address', 'phone', 'description']),
