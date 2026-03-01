@@ -52,3 +52,9 @@
 - **Blockers:** None
 
 **Status:** Sprint looks healthy. All core pages wired end-to-end, admin with CRUD + review moderation, filter/detail/card components in place. DB seeded with 501 items. No build errors.
+
+## SYNC 2026-03-01 08:20 (ET)
+- **Commits:** 15 total (latest: docs, SEO/loading/error pages, dark mode fixes, admin, filters, detail views, cards, seed data, prisma, init)
+- **Build:** ❌ FAIL — `pages-manifest.json` ENOENT during "Collecting page data" phase. Compiled OK, types OK. Likely stale `.next` cache or mixed pages/app router issue.
+- **DB:** ✅ Healthy — 343 KG, 50 aukles, 64 bureliai, 44 specialists, 5 reviews
+- **Blockers:** Build broken — fix needed before deploy. Try `rm -rf .next && npm run build`. If persists, check for any files in `src/pages/` conflicting with app router.
