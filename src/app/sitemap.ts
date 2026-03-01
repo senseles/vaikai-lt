@@ -1,47 +1,28 @@
 import { MetadataRoute } from 'next';
-import prisma from '@/lib/prisma';
 
 const BASE_URL = 'https://vaikai.lt';
 
+/** Only include cities that have valid routes (match VALID_CITY_SLUGS in middleware + cityNames in [city]/page.tsx) */
+const VALID_CITY_SLUGS = [
+  'vilnius', 'kaunas', 'klaipeda', 'siauliai', 'panevezys', 'palanga',
+  'silute', 'taurage', 'telsiai', 'mazeikiai', 'kedainiai', 'marijampole',
+  'utena', 'alytus', 'jonava', 'visaginas', 'druskininkai', 'elektrenai',
+  'ukmerge', 'akmene', 'anyksciai', 'birzai', 'ignalina', 'joniskis',
+  'jurbarkas', 'kaisiadorys', 'kelme', 'kretinga', 'kupiskis', 'lazdijai',
+  'moletai', 'pakruojis', 'pasvalys', 'plunge', 'prienai', 'radviliskis',
+  'raseiniai', 'rokiskis', 'trakai', 'varena', 'vilkaviskis', 'zarasai',
+  'sakiai',
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Get all distinct cities from all models
-  const [kg, au, bu, sp] = await Promise.all([
-    prisma.kindergarten.findMany({ select: { city: true }, distinct: ['city'] }),
-    prisma.aukle.findMany({ select: { city: true }, distinct: ['city'] }),
-    prisma.burelis.findMany({ select: { city: true }, distinct: ['city'] }),
-    prisma.specialist.findMany({ select: { city: true }, distinct: ['city'] }),
-  ]);
-
-  const citySet = new Set<string>();
-  for (const list of [kg, au, bu, sp]) {
-    for (const item of list) {
-      citySet.add(item.city);
-    }
-  }
-
-  // Convert city name → slug (same logic as toSlug in utils)
-  function toSlug(text: string): string {
-    const map: Record<string, string> = {
-      ą: 'a', č: 'c', ę: 'e', ė: 'e', į: 'i', š: 's', ų: 'u', ū: 'u', ž: 'z',
-      Ą: 'a', Č: 'c', Ę: 'e', Ė: 'e', Į: 'i', Š: 's', Ų: 'u', Ū: 'u', Ž: 'z',
-    };
-    return text
-      .split('')
-      .map((c) => map[c] ?? c)
-      .join('')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-  }
-
-  const citySlugs = Array.from(citySet).map(toSlug);
-
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
     { url: `${BASE_URL}/megstamiausieji`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
+    { url: `${BASE_URL}/paieska`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
+    { url: `${BASE_URL}/privatumo-politika`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
   ];
 
-  const cityPages: MetadataRoute.Sitemap = citySlugs.map((slug) => ({
+  const cityPages: MetadataRoute.Sitemap = VALID_CITY_SLUGS.map((slug) => ({
     url: `${BASE_URL}/${slug}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,

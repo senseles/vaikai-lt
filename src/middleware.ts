@@ -14,7 +14,7 @@ const VALID_CITY_SLUGS = new Set([
 ]);
 
 /** Known top-level routes that are NOT city slugs */
-const KNOWN_ROUTES = new Set(['', 'megstamiausieji', 'paieska', 'admin', 'prisijungti']);
+const KNOWN_ROUTES = new Set(['', 'megstamiausieji', 'paieska', 'admin', 'prisijungti', 'privatumo-politika']);
 
 /** Minimal 404 HTML — styled to match the site */
 const NOT_FOUND_HTML = `<!DOCTYPE html>

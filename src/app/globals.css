@@ -6,6 +6,13 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 120px;
+    --star-empty: #D1D5DB;
+    --star-empty-stroke: #9CA3AF;
+  }
+
+  html.dark {
+    --star-empty: #475569;
+    --star-empty-stroke: #64748b;
   }
 
   body {

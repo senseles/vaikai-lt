@@ -81,7 +81,7 @@ export default function FavoritesClient() {
   };
 
   if (loading) {
-    return <p className="text-center text-gray-400 py-12">Kraunama...</p>;
+    return <p className="text-center text-gray-400 dark:text-gray-500 py-12">Kraunama...</p>;
   }
 
   const total = kindergartens.length + aukles.length + bureliai.length + specialists.length;
@@ -90,7 +90,7 @@ export default function FavoritesClient() {
     return (
       <div className="text-center py-16">
         <p className="text-4xl mb-4">💔</p>
-        <p className="text-gray-500">Dar neturite mėgstamiausių. Naršykite ir pridėkite paspaudę ❤️</p>
+        <p className="text-gray-500 dark:text-gray-400">Dar neturite mėgstamiausių. Naršykite ir pridėkite paspaudę ❤️</p>
       </div>
     );
   }

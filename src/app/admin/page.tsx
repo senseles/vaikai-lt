@@ -147,7 +147,7 @@ export default function AdminPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
           />
-          {loginError && <p className="text-red-500 text-sm">{loginError}</p>}
+          {loginError && <p className="text-red-500 dark:text-red-400 text-sm">{loginError}</p>}
           <button type="submit" className="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700">
             Prisijungti
           </button>
@@ -412,12 +412,12 @@ function ItemForm({ itemType, editItem, onSave, onCancel }: ItemFormProps) {
               />
             )}
             {fieldErrors[f.key] && (
-              <p className="text-red-500 text-xs mt-1">{fieldErrors[f.key]}</p>
+              <p className="text-red-500 dark:text-red-400 text-xs mt-1">{fieldErrors[f.key]}</p>
             )}
           </div>
         ))}
 
-        {error && <p className="sm:col-span-2 text-red-500 text-sm">{error}</p>}
+        {error && <p className="sm:col-span-2 text-red-500 dark:text-red-400 text-sm">{error}</p>}
 
         <div className="sm:col-span-2 flex gap-2 pt-2">
           <button

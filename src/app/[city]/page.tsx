@@ -50,9 +50,29 @@ const PER_PAGE = 12;
 export async function generateMetadata({ params }: CityPageProps) {
   const cityName = cityNames[params.city];
   if (!cityName) return { title: 'Puslapis nerastas | Vaikai.lt' };
+  const title = `Darželiai, auklės, būreliai — ${cityName} | Vaikai.lt`;
+  const description = `Darželių, auklių, būrelių ir specialistų sąrašas ${cityName} mieste. Atsiliepimai ir vertinimai.`;
+  const url = `https://vaikai.lt/${params.city}`;
   return {
-    title: `Darželiai, auklės, būreliai — ${cityName} | Vaikai.lt`,
-    description: `Darželių, auklių, būrelių ir specialistų sąrašas ${cityName} mieste. Atsiliepimai ir vertinimai.`,
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: { lt: url, 'x-default': url },
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: 'Vaikai.lt',
+      locale: 'lt_LT',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image' as const,
+      title,
+      description,
+    },
   };
 }
 
