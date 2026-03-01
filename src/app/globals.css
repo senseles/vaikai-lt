@@ -95,6 +95,89 @@
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
   }
+
+  /* Card press/click effect */
+  .animate-press:active {
+    transform: scale(0.97) !important;
+    transition: transform 0.1s ease;
+  }
+
+  /* Heart pop animation for favorite button */
+  .animate-heart-pop {
+    animation: heart-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes heart-pop {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.3); }
+    60% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+
+  /* Shake animation for form errors */
+  .animate-shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+  }
+
+  /* Slide-down for mobile menu */
+  .animate-slide-down {
+    animation: slide-down 0.25s ease-out;
+  }
+  @keyframes slide-down {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Star bounce on select */
+  .animate-star-bounce {
+    animation: star-bounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes star-bounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+  }
+
+  /* Spin for loading */
+  .animate-spinner {
+    animation: spinner 0.8s linear infinite;
+  }
+  @keyframes spinner {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Checkmark draw animation */
+  .animate-check-draw {
+    animation: check-draw 0.4s ease-out forwards;
+  }
+  @keyframes check-draw {
+    0% { stroke-dashoffset: 20; }
+    100% { stroke-dashoffset: 0; }
+  }
+
+  /* Backdrop fade-in */
+  .animate-backdrop {
+    animation: fade-in 0.2s ease-out;
+  }
+
+  /* Modal: slide-up on mobile, scale on desktop */
+  .animate-modal-enter {
+    animation: slide-up 0.3s ease-out;
+  }
+  @media (min-width: 640px) {
+    .animate-modal-enter {
+      animation: modal-scale-in 0.25s ease-out;
+    }
+  }
+  @keyframes modal-scale-in {
+    from { opacity: 0; transform: scale(0.95) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
 }
 
 /* Print styles */
