@@ -160,10 +160,10 @@ export default function AdminPage() {
             placeholder="Slaptažodis"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg px-3 py-2.5 text-base focus:ring-2 focus:ring-blue-500"
           />
           {loginError && <p className="text-red-500 dark:text-red-400 text-sm">{loginError}</p>}
-          <button type="submit" className="w-full bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700">
+          <button type="submit" className="w-full bg-blue-600 text-white rounded-lg py-3 min-h-[48px] text-base font-medium hover:bg-blue-700">
             Prisijungti
           </button>
         </form>
@@ -199,12 +199,12 @@ export default function AdminPage() {
           <span className="text-gray-800 dark:text-gray-200 font-medium">Administravimas</span>
         </nav>
 
-        <nav className="flex gap-1 overflow-x-auto mb-6">
+        <nav className="flex gap-1 overflow-x-auto mb-6 scrollbar-none pb-1">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-3 py-2 text-sm rounded-lg whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-2.5 min-h-[44px] text-sm rounded-lg whitespace-nowrap transition-colors flex items-center gap-1.5 ${
                 activeTab === tab.key ? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800'
               }`}
             >
@@ -703,25 +703,25 @@ function CrudTable({ itemType }: { readonly itemType: ItemType; readonly label: 
 
       {/* Floating bulk action bar */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded-xl shadow-lg px-6 py-3 flex items-center gap-4">
+        <div className="fixed bottom-4 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-50 bg-white dark:bg-slate-800 border dark:border-slate-600 rounded-xl shadow-lg px-4 py-3 flex flex-wrap items-center justify-center gap-2 sm:gap-4">
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Pasirinkta: {selectedIds.size}
           </span>
           <button
             onClick={handleBulkDelete}
-            className="px-4 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
+            className="px-3 py-1.5 min-h-[44px] text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
           >
             Ištrinti ({selectedIds.size})
           </button>
           <button
             onClick={handleBulkExport}
-            className="px-4 py-1.5 text-sm bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 font-medium transition-colors"
+            className="px-3 py-1.5 min-h-[44px] text-sm bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 font-medium transition-colors"
           >
             Eksportuoti
           </button>
           <button
             onClick={() => setSelectedIds(new Set())}
-            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors min-h-[44px]"
           >
             Atsaukti
           </button>

@@ -147,7 +147,7 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
         <button
           data-modal-close
           onClick={onClose}
-          className="absolute top-2 right-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-500"
+          className="absolute top-2 right-2 w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-500"
           aria-label="Uždaryti"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

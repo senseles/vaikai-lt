@@ -83,7 +83,7 @@ export default function Header() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={t('nav.openMenu')}
             aria-expanded={mobileOpen}
@@ -103,7 +103,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                className="px-3 py-3 rounded-lg text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
@@ -111,7 +111,7 @@ export default function Header() {
             ))}
             <div className="flex items-center gap-2 mt-2 ml-3">
               <select
-                className="text-xs font-medium border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1.5 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300"
+                className="text-sm font-medium border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 min-h-[44px] bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300"
                 value={locale}
                 onChange={handleLocaleChange}
                 aria-label={t('nav.language')}
@@ -121,7 +121,7 @@ export default function Header() {
               </select>
               <button
                 onClick={toggleDark}
-                className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-gray-200 dark:border-slate-600 text-lg"
+                className="w-11 h-11 flex items-center justify-center rounded-full border-2 border-gray-200 dark:border-slate-600 text-lg"
                 aria-label={t('nav.darkMode')}
               >
                 {dark ? "☀️" : "🌙"}

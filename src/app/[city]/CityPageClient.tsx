@@ -143,7 +143,7 @@ export default function CityPageClient({
             role="tab"
             aria-selected={category === tab.id}
             onClick={() => updateParams({ category: tab.id, type: '', sub: '', spec: '', page: '' })}
-            className={`px-4 py-2 text-sm font-semibold rounded-lg whitespace-nowrap transition-all duration-200 ${
+            className={`px-4 py-2.5 min-h-[44px] text-sm font-semibold rounded-lg whitespace-nowrap transition-all duration-200 ${
               category === tab.id
                 ? 'bg-primary text-white shadow-sm shadow-primary/25'
                 : 'text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800'
@@ -164,7 +164,7 @@ export default function CityPageClient({
             value={searchParams.get('sub') ?? ''}
             onChange={(e) => updateParams({ sub: e.target.value })}
             aria-label="Pasirinkti kategoriją"
-            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white"
+            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-base sm:text-sm bg-white dark:bg-slate-700 dark:text-white"
           >
             <option value="">Visos kategorijos</option>
             {['Menai', 'Sportas', 'Muzika', 'Šokiai', 'Kalbos', 'IT', 'Gamta/Mokslas', 'Kita'].map((c) => (
@@ -177,7 +177,7 @@ export default function CityPageClient({
             value={searchParams.get('spec') ?? ''}
             onChange={(e) => updateParams({ spec: e.target.value })}
             aria-label="Pasirinkti specializaciją"
-            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white"
+            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-base sm:text-sm bg-white dark:bg-slate-700 dark:text-white"
           >
             <option value="">Visos specializacijos</option>
             {['Logopedas', 'Psichologas', 'Pediatras', 'Ergoterapeutas', 'Kineziterapeutas', 'Ortodontas', 'Alergologas'].map((s) => (
@@ -191,7 +191,7 @@ export default function CityPageClient({
             value={searchParams.get('area') ?? ''}
             onChange={(e) => updateParams({ area: e.target.value })}
             aria-label="Pasirinkti rajoną"
-            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 dark:text-white"
+            className="border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 text-base sm:text-sm bg-white dark:bg-slate-700 dark:text-white"
           >
             <option value="">Visi rajonai</option>
             {areas.map((a) => (

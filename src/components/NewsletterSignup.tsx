@@ -52,11 +52,11 @@ export default function NewsletterSignup() {
           placeholder="jusu@pastas.lt"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full min-w-0 text-sm rounded-l-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+          className="w-full min-w-0 text-base rounded-l-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
         />
         <button
           type="submit"
-          className="shrink-0 bg-primary hover:bg-primary/90 text-white text-sm font-medium px-4 py-2 rounded-r-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+          className="shrink-0 bg-primary hover:bg-primary/90 text-white text-sm font-medium px-4 py-2.5 min-h-[44px] rounded-r-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900"
         >
           Prenumeruoti
         </button>

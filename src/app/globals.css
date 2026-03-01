@@ -23,10 +23,18 @@
   body {
     @apply font-sans antialiased;
     -webkit-text-size-adjust: 100%;
+    font-size: 16px;
+    line-height: 1.5;
   }
 
   :focus-visible {
     @apply outline-2 outline-primary outline-offset-2;
+  }
+
+  /* Prevent images/embeds from causing horizontal overflow */
+  img, video, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
   }
 
   /* Force long URLs and text to break on mobile */
@@ -37,6 +45,14 @@
 }
 
 @layer utilities {
+  /* Hide scrollbar but keep scroll functionality (for horizontal tab strips) */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
   .animate-slide-up {
     animation: slide-up 0.3s ease-out;
   }

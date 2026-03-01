@@ -55,13 +55,13 @@ export default function CookieConsent() {
           <div className="flex gap-2 shrink-0">
             <button
               onClick={handleReject}
-              className="px-5 py-2 rounded-lg text-gray-700 dark:text-gray-300 font-medium transition-colors bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-slate-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
+              className="px-5 py-2.5 min-h-[44px] rounded-lg text-gray-700 dark:text-gray-300 font-medium transition-colors bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-slate-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
             >
               Atmesti
             </button>
             <button
               onClick={handleAccept}
-              className="px-5 py-2 rounded-lg text-white font-medium transition-colors bg-[#2d6a4f] hover:bg-[#245a42] focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] focus:ring-offset-2 dark:focus:ring-offset-slate-800"
+              className="px-5 py-2.5 min-h-[44px] rounded-lg text-white font-medium transition-colors bg-[#2d6a4f] hover:bg-[#245a42] focus:outline-none focus:ring-2 focus:ring-[#2d6a4f] focus:ring-offset-2 dark:focus:ring-offset-slate-800"
             >
               Sutinku
             </button>

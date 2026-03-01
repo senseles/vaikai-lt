@@ -79,7 +79,7 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
           placeholder="Jūsų vardas"
           value={authorName}
           onChange={(e) => setAuthorName(e.target.value)}
-          className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+          className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2.5 text-base focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
         />
       </div>
 
@@ -92,7 +92,7 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
           onChange={(e) => setText(e.target.value.slice(0, 2000))}
           rows={3}
           maxLength={2000}
-          className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none transition-colors"
+          className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2.5 text-base focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none transition-colors"
         />
         {text.length > 1800 && (
           <p className={`text-xs mt-1 ${text.length >= 2000 ? 'text-red-500' : 'text-gray-400'}`}>{text.length}/2000</p>
@@ -104,7 +104,7 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
       <button
         type="submit"
         disabled={submitting}
-        className="w-full bg-primary text-white rounded-lg py-2.5 text-sm font-medium hover:bg-primary-dark disabled:opacity-50 transition-colors"
+        className="w-full bg-primary text-white rounded-lg py-3 min-h-[48px] text-base font-medium hover:bg-primary-dark disabled:opacity-50 transition-colors"
       >
         {submitting ? 'Siunčiama...' : 'Siųsti atsiliepimą'}
       </button>
