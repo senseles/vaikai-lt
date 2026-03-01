@@ -49,6 +49,15 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            <select
+              className="text-xs font-medium border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1.5 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 cursor-pointer"
+              defaultValue="lt"
+              aria-label="Pasirinkti kalbą"
+            >
+              <option value="lt">LT</option>
+              <option value="en" disabled>EN</option>
+              <option value="ru" disabled>RU</option>
+            </select>
             <button
               onClick={toggleDark}
               className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-gray-200 dark:border-slate-600 hover:border-primary dark:hover:border-primary-light transition-all text-lg"
@@ -86,13 +95,24 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-            <button
-              onClick={toggleDark}
-              className="w-10 h-10 mt-2 ml-3 flex items-center justify-center rounded-full border-2 border-gray-200 dark:border-slate-600 text-lg"
-              aria-label="Perjungti tamsų režimą"
-            >
-              {dark ? "☀️" : "🌙"}
-            </button>
+            <div className="flex items-center gap-2 mt-2 ml-3">
+              <select
+                className="text-xs font-medium border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1.5 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300"
+                defaultValue="lt"
+                aria-label="Pasirinkti kalbą"
+              >
+                <option value="lt">LT</option>
+                <option value="en" disabled>EN</option>
+                <option value="ru" disabled>RU</option>
+              </select>
+              <button
+                onClick={toggleDark}
+                className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-gray-200 dark:border-slate-600 text-lg"
+                aria-label="Perjungti tamsų režimą"
+              >
+                {dark ? "☀️" : "🌙"}
+              </button>
+            </div>
           </nav>
         )}
       </div>
