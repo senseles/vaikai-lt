@@ -15,8 +15,9 @@ const cache = new Map<string, CacheEntry<unknown>>();
 
 /** Default TTL values in seconds */
 export const CACHE_TTL = {
-  LIST: 60,
-  CITIES: 300,
+  LIST: 300,      // 5 minutes for entity lists (mostly static data)
+  CITIES: 600,    // 10 minutes for city list
+  SEARCH: 120,    // 2 minutes for search results
 } as const;
 
 /**

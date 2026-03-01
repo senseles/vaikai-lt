@@ -54,8 +54,8 @@ export async function POST(request: NextRequest) {
   if (!rawAuthor || typeof rawAuthor !== 'string') {
     return errorResponse('authorName is required', 400);
   }
-  if (rating == null || typeof rating !== 'number' || rating < 1 || rating > 5) {
-    return errorResponse('rating must be a number between 1 and 5', 400);
+  if (rating == null || typeof rating !== 'number' || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return errorResponse('rating must be an integer between 1 and 5', 400);
   }
   if (!rawText || typeof rawText !== 'string') {
     return errorResponse('text is required', 400);
@@ -70,6 +70,12 @@ export async function POST(request: NextRequest) {
   }
   if (cleanText.length === 0) {
     return errorResponse('text is required', 400);
+  }
+  if (cleanText.length > 2000) {
+    return errorResponse('text must be 2000 characters or less', 400);
+  }
+  if (cleanAuthor.length > 100) {
+    return errorResponse('authorName must be 100 characters or less', 400);
   }
 
   const review = await prisma.review.create({

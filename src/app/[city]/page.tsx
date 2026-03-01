@@ -114,18 +114,15 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   if (spec) specialistWhere.specialty = { contains: spec };
   if (area) specialistWhere.area = area;
 
-  // Fetch distinct areas for this city (from all entity types)
-  const [kgAreas, aukleAreas, burelisAreas, specAreas] = await Promise.all([
+  // Fetch areas + data for ALL categories in a single parallel batch
+  const [
+    kgAreas, aukleAreas, burelisAreas, specAreas,
+    kindergartens, kindergartenTotal, aukles, aukleTotal, bureliai, burelisTotal, specialists, specialistTotal,
+  ] = await Promise.all([
     prisma.kindergarten.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
     prisma.aukle.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
     prisma.burelis.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
     prisma.specialist.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
-  ]);
-  const areaSet = new Set([...kgAreas, ...aukleAreas, ...burelisAreas, ...specAreas].map(a => a.area).filter(Boolean) as string[]);
-  const allAreas = Array.from(areaSet).sort((a, b) => a.localeCompare(b, 'lt'));
-
-  // Fetch data for ALL categories so every tab has data ready
-  const [kindergartens, kindergartenTotal, aukles, aukleTotal, bureliai, burelisTotal, specialists, specialistTotal] = await Promise.all([
     prisma.kindergarten.findMany({ where: kindergartenWhere, orderBy, skip: category === 'darzeliai' ? skip : 0, take: PER_PAGE }),
     prisma.kindergarten.count({ where: kindergartenWhere }),
     prisma.aukle.findMany({ where: aukleWhere, orderBy, skip: category === 'aukles' ? skip : 0, take: PER_PAGE }),
@@ -135,6 +132,8 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
     prisma.specialist.findMany({ where: specialistWhere, orderBy, skip: category === 'specialistai' ? skip : 0, take: PER_PAGE }),
     prisma.specialist.count({ where: specialistWhere }),
   ]);
+  const areaSet = new Set([...kgAreas, ...aukleAreas, ...burelisAreas, ...specAreas].map(a => a.area).filter(Boolean) as string[]);
+  const allAreas = Array.from(areaSet).sort((a, b) => a.localeCompare(b, 'lt'));
 
   // Serialize dates for client component
   const serialize = <T extends { createdAt: Date; updatedAt?: Date }>(items: T[]) =>
