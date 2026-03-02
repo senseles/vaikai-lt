@@ -49,7 +49,7 @@ export default function NewsletterSignup() {
         <input
           id="newsletter-email"
           type="email"
-          placeholder="jusu@pastas.lt"
+          placeholder="jūsų@paštas.lt"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full min-w-0 text-base rounded-l-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 px-3 py-2.5 min-h-[44px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"

@@ -49,12 +49,12 @@ export default function AuthPage() {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Neteisingas el. pasto formatas';
         return '';
       case 'password':
-        if (!value) return 'Slaptazodis yra privalomas';
-        if (value.length < 6) return 'Slaptazodis turi buti bent 6 simboliu';
+        if (!value) return 'Slaptažodis yra privalomas';
+        if (value.length < 6) return 'Slaptažodis turi būti bent 6 simbolių';
         return '';
       case 'name':
         // Name is optional for registration but validate if provided
-        if (mode === 'register' && value.trim() && value.trim().length < 2) return 'Vardas turi buti bent 2 simboliu';
+        if (mode === 'register' && value.trim() && value.trim().length < 2) return 'Vardas turi būti bent 2 simbolių';
         return '';
       default:
         return '';
@@ -108,7 +108,7 @@ export default function AuthPage() {
       const data = await res.json();
 
       if (!data.success) {
-        setError(data.error || 'Ivyko klaida. Bandykite dar karta.');
+        setError(data.error || 'Įvyko klaida. Bandykite dar kartą.');
         setLoading(false);
         return;
       }
@@ -120,7 +120,7 @@ export default function AuthPage() {
         router.refresh();
       }, 800);
     } catch {
-      setError('Tinklo klaida. Patikrinkite interneto rysio ir bandykite veliau.');
+      setError('Tinklo klaida. Patikrinkite interneto ryšį ir bandykite vėliau.');
       setLoading(false);
     }
   };
@@ -147,10 +147,10 @@ export default function AuthPage() {
             </svg>
           </div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-            {mode === 'login' ? 'Sekmingai prisijungta!' : 'Paskyra sukurta!'}
+            {mode === 'login' ? 'Sėkmingai prisijungta!' : 'Paskyra sukurta!'}
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Nukreipiame i pagrindini puslapi...
+            Nukreipiame į pagrindinį puslapį...
           </p>
         </div>
       </div>
@@ -160,7 +160,7 @@ export default function AuthPage() {
   return (
     <div className="max-w-md mx-auto px-4 py-8 sm:py-16">
       <nav className="text-sm text-gray-500 dark:text-gray-400 mb-6 sm:mb-8" aria-label="Navigacija">
-        <Link href="/" className="hover:text-primary transition-colors">Pradzia</Link>
+        <Link href="/" className="hover:text-primary transition-colors">Pradžia</Link>
         <span className="mx-2">/</span>
         <span className="text-gray-800 dark:text-gray-200 font-medium">
           {mode === 'login' ? 'Prisijungimas' : 'Registracija'}
@@ -173,8 +173,8 @@ export default function AuthPage() {
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
           {mode === 'login'
-            ? 'Prisijunkite, kad galetumete rasyti atsiliepimus'
-            : 'Sukurkite paskyra ir dalinkites savo patirtimi'}
+            ? 'Prisijunkite, kad galėtumėte rašyti atsiliepimus'
+            : 'Sukurkite paskyrą ir dalinkitės savo patirtimi'}
         </p>
 
         {/* Tab switcher */}
@@ -227,7 +227,7 @@ export default function AuthPage() {
                   }
                 }}
                 onBlur={() => handleBlur('name', name)}
-                placeholder="Jusu vardas"
+                placeholder="Jūsų vardas"
                 className={touched.name && fieldErrors.name ? inputErrorClass : inputNormalClass}
                 aria-invalid={touched.name && !!fieldErrors.name}
                 aria-describedby={fieldErrors.name ? 'name-error' : undefined}
@@ -296,7 +296,7 @@ export default function AuthPage() {
           {/* Password field */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Slaptazodis <span className="text-red-500">*</span>
+              Slaptažodis <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -314,7 +314,7 @@ export default function AuthPage() {
                   }
                 }}
                 onBlur={() => handleBlur('password', password)}
-                placeholder={mode === 'register' ? 'Maziausiai 6 simboliai' : ''}
+                placeholder={mode === 'register' ? 'Mažiausiai 6 simboliai' : ''}
                 className={`${touched.password && fieldErrors.password ? inputErrorClass : inputNormalClass} pr-12`}
                 aria-invalid={touched.password && !!fieldErrors.password}
                 aria-describedby={fieldErrors.password ? 'password-error' : mode === 'register' ? 'password-strength' : undefined}
@@ -324,7 +324,7 @@ export default function AuthPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1"
-                aria-label={showPassword ? 'Slpti slaptazodi' : 'Rodyti slaptazodi'}
+                aria-label={showPassword ? 'Slėpti slaptažodį' : 'Rodyti slaptažodį'}
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -410,12 +410,12 @@ export default function AuthPage() {
                 onClick={() => switchMode('register')}
                 className="text-primary dark:text-primary-light font-medium hover:underline"
               >
-                Registruokites
+                Registruokitės
               </button>
             </>
           ) : (
             <>
-              Jau turite paskyra?{' '}
+              Jau turite paskyrą?{' '}
               <button
                 type="button"
                 onClick={() => switchMode('login')}

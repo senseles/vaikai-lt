@@ -66,7 +66,7 @@ export default function StatsCard({ icon, label, count, change, color = 'blue' }
         <p className={`text-sm ${c.text} opacity-80 truncate`}>{label}</p>
         {change !== undefined && change !== 0 && (
           <p className={`text-xs mt-1 font-medium ${change > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
-            {change > 0 ? '+' : ''}{change}% nuo praites savaites
+            {change > 0 ? '+' : ''}{change}% nuo praėjusios savaitės
           </p>
         )}
       </div>

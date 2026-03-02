@@ -28,13 +28,13 @@ Vaikai.lt — tai didžiausia Lietuvos vaikų priežiūros paslaugų paieškos i
 
 Platformoje šiuo metu yra:
 
-- **~3 100** darželių (valstybinių, privačių, Montessori ir kt.)
+- **~7 075** darželių (valstybinių, privačių, Montessori ir kt.)
 - **~210** auklių profilių
 - **~210** būrelių
 - **~160** vaikų specialistų (logopedai, psichologai ir kt.)
 - **~58 700** atsiliepimų su vertinimais
 - **43** Lietuvos miestai su atskirais puslapiais
-- **Forumas** su 8 kategorijomis, ~119 įrašų ir ~914 komentarų
+- **Forumas** su 8 kategorijomis, ~119 įrašų ir ~832 komentarų
 
 ---
 
@@ -118,7 +118,7 @@ Platformoje šiuo metu yra:
 
 | Modelis | Aprašymas | Apytikris kiekis |
 |---|---|---|
-| `Kindergarten` | Darželiai — pavadinimas, miestas, tipas, adresas, telefonas, svetainė, kalba, amžius, grupės, valandos, ypatybės | ~3 100 |
+| `Kindergarten` | Darželiai — pavadinimas, miestas, tipas, adresas, telefonas, svetainė, kalba, amžius, grupės, valandos, ypatybės | ~7 075 |
 | `Aukle` | Auklės — patirtis, amžiaus grupė, valandinė kaina, kalbos, prieinamumas | ~210 |
 | `Burelis` | Būreliai — kategorija, subkategorija, amžiaus grupė, kaina, tvarkaraštis | ~210 |
 | `Specialist` | Vaikų specialistai — specializacija, klinika, kaina, kalbos | ~160 |
@@ -127,7 +127,7 @@ Platformoje šiuo metu yra:
 | `Favorite` | Mėgstamiausi — per sesijos ID | — |
 | `ForumCategory` | Forumo kategorijos — pavadinimas, slug, aprašymas, ikona, eilė | 8 |
 | `ForumPost` | Forumo įrašai — pavadinimas, turinys, autorius, balsai, peržiūros | ~119 |
-| `ForumComment` | Forumo komentarai — turinys, autorius, balsai, self-referencing gijos | ~914 |
+| `ForumComment` | Forumo komentarai — turinys, autorius, balsai, self-referencing gijos | ~832 |
 | `ForumVote` | Balsai — sesijos pagrindu, unikalūs per įrašą/komentarą | — |
 
 ### Indeksai

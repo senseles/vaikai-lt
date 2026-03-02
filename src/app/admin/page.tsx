@@ -29,7 +29,9 @@ interface DashboardStats {
     createdAt: string;
   }[];
   reviewsPerDay: { date: string; count: number }[];
+  reviewsPerMonth: { month: string; count: number }[];
   entitiesPerWeek: { week: string; count: number }[];
+  topRatedCities: { city: string; avgRating: number; count: number }[];
 }
 
 const ITEM_TYPE_LABELS: Record<string, string> = {
@@ -223,7 +225,7 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      {/* Charts - stack vertically on mobile */}
+      {/* Charts Row 1 - Reviews per day + Entities per week */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Reviews per day chart */}
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
@@ -286,6 +288,159 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Charts Row 2 - Entity type breakdown + Reviews per month */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Entity type breakdown - CSS donut chart */}
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">Įstaigų pasiskirstymas pagal tipą</h3>
+          {(() => {
+            const segments = [
+              { label: 'Darželiai', count: stats.kindergartenCount, color: '#3b82f6', darkColor: '#60a5fa' },
+              { label: 'Auklės', count: stats.aukleCount, color: '#22c55e', darkColor: '#4ade80' },
+              { label: 'Būreliai', count: stats.burelisCount, color: '#f97316', darkColor: '#fb923c' },
+              { label: 'Specialistai', count: stats.specialistCount, color: '#14b8a6', darkColor: '#2dd4bf' },
+            ];
+            const maxSegment = Math.max(...segments.map(s => s.count));
+            return (
+              <div className="space-y-3">
+                {segments.map((seg) => {
+                  const pct = maxSegment > 0 ? (seg.count / maxSegment) * 100 : 0;
+                  const totalPct = totalEntities > 0 ? Math.round((seg.count / totalEntities) * 100) : 0;
+                  return (
+                    <div key={seg.label}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{seg.label}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {seg.count.toLocaleString('lt-LT')} ({totalPct}%)
+                        </span>
+                      </div>
+                      <div className="h-3 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-700 ease-out"
+                          style={{
+                            width: `${pct}%`,
+                            backgroundColor: seg.color,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+                <div className="pt-2 border-t border-gray-100 dark:border-slate-700">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">Viso</span>
+                    <span className="text-xs font-bold text-gray-800 dark:text-gray-200">{totalEntities.toLocaleString('lt-LT')}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Reviews per month chart */}
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">Atsiliepimai per mėnesį (6 mėnesiai)</h3>
+          {(() => {
+            const months = stats.reviewsPerMonth ?? [];
+            const maxMonthCount = Math.max(...months.map((m) => m.count), 1);
+            if (months.length === 0) {
+              return (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <div className="w-10 h-10 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-2">
+                    <span className="text-gray-400 dark:text-gray-500 text-lg">★</span>
+                  </div>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">Nėra duomenų</p>
+                </div>
+              );
+            }
+            return (
+              <div className="flex items-end gap-1.5 sm:gap-2" style={{ height: chartHeight }}>
+                {months.map((m) => {
+                  const barHeight = Math.max(4, (m.count / maxMonthCount) * chartHeight);
+                  const [year, monthNum] = m.month.split('-');
+                  const monthDate = new Date(parseInt(year), parseInt(monthNum) - 1);
+                  return (
+                    <div key={m.month} className="flex-1 flex flex-col items-center gap-1 min-w-0">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{m.count}</span>
+                      <div
+                        className="w-full bg-purple-500 dark:bg-purple-400 rounded-t-md transition-all duration-500 ease-out"
+                        style={{ height: barHeight }}
+                        title={`${monthDate.toLocaleDateString('lt-LT', { year: 'numeric', month: 'long' })}: ${m.count} atsiliepimų`}
+                      />
+                      <span className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap truncate w-full text-center">
+                        {monthDate.toLocaleDateString('lt-LT', { month: 'short' })}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </div>
+      </div>
+
+      {/* Top-rated cities chart */}
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5">
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">Geriausiai vertinami miestai</h3>
+        {(() => {
+          const cities = stats.topRatedCities ?? [];
+          if (cities.length === 0) {
+            return (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="w-10 h-10 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-2">
+                  <span className="text-gray-400 dark:text-gray-500 text-lg">🏙️</span>
+                </div>
+                <p className="text-sm text-gray-400 dark:text-gray-500">Nėra duomenų</p>
+              </div>
+            );
+          }
+          const maxRating = 5;
+          return (
+            <div className="space-y-2.5">
+              {cities.map((c, i) => {
+                const pct = (c.avgRating / maxRating) * 100;
+                // Gradient from gold (rank 1) to green
+                const barColors = [
+                  'bg-amber-400 dark:bg-amber-500',
+                  'bg-amber-400 dark:bg-amber-500',
+                  'bg-yellow-400 dark:bg-yellow-500',
+                  'bg-lime-400 dark:bg-lime-500',
+                  'bg-green-400 dark:bg-green-500',
+                  'bg-emerald-400 dark:bg-emerald-500',
+                  'bg-teal-400 dark:bg-teal-500',
+                  'bg-cyan-400 dark:bg-cyan-500',
+                ];
+                return (
+                  <div key={c.city}>
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-xs font-bold text-gray-400 dark:text-gray-500 w-4 text-right shrink-0">{i + 1}.</span>
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{c.city}</span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs text-gray-400 dark:text-gray-500">{c.count} darželių</span>
+                        <span className="inline-flex items-center gap-0.5 text-xs font-bold text-amber-600 dark:text-amber-400">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          {c.avgRating.toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-700 ease-out ${barColors[i] ?? barColors[barColors.length - 1]}`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Recent Activity */}

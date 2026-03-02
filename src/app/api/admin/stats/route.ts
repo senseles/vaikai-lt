@@ -117,6 +117,46 @@ export async function GET() {
       },
     });
 
+    // Top-rated cities (by average kindergarten rating, with at least 3 entities)
+    const allKindergartens = await prisma.kindergarten.findMany({
+      select: { city: true, baseRating: true },
+    });
+    const cityRatings: Record<string, { total: number; count: number }> = {};
+    for (const kg of allKindergartens) {
+      if (!cityRatings[kg.city]) cityRatings[kg.city] = { total: 0, count: 0 };
+      cityRatings[kg.city].total += kg.baseRating;
+      cityRatings[kg.city].count++;
+    }
+    const topRatedCities = Object.entries(cityRatings)
+      .filter(([, v]) => v.count >= 3)
+      .map(([city, v]) => ({ city, avgRating: Math.round((v.total / v.count) * 10) / 10, count: v.count }))
+      .sort((a, b) => b.avgRating - a.avgRating)
+      .slice(0, 8);
+
+    // Reviews per month (last 6 months)
+    const sixMonthsAgo = new Date(now);
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const monthlyReviewsRaw = await prisma.review.findMany({
+      where: { createdAt: { gte: sixMonthsAgo } },
+      select: { createdAt: true },
+      orderBy: { createdAt: 'asc' },
+    });
+    const reviewsByMonth: Record<string, number> = {};
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now);
+      d.setMonth(d.getMonth() - i);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      reviewsByMonth[key] = 0;
+    }
+    for (const r of monthlyReviewsRaw) {
+      const d = new Date(r.createdAt);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      if (reviewsByMonth[key] !== undefined) {
+        reviewsByMonth[key]++;
+      }
+    }
+    const reviewsPerMonth = Object.entries(reviewsByMonth).map(([month, count]) => ({ month, count }));
+
     const stats = {
       kindergartenCount,
       aukleCount,
@@ -128,7 +168,9 @@ export async function GET() {
       forumPostCount,
       forumCommentCount,
       reviewsPerDay,
+      reviewsPerMonth,
       entitiesPerWeek: weekBuckets,
+      topRatedCities,
       recentReviews,
       recentForumPosts,
       dataQuality: {
