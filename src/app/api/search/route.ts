@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.PUBLIC_GET);
+  if (rateLimitResponse) return rateLimitResponse;
+
   const q = request.nextUrl.searchParams.get('q')?.trim() ?? '';
   if (q.length < 2) {
     return NextResponse.json({ suggestions: [] });

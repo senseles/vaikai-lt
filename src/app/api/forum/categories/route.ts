@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
-import { jsonResponse, errorResponse } from '@/lib/api-utils';
+import { cachedJsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       postCount: cat._count.posts,
     }));
 
-    return jsonResponse(data);
+    return cachedJsonResponse(data, 300, 600);
   } catch {
     return errorResponse('Vidinė serverio klaida', 500);
   }

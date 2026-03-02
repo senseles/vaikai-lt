@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createHash, randomBytes } from 'crypto';
+import { randomBytes } from 'crypto';
 import prisma from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
-
-function verifyPassword(password: string, stored: string): boolean {
-  const [salt, hash] = stored.split(':');
-  if (!salt || !hash) return false;
-  const check = createHash('sha256').update(salt + password).digest('hex');
-  return check === hash;
-}
+import { checkCsrf } from '@/lib/security';
+import { verifyPassword, hashPassword, needsRehash } from '@/lib/password';
 
 function json<T>(data: T, status = 200) {
   return NextResponse.json(data, { status });
 }
 
 export async function POST(request: NextRequest) {
+  const csrfResponse = checkCsrf(request);
+  if (csrfResponse) return csrfResponse;
+
   const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.ADMIN_LOGIN);
   if (rateLimitResponse) return rateLimitResponse;
 
@@ -31,9 +29,17 @@ export async function POST(request: NextRequest) {
       return json({ success: false, error: 'Neteisingas el. paštas arba slaptažodis' }, 401);
     }
 
+    // Rehash legacy SHA-256 passwords to scrypt
+    if (needsRehash(user.passwordHash)) {
+      const newHash = hashPassword(password);
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { passwordHash: newHash },
+      });
+    }
+
     // Create session token
-    const raw = randomBytes(32).toString('hex') + Date.now().toString();
-    const token = createHash('sha256').update(raw).digest('hex');
+    const token = randomBytes(32).toString('hex');
 
     const response = json({
       success: true,

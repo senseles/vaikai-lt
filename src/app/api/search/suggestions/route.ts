@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { CITIES } from '@/lib/cities';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 // Build a city name -> slug lookup for fast resolution
 const cityNameToSlug: Record<string, string> = {};
@@ -27,6 +28,9 @@ const categoryMap: Record<string, string> = {
 };
 
 export async function GET(request: NextRequest) {
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.PUBLIC_GET);
+  if (rateLimitResponse) return rateLimitResponse;
+
   const q = request.nextUrl.searchParams.get('q')?.trim() ?? '';
   if (q.length < 2) {
     return NextResponse.json({ suggestions: [] });

@@ -84,10 +84,18 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { ids, action } = body as { ids?: string[]; action?: string };
+    const { ids, action } = body as { ids?: unknown[]; action?: string };
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
       return json({ success: false, error: 'Reikalingi ID' }, 400);
+    }
+
+    if (!ids.every((id): id is string => typeof id === 'string' && id.length > 0)) {
+      return json({ success: false, error: 'Visi ID turi būti tekstinės reikšmės' }, 400);
+    }
+
+    if (ids.length > 100) {
+      return json({ success: false, error: 'Maksimalus kiekis: 100 ID' }, 400);
     }
 
     if (!action || !['approve', 'reject'].includes(action)) {

@@ -64,7 +64,6 @@ export async function POST(request: NextRequest) {
     return json({ success: true, data: created }, 201);
   } catch (err) {
     console.error('Admin create aukle error:', err);
-    const message = err instanceof Error ? err.message : 'Nepavyko sukurti';
-    return json({ success: false, error: message }, 500);
+    return json({ success: false, error: 'Nepavyko sukurti' }, 500);
   }
 }

@@ -190,12 +190,12 @@ function ItemForm({
               />
             )}
             {fieldErrors[f.key] && (
-              <p className="text-red-500 text-xs mt-1">{fieldErrors[f.key]}</p>
+              <p className="text-red-500 dark:text-red-400 text-xs mt-1">{fieldErrors[f.key]}</p>
             )}
           </div>
         ))}
 
-        {error && <p className="sm:col-span-2 text-red-500 text-sm">{error}</p>}
+        {error && <p className="sm:col-span-2 text-red-500 dark:text-red-400 text-sm">{error}</p>}
 
         <div className="sm:col-span-2 flex gap-2 pt-2">
           <button
@@ -343,7 +343,7 @@ function MobileCardView({
               </button>
               <button
                 onClick={() => onDeleteRequest(item)}
-                className="px-3 py-1.5 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100 font-medium transition-colors min-h-[32px]"
+                className="px-3 py-1.5 text-xs bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 font-medium transition-colors min-h-[32px]"
               >
                 Ištrinti
               </button>
@@ -518,17 +518,17 @@ export default function AdminTable({ apiPath, columns, fields, entityLabel, perP
     <div>
       {/* Action messages */}
       {actionError && (
-        <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center justify-between">
+        <div className="mb-4 px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300 flex items-center justify-between">
           <span>{actionError}</span>
-          <button onClick={() => setActionError('')} className="text-red-400 hover:text-red-600 ml-2 p-1" aria-label="Uzdaryti">
+          <button onClick={() => setActionError('')} className="text-red-400 dark:text-red-500 hover:text-red-600 dark:hover:text-red-300 ml-2 p-1" aria-label="Uzdaryti">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
       )}
       {actionSuccess && (
-        <div className="mb-4 px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex items-center justify-between">
+        <div className="mb-4 px-4 py-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-sm text-green-700 dark:text-green-300 flex items-center justify-between">
           <span>{actionSuccess}</span>
-          <button onClick={() => setActionSuccess('')} className="text-green-400 hover:text-green-600 ml-2 p-1" aria-label="Uzdaryti">
+          <button onClick={() => setActionSuccess('')} className="text-green-400 dark:text-green-500 hover:text-green-600 dark:hover:text-green-300 ml-2 p-1" aria-label="Uzdaryti">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>

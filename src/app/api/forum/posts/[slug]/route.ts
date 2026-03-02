@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
-import { jsonResponse, errorResponse } from '@/lib/api-utils';
+import { cachedJsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 interface CommentWithReplies {
@@ -93,10 +93,10 @@ export async function GET(
     const { comments, ...postData } = post;
     const commentTree = buildCommentTree(comments);
 
-    return jsonResponse({
+    return cachedJsonResponse({
       ...postData,
       comments: commentTree,
-    });
+    }, 120, 600);
   } catch {
     return errorResponse('Vidinė serverio klaida', 500);
   }

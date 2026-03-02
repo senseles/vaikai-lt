@@ -37,7 +37,7 @@ const columns: ColumnDef[] = [
       return (
         <span className="inline-flex items-center gap-1 text-sm">
           <span className="text-yellow-500">★</span>
-          <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">{r.toFixed(1)}</span>
+          <span className="font-medium text-gray-700 dark:text-gray-300">{r.toFixed(1)}</span>
         </span>
       );
     },

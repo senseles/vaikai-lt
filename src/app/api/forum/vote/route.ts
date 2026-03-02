@@ -58,67 +58,47 @@ export async function POST(request: NextRequest) {
 
       if (existingVote) {
         if (existingVote.value === value) {
-          // Same vote — remove it (toggle off)
-          await prisma.forumVote.delete({ where: { id: existingVote.id } });
-
-          // Update counts
-          if (value === 1) {
-            await prisma.forumPost.update({
+          // Same vote — remove it (toggle off) — atomic transaction
+          await prisma.$transaction([
+            prisma.forumVote.delete({ where: { id: existingVote.id } }),
+            prisma.forumPost.update({
               where: { id: postId },
-              data: { upvotes: { decrement: 1 } },
-            });
-          } else {
-            await prisma.forumPost.update({
-              where: { id: postId },
-              data: { downvotes: { decrement: 1 } },
-            });
-          }
-
+              data: value === 1 ? { upvotes: { decrement: 1 } } : { downvotes: { decrement: 1 } },
+            }),
+          ]);
           return jsonResponse({ action: 'removed', postId });
         } else {
-          // Different vote — update
-          await prisma.forumVote.update({
-            where: { id: existingVote.id },
-            data: { value: value as number },
-          });
-
-          // Adjust counts: remove old vote, add new
-          if (value === 1) {
-            await prisma.forumPost.update({
+          // Different vote — update — atomic transaction
+          await prisma.$transaction([
+            prisma.forumVote.update({
+              where: { id: existingVote.id },
+              data: { value: value as number },
+            }),
+            prisma.forumPost.update({
               where: { id: postId },
-              data: { upvotes: { increment: 1 }, downvotes: { decrement: 1 } },
-            });
-          } else {
-            await prisma.forumPost.update({
-              where: { id: postId },
-              data: { upvotes: { decrement: 1 }, downvotes: { increment: 1 } },
-            });
-          }
-
+              data: value === 1
+                ? { upvotes: { increment: 1 }, downvotes: { decrement: 1 } }
+                : { upvotes: { decrement: 1 }, downvotes: { increment: 1 } },
+            }),
+          ]);
           return jsonResponse({ action: 'changed', postId, value });
         }
       }
 
-      // New vote
-      await prisma.forumVote.create({
-        data: {
-          postId,
-          sessionId: sessionId as string,
-          value: value as number,
-        },
-      });
-
-      if (value === 1) {
-        await prisma.forumPost.update({
+      // New vote — atomic transaction
+      await prisma.$transaction([
+        prisma.forumVote.create({
+          data: {
+            postId,
+            sessionId: sessionId as string,
+            value: value as number,
+          },
+        }),
+        prisma.forumPost.update({
           where: { id: postId },
-          data: { upvotes: { increment: 1 } },
-        });
-      } else {
-        await prisma.forumPost.update({
-          where: { id: postId },
-          data: { downvotes: { increment: 1 } },
-        });
-      }
+          data: value === 1 ? { upvotes: { increment: 1 } } : { downvotes: { increment: 1 } },
+        }),
+      ]);
 
       return jsonResponse({ action: 'voted', postId, value }, 201);
     }
@@ -140,65 +120,47 @@ export async function POST(request: NextRequest) {
 
       if (existingVote) {
         if (existingVote.value === value) {
-          // Same vote — remove it
-          await prisma.forumVote.delete({ where: { id: existingVote.id } });
-
-          if (value === 1) {
-            await prisma.forumComment.update({
+          // Same vote — remove it — atomic transaction
+          await prisma.$transaction([
+            prisma.forumVote.delete({ where: { id: existingVote.id } }),
+            prisma.forumComment.update({
               where: { id: commentId },
-              data: { upvotes: { decrement: 1 } },
-            });
-          } else {
-            await prisma.forumComment.update({
-              where: { id: commentId },
-              data: { downvotes: { decrement: 1 } },
-            });
-          }
-
+              data: value === 1 ? { upvotes: { decrement: 1 } } : { downvotes: { decrement: 1 } },
+            }),
+          ]);
           return jsonResponse({ action: 'removed', commentId });
         } else {
-          // Different vote — update
-          await prisma.forumVote.update({
-            where: { id: existingVote.id },
-            data: { value: value as number },
-          });
-
-          if (value === 1) {
-            await prisma.forumComment.update({
+          // Different vote — update — atomic transaction
+          await prisma.$transaction([
+            prisma.forumVote.update({
+              where: { id: existingVote.id },
+              data: { value: value as number },
+            }),
+            prisma.forumComment.update({
               where: { id: commentId },
-              data: { upvotes: { increment: 1 }, downvotes: { decrement: 1 } },
-            });
-          } else {
-            await prisma.forumComment.update({
-              where: { id: commentId },
-              data: { upvotes: { decrement: 1 }, downvotes: { increment: 1 } },
-            });
-          }
-
+              data: value === 1
+                ? { upvotes: { increment: 1 }, downvotes: { decrement: 1 } }
+                : { upvotes: { decrement: 1 }, downvotes: { increment: 1 } },
+            }),
+          ]);
           return jsonResponse({ action: 'changed', commentId, value });
         }
       }
 
-      // New vote
-      await prisma.forumVote.create({
-        data: {
-          commentId,
-          sessionId: sessionId as string,
-          value: value as number,
-        },
-      });
-
-      if (value === 1) {
-        await prisma.forumComment.update({
+      // New vote — atomic transaction
+      await prisma.$transaction([
+        prisma.forumVote.create({
+          data: {
+            commentId,
+            sessionId: sessionId as string,
+            value: value as number,
+          },
+        }),
+        prisma.forumComment.update({
           where: { id: commentId },
-          data: { upvotes: { increment: 1 } },
-        });
-      } else {
-        await prisma.forumComment.update({
-          where: { id: commentId },
-          data: { downvotes: { increment: 1 } },
-        });
-      }
+          data: value === 1 ? { upvotes: { increment: 1 } } : { downvotes: { increment: 1 } },
+        }),
+      ]);
 
       return jsonResponse({ action: 'voted', commentId, value }, 201);
     }

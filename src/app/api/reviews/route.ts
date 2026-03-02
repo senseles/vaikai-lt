@@ -55,6 +55,18 @@ export async function POST(request: NextRequest) {
   if (!itemType || !VALID_ITEM_TYPES.includes(itemType as typeof VALID_ITEM_TYPES[number])) {
     return errorResponse(`itemType must be one of: ${VALID_ITEM_TYPES.join(', ')}`, 400);
   }
+
+  // Verify the referenced entity exists
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const entityModel = (prisma as any)[itemType as string];
+  const entityExists = await entityModel.findUnique({
+    where: { id: itemId as string },
+    select: { id: true },
+  });
+  if (!entityExists) {
+    return errorResponse('Nurodytas objektas nerastas', 404);
+  }
+
   if (!rawAuthor || typeof rawAuthor !== 'string') {
     return errorResponse('authorName is required', 400);
   }

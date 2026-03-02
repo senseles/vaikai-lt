@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { createAdminToken } from '@/lib/admin-tokens';
+import { checkCsrf } from '@/lib/security';
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'darzeliai2026';
 
@@ -9,6 +10,9 @@ function json<T>(data: T, status = 200) {
 }
 
 export async function POST(request: NextRequest) {
+  const csrfResponse = checkCsrf(request);
+  if (csrfResponse) return csrfResponse;
+
   const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.ADMIN_LOGIN);
   if (rateLimitResponse) return rateLimitResponse;
 

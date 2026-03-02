@@ -1,19 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createHash, randomBytes } from 'crypto';
+import { randomBytes } from 'crypto';
 import prisma from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
-
-function hashPassword(password: string): string {
-  const salt = randomBytes(16).toString('hex');
-  const hash = createHash('sha256').update(salt + password).digest('hex');
-  return `${salt}:${hash}`;
-}
+import { checkCsrf } from '@/lib/security';
+import { hashPassword } from '@/lib/password';
 
 function json<T>(data: T, status = 200) {
   return NextResponse.json(data, { status });
 }
 
 export async function POST(request: NextRequest) {
+  const csrfResponse = checkCsrf(request);
+  if (csrfResponse) return csrfResponse;
+
   const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.ADMIN_LOGIN);
   if (rateLimitResponse) return rateLimitResponse;
 
@@ -50,8 +49,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Create session token
-    const raw = randomBytes(32).toString('hex') + Date.now().toString();
-    const token = createHash('sha256').update(raw).digest('hex');
+    const token = randomBytes(32).toString('hex');
 
     const response = json({
       success: true,

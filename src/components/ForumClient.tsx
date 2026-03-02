@@ -473,7 +473,7 @@ function CommentForm({ postId, parentId, onSubmit, compact }: CommentFormProps) 
             className="w-full flex-1 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 resize-none placeholder:text-slate-400"
           />
         </div>
-        {error && <p className="text-red-500 text-xs">{error}</p>}
+        {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
         <div className="flex justify-end">
           <button
             type="submit"
@@ -512,7 +512,7 @@ function CommentForm({ postId, parentId, onSubmit, compact }: CommentFormProps) 
         rows={4}
         className="w-full px-3 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 resize-y placeholder:text-slate-400"
       />
-      {error && <p className="text-red-500 text-xs">{error}</p>}
+      {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
       <div className="flex justify-end">
         <button
           type="submit"

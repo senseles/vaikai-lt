@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
-import { jsonResponse, errorResponse, getPagination } from '@/lib/api-utils';
+import { jsonResponse, cachedJsonResponse, errorResponse, getPagination } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { checkCsrf, checkHoneypot, checkSubmitTiming, stripHtml } from '@/lib/security';
 
@@ -126,10 +126,10 @@ export async function GET(request: NextRequest) {
       commentCount: _count.comments,
     }));
 
-    return jsonResponse({
+    return cachedJsonResponse({
       data,
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    });
+    }, 60, 300);
   } catch {
     return errorResponse('Vidinė serverio klaida', 500);
   }

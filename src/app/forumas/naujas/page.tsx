@@ -163,7 +163,7 @@ export default function NewPostPage() {
             className={`w-full px-4 py-3 rounded-xl border ${errors.title ? 'border-red-400' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 placeholder:text-slate-400`}
           />
           <div className="flex justify-between mt-1">
-            {errors.title ? <p className="text-red-500 text-xs">{errors.title}</p> : <span />}
+            {errors.title ? <p className="text-red-500 dark:text-red-400 text-xs">{errors.title}</p> : <span />}
             <p className="text-xs text-slate-400 tabular-nums">{title.length}/200</p>
           </div>
         </div>
@@ -186,7 +186,7 @@ export default function NewPostPage() {
             className={`w-full px-4 py-3 rounded-xl border ${errors.content ? 'border-red-400' : 'border-gray-200 dark:border-slate-600'} bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 resize-y placeholder:text-slate-400 max-w-full`}
           />
           <div className="flex justify-between mt-1">
-            {errors.content ? <p className="text-red-500 text-xs">{errors.content}</p> : <span />}
+            {errors.content ? <p className="text-red-500 dark:text-red-400 text-xs">{errors.content}</p> : <span />}
             <p className="text-xs text-slate-400 tabular-nums">{content.length}/5000</p>
           </div>
         </div>

@@ -198,3 +198,14 @@
   2. Google Font preconnect warning in `layout.tsx` (non-blocking but should fix)
 
 **Next:** Remove unused imports in forum page to unblock build. Then deploy candidate.
+
+---
+
+## SYNC 2026-03-01 20:23 EST (Sun)
+
+- **Commits (last 20):** 20 commits visible — latest `f4b6863` (admin CRUD, auth forms, mobile polish, dark mode, forum seeding)
+- **Build:** ✅ Clean — no errors. All pages compile. Previous unused import blockers resolved.
+- **DB:** ✅ Healthy — KG: 3,100 | Auklės: 210 | Būreliai: 210 | Specialists: 160 | Reviews: 58,730
+- **Blockers:** None currently.
+
+**Summary:** Project in good shape. Forum, admin panel, mobile responsiveness, and seed data all landed. Build passes, DB well-populated. Ready for deploy candidate review.
