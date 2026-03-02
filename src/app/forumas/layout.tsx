@@ -15,6 +15,7 @@ export const metadata: Metadata = {
     description:
       'Diskusijos apie vaikų ugdymą, darželius, aukles ir daugiau. Prisijunkite prie bendruomenės!',
     url: 'https://vaikai.lt/forumas',
+    type: 'website',
   },
 };
 

@@ -115,7 +115,7 @@ function ReviewItem({ review }: { readonly review: Review }) {
         {reportState === 'idle' && (
           <button
             onClick={handleReport}
-            className="text-xs text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1 min-h-[44px] px-1"
+            className="text-xs text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors flex items-center gap-1 min-h-[44px] px-1"
             title="Pranešti apie atsiliepimą"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -130,13 +130,13 @@ function ReviewItem({ review }: { readonly review: Review }) {
             <span className="text-gray-500 dark:text-gray-400">Pranešti apie atsiliepimą?</span>
             <button
               onClick={handleReport}
-              className="text-red-500 hover:text-red-700 font-medium transition-colors min-h-[32px] px-2"
+              className="text-red-500 hover:text-red-700 font-medium transition-colors min-h-[44px] px-2"
             >
               Taip
             </button>
             <button
               onClick={cancelReport}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors min-h-[32px] px-2"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors min-h-[44px] px-2"
             >
               Ne
             </button>
