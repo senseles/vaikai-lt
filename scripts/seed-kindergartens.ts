@@ -66,6 +66,25 @@ const KINDERGARTEN_NAMES = [
   'Kumeliukas', 'Vilniukas', 'Tigriukas', 'Liūtukas', 'Dramblėlis',
   'Beždžionėlė', 'Delfiniukas', 'Banginėlis', 'Ruoniukas', 'Pingviniukas',
   'Ūsiukas', 'Lapinas', 'Barsukas', 'Ūdriukas', 'Bebriukas',
+  // Additional names for 5000+ variety
+  'Saulėgrąža', 'Kopūstėlis', 'Vyšnelė', 'Mėlynėlė', 'Žemuogėlė',
+  'Aviečiukė', 'Riešutėlis', 'Spanguolėlė', 'Obuolėlis', 'Kriaušaitė',
+  'Šilauogė', 'Bruknelė', 'Slyvaitė', 'Citrinėlė', 'Apelsiniukas',
+  'Persikas', 'Abrikosas', 'Figėlė', 'Datulaitė', 'Migdoliukas',
+  'Debesėlis', 'Vaivorykštė', 'Snaigutė', 'Lašeliukas', 'Raselė',
+  'Vėjelė', 'Audrelė', 'Žaibutė', 'Perkūniukas', 'Mėnulėlis',
+  'Žvaigždelė', 'Kometukė', 'Planetiukas', 'Saulytė', 'Aušrinė',
+  'Vakarinė', 'Poliarinė', 'Šiaurinė', 'Pietinė', 'Rytinė',
+  'Upeliukas', 'Ežeriukas', 'Šaltiniukas', 'Upelytė', 'Jūrelė',
+  'Bangelė', 'Kriokliukas', 'Tvenkiniukas', 'Pelkutė', 'Kūdriukas',
+  'Kalniukas', 'Daubėlė', 'Slėniukas', 'Kalvelė', 'Pievutė',
+  'Lankelė', 'Pušynėlis', 'Beržynėlis', 'Eglynėlis', 'Ąžuolynėlis',
+  'Girelė', 'Miškelis', 'Šilelis', 'Alksniukas', 'Kadagiukas',
+  'Lazdyniukas', 'Šeiviukas', 'Klevelis', 'Uosiukas', 'Liepaitė',
+  'Dilgėliukas', 'Dobilėlis', 'Baltažiedė', 'Raudonėlis', 'Žaliukas',
+  'Mėlyniukas', 'Geltonėlis', 'Oranžiukas', 'Rožinė', 'Sidabriukas',
+  'Auksiukas', 'Bronzėlis', 'Varinis', 'Kristalas', 'Perliukas',
+  'Koralas', 'Smaragdas', 'Rubiniukas', 'Safyriukas', 'Deimantukas',
 ];
 
 const KINDERGARTEN_PREFIXES = [
@@ -117,287 +136,287 @@ const CITY_CONFIGS: CityConfig[] = [
   {
     city: 'Vilnius', region: 'Vilniaus',
     areas: ['Žirmūnai', 'Antakalnis', 'Šeškinė', 'Fabijoniškės', 'Pašilaičiai', 'Pilaitė', 'Baltupiai', 'Žvėrynas', 'Naujamiestis', 'Senamiestis', 'Lazdynai', 'Karoliniškės', 'Viršuliškės', 'Justiniškės', 'Grigiškės', 'Verkiai', 'Naujininkai', 'Rasos', 'Šnipiškės'],
-    target: 200,
+    target: 800,
   },
   {
     city: 'Kaunas', region: 'Kauno',
     areas: ['Centras', 'Žaliakalnis', 'Šilainiai', 'Eiguliai', 'Dainava', 'Kalniečiai', 'Aleksotas', 'Šančiai', 'Petrašiūnai', 'Vilijampolė', 'Gričiupis'],
-    target: 120,
+    target: 500,
   },
   {
     city: 'Klaipėda', region: 'Klaipėdos',
     areas: ['Centras', 'Mažasis kaimelis', 'Debrecenas', 'Bandužiai', 'Tauralaukis', 'Giruliai', 'Rumpiškės', 'Melnragė'],
-    target: 80,
+    target: 350,
   },
   {
     city: 'Šiauliai', region: 'Šiaulių',
     areas: ['Centras', 'Lieporiai', 'Dainai', 'Gubernija', 'Zokniai', 'Ginkūnai', 'Medelynas', 'Rėkyva'],
-    target: 50,
+    target: 200,
   },
   {
     city: 'Panevėžys', region: 'Panevėžio',
     areas: ['Centras', 'Kniaudiškiai', 'Tulpių', 'Senvagė', 'Rožynas', 'Molainiai', 'Pilėnai'],
-    target: 40,
+    target: 170,
   },
   // Vilniaus apskr. smaller cities
   {
     city: 'Ukmergė', region: 'Vilniaus',
     areas: ['Centras', 'Pašilė', 'Pivonija'],
-    target: 15,
+    target: 50,
   },
   {
     city: 'Elektrėnai', region: 'Vilniaus',
     areas: ['Centras', 'Kietaviškės'],
-    target: 12,
+    target: 40,
   },
   {
     city: 'Šalčininkai', region: 'Vilniaus',
     areas: ['Centras', 'Eišiškės'],
-    target: 10,
+    target: 35,
   },
   {
     city: 'Širvintos', region: 'Vilniaus',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   {
     city: 'Švenčionys', region: 'Vilniaus',
     areas: ['Centras', 'Pabradė'],
-    target: 10,
+    target: 35,
   },
   {
     city: 'Trakai', region: 'Vilniaus',
     areas: ['Centras', 'Lentvaris'],
-    target: 12,
+    target: 40,
   },
   {
     city: 'Vilniaus r.', region: 'Vilniaus',
     areas: ['Avižieniai', 'Pagiriai', 'Nemėžis', 'Bezdonys'],
-    target: 15,
+    target: 55,
   },
   // Kauno apskr. smaller cities
   {
     city: 'Jonava', region: 'Kauno',
     areas: ['Centras', 'Žeimiai', 'Chemikų'],
-    target: 18,
+    target: 60,
   },
   {
     city: 'Kėdainiai', region: 'Kauno',
     areas: ['Centras', 'Pramonės rajonas', 'Josvainiškiai'],
-    target: 15,
+    target: 55,
   },
   {
     city: 'Prienai', region: 'Kauno',
     areas: ['Centras', 'Naujoji dalis'],
-    target: 10,
+    target: 35,
   },
   {
     city: 'Raseiniai', region: 'Kauno',
     areas: ['Centras', 'Karalienė'],
-    target: 10,
+    target: 35,
   },
   {
     city: 'Kaišiadorys', region: 'Kauno',
     areas: ['Centras', 'Girelė'],
-    target: 10,
+    target: 35,
   },
   {
     city: 'Birštonas', region: 'Kauno',
     areas: ['Centras', 'Kurorto zona'],
-    target: 10,
+    target: 30,
   },
   // Klaipėdos apskr. smaller cities
   {
     city: 'Palanga', region: 'Klaipėdos',
     areas: ['Centras', 'Šventoji', 'Kurorto zona'],
-    target: 15,
+    target: 50,
   },
   {
     city: 'Šilutė', region: 'Klaipėdos',
     areas: ['Centras', 'Žibų rajonas'],
-    target: 12,
+    target: 40,
   },
   {
     city: 'Kretinga', region: 'Klaipėdos',
     areas: ['Centras', 'Padvariai'],
-    target: 12,
+    target: 40,
   },
   {
     city: 'Skuodas', region: 'Klaipėdos',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   {
     city: 'Neringa', region: 'Klaipėdos',
     areas: ['Nida', 'Juodkrantė', 'Preila'],
-    target: 10,
+    target: 25,
   },
   // Šiaulių apskr. smaller cities
   {
     city: 'Joniškis', region: 'Šiaulių',
     areas: ['Centras'],
-    target: 10,
+    target: 35,
   },
   {
     city: 'Pakruojis', region: 'Šiaulių',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   {
     city: 'Radviliškis', region: 'Šiaulių',
     areas: ['Centras', 'Geležinkelio rajonas'],
-    target: 12,
+    target: 40,
   },
   {
     city: 'Kelmė', region: 'Šiaulių',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   {
     city: 'Akmenė', region: 'Šiaulių',
     areas: ['Centras', 'Naujoji Akmenė'],
-    target: 10,
+    target: 35,
   },
   // Panevėžio apskr. smaller cities
   {
     city: 'Rokiškis', region: 'Panevėžio',
     areas: ['Centras', 'Aukštaičių'],
-    target: 12,
+    target: 40,
   },
   {
     city: 'Biržai', region: 'Panevėžio',
     areas: ['Centras', 'Astravo'],
-    target: 12,
+    target: 40,
   },
   {
     city: 'Pasvalys', region: 'Panevėžio',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   {
     city: 'Kupiškis', region: 'Panevėžio',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   // Alytaus apskr.
   {
     city: 'Alytus', region: 'Alytaus',
     areas: ['Centras', 'Putinai', 'Vidzgiris', 'Dainava', 'Likiškiai'],
-    target: 25,
+    target: 90,
   },
   {
     city: 'Druskininkai', region: 'Alytaus',
     areas: ['Centras', 'Viečiūnai', 'Kurorto zona'],
-    target: 15,
+    target: 50,
   },
   {
     city: 'Lazdijai', region: 'Alytaus',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   {
     city: 'Varėna', region: 'Alytaus',
     areas: ['Centras', 'Naujoji Varėna'],
-    target: 10,
+    target: 30,
   },
   // Marijampolės apskr.
   {
     city: 'Marijampolė', region: 'Marijampolės',
     areas: ['Centras', 'Mokolai', 'Sasnavos', 'Degučiai'],
-    target: 20,
+    target: 70,
   },
   {
     city: 'Vilkaviškis', region: 'Marijampolės',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   {
     city: 'Šakiai', region: 'Marijampolės',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   {
     city: 'Kazlų Rūda', region: 'Marijampolės',
     areas: ['Centras'],
-    target: 10,
+    target: 25,
   },
   {
     city: 'Kalvarija', region: 'Marijampolės',
     areas: ['Centras'],
-    target: 10,
+    target: 25,
   },
   // Utenos apskr.
   {
     city: 'Utena', region: 'Utenos',
     areas: ['Centras', 'Vyturiai', 'Aukštakalnis', 'Dauniškis'],
-    target: 18,
+    target: 60,
   },
   {
     city: 'Visaginas', region: 'Utenos',
     areas: ['Centras', '1-asis mikrorajonas', '2-asis mikrorajonas', '3-iasis mikrorajonas'],
-    target: 15,
+    target: 50,
   },
   {
     city: 'Molėtai', region: 'Utenos',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   {
     city: 'Anykščiai', region: 'Utenos',
     areas: ['Centras', 'Kurklių'],
-    target: 12,
+    target: 40,
   },
   {
     city: 'Zarasai', region: 'Utenos',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   {
     city: 'Ignalina', region: 'Utenos',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   // Telšių apskr.
   {
     city: 'Telšiai', region: 'Telšių',
     areas: ['Centras', 'Degaičiai', 'Mastis'],
-    target: 15,
+    target: 50,
   },
   {
     city: 'Mažeikiai', region: 'Telšių',
     areas: ['Centras', 'Reivyčiai', 'Ventos'],
-    target: 15,
+    target: 50,
   },
   {
     city: 'Plungė', region: 'Telšių',
     areas: ['Centras', 'Milašaičiai'],
-    target: 12,
+    target: 40,
   },
   {
     city: 'Rietavas', region: 'Telšių',
     areas: ['Centras'],
-    target: 10,
+    target: 25,
   },
   // Tauragės apskr.
   {
     city: 'Tauragė', region: 'Tauragės',
     areas: ['Centras', 'Jovarų', 'Martynaičiai'],
-    target: 15,
+    target: 50,
   },
   {
     city: 'Jurbarkas', region: 'Tauragės',
     areas: ['Centras', 'Dainiai'],
-    target: 10,
+    target: 35,
   },
   {
     city: 'Šilalė', region: 'Tauragės',
     areas: ['Centras'],
-    target: 10,
+    target: 30,
   },
   {
     city: 'Pagėgiai', region: 'Tauragės',
     areas: ['Centras'],
-    target: 10,
+    target: 25,
   },
 ];
 
@@ -608,7 +627,7 @@ function generateKindergartens(): KindergartenRecord[] {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log('=== Seed Kindergartens (900+) ===');
+  console.log('=== Seed Kindergartens (3800+) ===');
   console.log('');
 
   // Load existing slugs from DB to avoid collisions

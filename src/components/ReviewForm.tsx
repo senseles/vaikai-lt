@@ -98,7 +98,7 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
           className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2.5 text-base focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none transition-colors"
         />
         {text.length > 1800 && (
-          <p className={`text-xs mt-1 ${text.length >= 2000 ? 'text-red-500' : 'text-gray-400'}`}>{text.length}/2000</p>
+          <p className={`text-xs mt-1 ${text.length >= 2000 ? 'text-red-500 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}>{text.length}/2000</p>
         )}
       </div>
 

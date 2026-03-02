@@ -207,7 +207,7 @@ export default function AdminShell({ children }: { readonly children: React.Reac
                 <span className="w-5 text-center text-base flex-shrink-0">{item.icon}</span>
                 <span className="truncate">{item.label}</span>
                 {active && (
-                  <span className="ml-auto w-1.5 h-1.5 bg-white rounded-full flex-shrink-0 opacity-80" />
+                  <span className="ml-auto w-1.5 h-1.5 bg-white/80 dark:bg-gray-300/60 rounded-full flex-shrink-0" />
                 )}
               </Link>
             );

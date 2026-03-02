@@ -56,7 +56,7 @@ export default function FavoriteButton({ itemId, itemType }: FavoriteButtonProps
       aria-label={favorited ? 'Pašalinti iš mėgstamų' : 'Pridėti prie mėgstamų'}
     >
       <svg
-        className={`w-5 h-5 transition-all duration-200 ${favorited ? 'text-red-500 fill-red-500 animate-heart-pop' : 'text-gray-400 fill-none'}`}
+        className={`w-5 h-5 transition-all duration-200 ${favorited ? 'text-red-500 fill-red-500 animate-heart-pop' : 'text-gray-400 dark:text-gray-500 fill-none'}`}
         viewBox="0 0 24 24"
         stroke="currentColor"
         strokeWidth="2"

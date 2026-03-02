@@ -14,6 +14,7 @@ import PriceFilter from '@/components/PriceFilter';
 import EmptyState from '@/components/EmptyState';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import Pagination from '@/components/Pagination';
+import ScrollReveal from '@/components/ScrollReveal';
 
 const DetailModal = dynamic(() => import('@/components/DetailModal'), {
   loading: () => <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"><div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>,
@@ -228,29 +229,29 @@ export default function CityPageClient({
         <ErrorBoundary fallback={<EmptyState icon="filter" title="Klaida" description="Nepavyko atvaizduoti rezultatų. Pabandykite perkrauti puslapį." />}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {category === 'darzeliai' && kindergartens.map((item, i) => (
-              <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
+              <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
                 <KindergartenCard
                   item={item}
                   onSelect={(it) => openDetail(it, 'kindergarten')}
                   compareSelected={compareIds.has(item.id)}
                   onCompareToggle={toggleCompare}
                 />
-              </div>
+              </ScrollReveal>
             ))}
             {category === 'aukles' && (filterByPrice(aukles) as Aukle[]).map((item, i) => (
-              <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
+              <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
                 <AukleCard item={item} onSelect={(it) => openDetail(it, 'aukle')} />
-              </div>
+              </ScrollReveal>
             ))}
             {category === 'bureliai' && bureliai.map((item, i) => (
-              <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
+              <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
                 <BurelisCard item={item} onSelect={(it) => openDetail(it, 'burelis')} />
-              </div>
+              </ScrollReveal>
             ))}
             {category === 'specialistai' && (filterByPrice(specialists) as Specialist[]).map((item, i) => (
-              <div key={item.id} className="animate-fade-in-up" style={{ animationDelay: `${Math.min(i, 5) * 50}ms`, animationFillMode: 'both' }}>
+              <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
                 <SpecialistCard item={item} onSelect={(it) => openDetail(it, 'specialist')} />
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </ErrorBoundary>

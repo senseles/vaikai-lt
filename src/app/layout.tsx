@@ -116,7 +116,7 @@ export default function RootLayout({
         </noscript>
         <LanguageProvider>
           <Header />
-          <main id="main-content" className="flex-1 pb-20 md:pb-0">{children}</main>
+          <main id="main-content" className="flex-1 pb-20 md:pb-0 animate-fade-in">{children}</main>
           <Footer />
           <MobileBottomNav />
           <CookieConsent />

@@ -144,7 +144,7 @@ function ReviewItem({ review }: { readonly review: Review }) {
         )}
 
         {reportState === 'sending' && (
-          <span className="text-xs text-gray-400">Siunčiama...</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">Siunčiama...</span>
         )}
 
         {reportState === 'sent' && (

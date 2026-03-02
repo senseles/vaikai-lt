@@ -310,7 +310,7 @@ function MobileCardView({
                 type="checkbox"
                 checked={isSelected}
                 onChange={() => onToggleSelect(id)}
-                className="rounded border-gray-300 text-[#2d6a4f] focus:ring-[#2d6a4f] mt-0.5 w-4 h-4 flex-shrink-0"
+                className="rounded border-gray-300 dark:border-slate-600 text-[#2d6a4f] focus:ring-[#2d6a4f] mt-0.5 w-4 h-4 flex-shrink-0"
                 aria-label={`Pasirinkti ${String(item.name ?? '')}`}
               />
               <div className="flex-1 min-w-0">
@@ -599,7 +599,7 @@ export default function AdminTable({ apiPath, columns, fields, entityLabel, perP
                       type="checkbox"
                       checked={allSelected}
                       onChange={toggleSelectAll}
-                      className="rounded border-gray-300 text-[#2d6a4f] focus:ring-[#2d6a4f]"
+                      className="rounded border-gray-300 dark:border-slate-600 text-[#2d6a4f] focus:ring-[#2d6a4f]"
                       aria-label="Pasirinkti visus"
                     />
                   </th>
@@ -651,7 +651,7 @@ export default function AdminTable({ apiPath, columns, fields, entityLabel, perP
                           type="checkbox"
                           checked={selectedIds.has(String(item.id))}
                           onChange={() => toggleSelectItem(String(item.id))}
-                          className="rounded border-gray-300 text-[#2d6a4f] focus:ring-[#2d6a4f]"
+                          className="rounded border-gray-300 dark:border-slate-600 text-[#2d6a4f] focus:ring-[#2d6a4f]"
                           aria-label={`Pasirinkti ${String(item.name ?? '')}`}
                         />
                       </td>
@@ -726,7 +726,7 @@ export default function AdminTable({ apiPath, columns, fields, entityLabel, perP
                 type="checkbox"
                 checked={allSelected}
                 onChange={toggleSelectAll}
-                className="rounded border-gray-300 text-[#2d6a4f] focus:ring-[#2d6a4f] w-4 h-4"
+                className="rounded border-gray-300 dark:border-slate-600 text-[#2d6a4f] focus:ring-[#2d6a4f] w-4 h-4 dark:bg-slate-700"
                 aria-label="Pasirinkti visus"
               />
               <span className="text-sm text-gray-500 dark:text-gray-400">
