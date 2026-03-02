@@ -3,7 +3,10 @@ import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { createAdminToken } from '@/lib/admin-tokens';
 import { checkCsrf } from '@/lib/security';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'darzeliai2026';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+if (!ADMIN_PASSWORD) {
+  console.error('ADMIN_PASSWORD aplinkos kintamasis nerastas');
+}
 
 function json<T>(data: T, status = 200) {
   return NextResponse.json(data, { status });

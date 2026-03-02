@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { checkCsrf } from '@/lib/security';
 import { verifyPassword, hashPassword, needsRehash } from '@/lib/password';
+import { computeTokenHmac } from '@/lib/user-tokens';
 
 function json<T>(data: T, status = 200) {
   return NextResponse.json(data, { status });
@@ -38,15 +39,16 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Create session token
-    const token = randomBytes(32).toString('hex');
+    // Create HMAC-signed session token
+    const randomPart = randomBytes(32).toString('hex');
+    const hmac = computeTokenHmac(user.id, randomPart);
 
     const response = json({
       success: true,
       data: { id: user.id, email: user.email, name: user.name },
     });
 
-    response.cookies.set('user_token', `${user.id}:${token}`, {
+    response.cookies.set('user_token', `${user.id}:${randomPart}:${hmac}`, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

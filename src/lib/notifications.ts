@@ -21,9 +21,11 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'admin@vaikai.lt';
  * TODO: Integrate with an email service provider.
  */
 async function sendEmail(payload: EmailPayload): Promise<boolean> {
-  // Placeholder: log the email instead of sending
-  console.log(`[EMAIL] To: ${payload.to} | Subject: ${payload.subject}`);
-  console.log(`[EMAIL] Body: ${payload.body.substring(0, 200)}...`);
+  // Placeholder: log only in development
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.log(`[EMAIL] To: ${payload.to} | Subject: ${payload.subject}`);
+  }
   return true;
 }
 

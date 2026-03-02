@@ -91,11 +91,29 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!post) return {};
 
+  const title = `${post.title} — Tėvų forumas — Vaikai.lt`;
+  const description = post.content.slice(0, 160);
+  const url = `https://vaikai.lt/forumas/${params.category}/${params.slug}`;
+
   return {
-    title: `${post.title} — Tėvų forumas — Vaikai.lt`,
-    description: post.content.slice(0, 160),
+    title,
+    description,
     alternates: {
-      canonical: `/forumas/${params.category}/${params.slug}`,
+      canonical: url,
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: 'Vaikai.lt',
+      type: 'article',
+      locale: 'lt_LT',
+      publishedTime: post.createdAt?.toISOString(),
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
     },
   };
 }

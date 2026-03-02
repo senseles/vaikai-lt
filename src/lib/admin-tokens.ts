@@ -4,7 +4,7 @@
  * Token format: <expiresAtMs>.<hmacHex>
  */
 
-const ADMIN_SECRET = process.env.ADMIN_PASSWORD ?? 'darzeliai2026';
+const ADMIN_SECRET = process.env.ADMIN_SECRET ?? process.env.ADMIN_PASSWORD ?? '';
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function toHex(buf: ArrayBuffer): string {
