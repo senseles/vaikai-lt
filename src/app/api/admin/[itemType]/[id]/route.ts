@@ -56,14 +56,14 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const model = (prisma as any)[itemType];
-    await model.delete({ where: { id } });
-
-    // Also delete associated reviews
+    // Delete reviews first to avoid orphans if entity delete fails
     await prisma.review.deleteMany({
       where: { itemId: id, itemType },
     });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const model = (prisma as any)[itemType];
+    await model.delete({ where: { id } });
 
     return json({ success: true });
   } catch (err) {

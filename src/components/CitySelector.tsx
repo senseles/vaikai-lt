@@ -123,7 +123,7 @@ export default function CitySelector() {
                   <Link
                     key={city.slug}
                     href={`/${city.slug}`}
-                    className="px-3.5 py-2 min-h-[36px] text-sm rounded-full bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-primary-bg dark:hover:bg-primary-dark hover:text-primary-dark dark:hover:text-primary-bg active:scale-[0.97] transition-all"
+                    className="px-3.5 py-2 min-h-[44px] flex items-center text-sm rounded-full bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-primary-bg dark:hover:bg-primary-dark hover:text-primary-dark dark:hover:text-primary-bg active:scale-[0.97] transition-all"
                   >
                     {city.name}
                   </Link>

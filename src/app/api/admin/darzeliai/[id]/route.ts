@@ -45,8 +45,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 export async function DELETE(_request: NextRequest, { params }: Params) {
   const { id } = params;
   try {
-    await prisma.kindergarten.delete({ where: { id } });
+    // Delete reviews first to avoid orphans if entity delete fails
     await prisma.review.deleteMany({ where: { itemId: id, itemType: 'kindergarten' } });
+    await prisma.kindergarten.delete({ where: { id } });
     return json({ success: true });
   } catch (err) {
     console.error(`Admin delete kindergarten/${id} error:`, err);

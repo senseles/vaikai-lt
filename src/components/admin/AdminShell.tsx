@@ -100,10 +100,10 @@ export default function AdminShell({ children }: { readonly children: React.Reac
   // Loading state
   if (checking) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block w-8 h-8 border-[3px] border-gray-200 border-t-[#2d6a4f] rounded-full animate-spin mb-3" />
-          <p className="text-sm text-gray-400">Tikrinama...</p>
+          <div className="inline-block w-8 h-8 border-[3px] border-gray-200 dark:border-slate-700 border-t-[#2d6a4f] rounded-full animate-spin mb-3" />
+          <p className="text-sm text-gray-400 dark:text-gray-500">Tikrinama...</p>
         </div>
       </div>
     );
@@ -112,25 +112,25 @@ export default function AdminShell({ children }: { readonly children: React.Reac
   // Login screen
   if (!authenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 p-4">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
             <div className="w-14 h-14 bg-[#2d6a4f] rounded-2xl flex items-center justify-center mx-auto mb-4">
               <span className="text-white text-xl font-bold">V</span>
             </div>
-            <h1 className="text-xl font-bold text-gray-900">Vaikai.lt Admin</h1>
-            <p className="text-sm text-gray-500 mt-1">Prisijunkite prie administravimo skydelio</p>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Vaikai.lt Admin</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Prisijunkite prie administravimo skydelio</p>
           </div>
-          <form onSubmit={login} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-4">
+          <form onSubmit={login} className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Slaptažodis</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Slaptažodis</label>
               <input
                 type="password"
                 placeholder="Įveskite slaptažodį"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoFocus
-                className="w-full border border-gray-200 bg-white text-gray-900 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#2d6a4f] focus:border-transparent outline-none"
+                className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#2d6a4f] focus:border-transparent outline-none"
               />
             </div>
             {loginError && <p className="text-red-500 text-sm">{loginError}</p>}
@@ -142,8 +142,8 @@ export default function AdminShell({ children }: { readonly children: React.Reac
               {loggingIn ? 'Jungiamasi...' : 'Prisijungti'}
             </button>
           </form>
-          <p className="text-center text-xs text-gray-400 mt-4">
-            <Link href="/" className="hover:text-gray-600 transition-colors">← Grįžti į svetainę</Link>
+          <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
+            <Link href="/" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">← Grįžti į svetainę</Link>
           </p>
         </div>
       </div>
@@ -151,7 +151,7 @@ export default function AdminShell({ children }: { readonly children: React.Reac
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-slate-900">
       {/* Mobile overlay — closes sidebar when clicking outside */}
       <div
         className={`fixed inset-0 z-40 bg-black/30 lg:hidden transition-opacity duration-300 ${
@@ -181,7 +181,7 @@ export default function AdminShell({ children }: { readonly children: React.Reac
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
             aria-label="Uždaryti meniu"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,25 +236,25 @@ export default function AdminShell({ children }: { readonly children: React.Reac
       {/* Main content */}
       <div className="lg:pl-64 min-h-screen transition-all duration-300">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 lg:px-6 h-14 flex items-center justify-between">
+        <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 px-4 lg:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
               aria-label="Meniu"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h2 className="text-sm font-semibold text-gray-800">
+            <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
               {currentPageLabel}
             </h2>
           </div>
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors px-2 py-1.5 rounded-lg hover:bg-gray-50"
+              className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
             >
               <span>←</span> Svetainė
             </Link>

@@ -115,7 +115,7 @@ function ReviewItem({ review }: { readonly review: Review }) {
         {reportState === 'idle' && (
           <button
             onClick={handleReport}
-            className="text-xs text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1"
+            className="text-xs text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1 min-h-[44px] px-1"
             title="Pranešti apie atsiliepimą"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -28,13 +28,56 @@ export async function GET(request: NextRequest) {
     if (r >= 1 && r <= 5) where.rating = r;
   }
 
-  const reviews = await prisma.review.findMany({
-    where,
-    orderBy: { createdAt: 'desc' },
-    take: 100,
-  });
+  // Get total count for the current filter
+  const [reviews, totalCount] = await Promise.all([
+    prisma.review.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    }),
+    prisma.review.count({ where }),
+  ]);
 
-  return json(reviews);
+  // Resolve entity names for each review
+  const itemIds: Record<string, Set<string>> = {
+    kindergarten: new Set(),
+    aukle: new Set(),
+    burelis: new Set(),
+    specialist: new Set(),
+  };
+  for (const r of reviews) {
+    if (itemIds[r.itemType]) {
+      itemIds[r.itemType].add(r.itemId);
+    }
+  }
+
+  const nameMap = new Map<string, string>();
+
+  const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
+    itemIds.kindergarten.size > 0
+      ? prisma.kindergarten.findMany({ where: { id: { in: Array.from(itemIds.kindergarten) } }, select: { id: true, name: true } })
+      : [],
+    itemIds.aukle.size > 0
+      ? prisma.aukle.findMany({ where: { id: { in: Array.from(itemIds.aukle) } }, select: { id: true, name: true } })
+      : [],
+    itemIds.burelis.size > 0
+      ? prisma.burelis.findMany({ where: { id: { in: Array.from(itemIds.burelis) } }, select: { id: true, name: true } })
+      : [],
+    itemIds.specialist.size > 0
+      ? prisma.specialist.findMany({ where: { id: { in: Array.from(itemIds.specialist) } }, select: { id: true, name: true } })
+      : [],
+  ]);
+
+  for (const item of [...kindergartens, ...aukles, ...bureliai, ...specialists]) {
+    nameMap.set(item.id, item.name);
+  }
+
+  const enrichedReviews = reviews.map((r) => ({
+    ...r,
+    itemName: nameMap.get(r.itemId) ?? undefined,
+  }));
+
+  return json({ reviews: enrichedReviews, total: totalCount });
 }
 
 /** PATCH /api/admin/reviews — bulk approve or reject */

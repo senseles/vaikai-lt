@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import type { Metadata } from 'next';
+import PaginationServer from '@/components/PaginationServer';
 
 const CATEGORY_ICONS: Record<string, string> = {
   darzeliai: '🏫',
@@ -273,30 +274,14 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
           </div>
         )}
 
-        {/* Pagination — touch-friendly */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-6 sm:mt-8">
-            {page > 1 && (
-              <Link
-                href={`/forumas/${category.slug}?sort=${sort}&page=${page - 1}`}
-                className="px-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors min-h-[44px] flex items-center"
-              >
-                Ankstesnis
-              </Link>
-            )}
-            <span className="px-3 py-2 text-sm text-slate-600 dark:text-slate-400 tabular-nums">
-              {page} / {totalPages}
-            </span>
-            {page < totalPages && (
-              <Link
-                href={`/forumas/${category.slug}?sort=${sort}&page=${page + 1}`}
-                className="px-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors min-h-[44px] flex items-center"
-              >
-                Kitas
-              </Link>
-            )}
-          </div>
-        )}
+        {/* Pagination */}
+        <PaginationServer
+          currentPage={page}
+          totalPages={totalPages}
+          totalResults={total}
+          perPage={limit}
+          buildHref={(p) => `/forumas/${category.slug}?sort=${sort}&page=${p}`}
+        />
       </section>
     </>
   );

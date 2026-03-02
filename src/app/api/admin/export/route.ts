@@ -28,13 +28,13 @@ export async function GET(request: NextRequest) {
 
     if (format === 'csv') {
       const allColumns = new Set<string>();
-      allColumns.add('type');
+      allColumns.add('entityType');
 
       const taggedRows: Record<string, unknown>[] = [];
 
-      const addRows = (items: Record<string, unknown>[], type: string) => {
+      const addRows = (items: Record<string, unknown>[], entityType: string) => {
         for (const item of items) {
-          const row: Record<string, unknown> = { type };
+          const row: Record<string, unknown> = { entityType };
           for (const key of Object.keys(item)) {
             allColumns.add(key);
             row[key] = item[key];
@@ -65,7 +65,12 @@ export async function GET(request: NextRequest) {
         columns.map((col) => escapeCsvValue(row[col])).join(',')
       );
       const csvContent = [headerLine, ...dataLines].join('\n');
-      const csvBuffer = new TextEncoder().encode(csvContent);
+      // Add UTF-8 BOM for Excel compatibility with Lithuanian characters
+      const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+      const csvBytes = new TextEncoder().encode(csvContent);
+      const csvBuffer = new Uint8Array(bom.length + csvBytes.length);
+      csvBuffer.set(bom);
+      csvBuffer.set(csvBytes, bom.length);
 
       return new NextResponse(csvBuffer, {
         status: 200,

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { CITIES } from '@/lib/cities';
 
-// Build a city name → slug lookup for fast resolution
+// Build a city name -> slug lookup for fast resolution
 const cityNameToSlug: Record<string, string> = {};
 for (const c of CITIES) {
   cityNameToSlug[c.name.toLocaleLowerCase('lt')] = c.slug;
@@ -12,7 +12,7 @@ function getCitySlug(cityName: string): string {
   const lower = cityName.toLocaleLowerCase('lt');
   // Direct match
   if (cityNameToSlug[lower]) return cityNameToSlug[lower];
-  // Partial match (e.g. "Vilnius m." → "vilnius")
+  // Partial match (e.g. "Vilnius m." -> "vilnius")
   for (const [name, slug] of Object.entries(cityNameToSlug)) {
     if (lower.includes(name) || name.includes(lower)) return slug;
   }
@@ -37,25 +37,25 @@ export async function GET(request: NextRequest) {
       prisma.kindergarten.findMany({
         where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { address: { contains: q } }] },
         select: { id: true, name: true, city: true, slug: true, baseRating: true },
-        take: 3,
+        take: 4,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.aukle.findMany({
         where: { OR: [{ name: { contains: q } }, { city: { contains: q } }] },
         select: { id: true, name: true, city: true, slug: true, baseRating: true },
-        take: 2,
+        take: 3,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.burelis.findMany({
         where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { category: { contains: q } }] },
         select: { id: true, name: true, city: true, slug: true, baseRating: true },
-        take: 2,
+        take: 3,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.specialist.findMany({
         where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { specialty: { contains: q } }] },
         select: { id: true, name: true, city: true, slug: true, baseRating: true },
-        take: 2,
+        take: 3,
         orderBy: { baseRating: 'desc' },
       }),
     ]);
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
         rating: i.baseRating,
         citySlug: getCitySlug(i.city),
       })),
-    ].slice(0, 5).map(s => ({
+    ].slice(0, 8).map(s => ({
       ...s,
       url: s.citySlug ? `/${s.citySlug}?category=${categoryMap[s.itemType] || 'darzeliai'}` : `/paieska?q=${encodeURIComponent(s.name)}`,
     }));

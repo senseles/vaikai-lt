@@ -7,17 +7,17 @@ const columns: ColumnDef[] = [
   {
     key: 'name',
     label: 'Vardas',
-    render: (val) => <span className="font-medium text-gray-900">{String(val ?? '')}</span>,
+    render: (val) => <span className="font-medium text-gray-900 dark:text-gray-100">{String(val ?? '')}</span>,
   },
   {
     key: 'city',
     label: 'Miestas',
-    render: (val) => <span className="text-gray-600">{String(val ?? '')}</span>,
+    render: (val) => <span className="text-gray-600 dark:text-gray-400">{String(val ?? '')}</span>,
   },
   {
     key: 'experience',
     label: 'Patirtis',
-    render: (val) => <span className="text-gray-500 text-sm">{String(val ?? '—')}</span>,
+    render: (val) => <span className="text-gray-500 dark:text-gray-400 text-sm">{String(val ?? '—')}</span>,
     hideOnMobile: true,
   },
   {
@@ -25,11 +25,11 @@ const columns: ColumnDef[] = [
     label: 'Įvertinimas',
     render: (val) => {
       const r = Number(val ?? 0);
-      if (r === 0) return <span className="text-gray-300">—</span>;
+      if (r === 0) return <span className="text-gray-300 dark:text-gray-600">—</span>;
       return (
         <span className="inline-flex items-center gap-1 text-sm">
           <span className="text-yellow-500">★</span>
-          <span className="font-medium text-gray-700">{r.toFixed(1)}</span>
+          <span className="font-medium text-gray-700 dark:text-gray-300 dark:text-gray-600">{r.toFixed(1)}</span>
         </span>
       );
     },
@@ -37,7 +37,7 @@ const columns: ColumnDef[] = [
   {
     key: 'hourlyRate',
     label: 'Kaina',
-    render: (val) => <span className="text-gray-500 text-sm">{String(val ?? '—')}</span>,
+    render: (val) => <span className="text-gray-500 dark:text-gray-400 text-sm">{String(val ?? '—')}</span>,
     hideOnMobile: true,
   },
 ];
@@ -59,8 +59,8 @@ export default function AdminAukles() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-lg font-bold text-gray-900">Auklės</h1>
-        <p className="text-sm text-gray-500 mt-1">Tvarkykite auklių sąrašą</p>
+        <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Auklės</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Tvarkykite auklių sąrašą</p>
       </div>
       <AdminTable
         apiPath="/api/admin/aukles"

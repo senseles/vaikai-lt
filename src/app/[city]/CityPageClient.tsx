@@ -13,6 +13,7 @@ import SortSelect from '@/components/SortSelect';
 import PriceFilter from '@/components/PriceFilter';
 import EmptyState from '@/components/EmptyState';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import Pagination from '@/components/Pagination';
 
 const DetailModal = dynamic(() => import('@/components/DetailModal'), {
   loading: () => <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"><div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>,
@@ -40,7 +41,9 @@ interface CityPageClientProps {
   readonly initialType: string;
   readonly initialSort: string;
   readonly totalPages: Record<Category, number>;
+  readonly totalCounts: Record<Category, number>;
   readonly currentPage: number;
+  readonly perPage: number;
   readonly areas: string[];
 }
 
@@ -56,7 +59,9 @@ export default function CityPageClient({
   initialType,
   initialSort,
   totalPages,
+  totalCounts,
   currentPage,
+  perPage,
   areas,
 }: CityPageClientProps) {
   const router = useRouter();
@@ -252,29 +257,14 @@ export default function CityPageClient({
       )}
 
       {/* Pagination */}
-      {tp > 1 && (
-        <nav aria-label="Puslapių navigacija" className="flex items-center justify-center gap-2 mt-8">
-          <button
-            disabled={page <= 1}
-            onClick={() => updateParams({ page: String(page - 1) })}
-            className="px-4 py-2.5 min-h-[44px] text-sm font-medium border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 active:bg-gray-100 dark:active:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-            aria-label={`Ankstesnis puslapis (${page - 1})`}
-          >
-            &larr; Ankstesnis
-          </button>
-          <span className="text-sm text-gray-500 dark:text-gray-400 px-2" aria-current="page">
-            {page} / {tp}
-          </span>
-          <button
-            disabled={page >= tp}
-            onClick={() => updateParams({ page: String(page + 1) })}
-            className="px-4 py-2.5 min-h-[44px] text-sm font-medium border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-slate-700 active:bg-gray-100 dark:active:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-            aria-label={`Kitas puslapis (${page + 1})`}
-          >
-            Kitas &rarr;
-          </button>
-        </nav>
-      )}
+      <Pagination
+        currentPage={page}
+        totalPages={tp}
+        totalResults={totalCounts[category] ?? 0}
+        perPage={perPage}
+        onPageChange={(newPage) => updateParams({ page: String(newPage) })}
+        scrollToTop
+      />
 
       {/* Compare bar */}
       {compareIds.size >= 2 && (

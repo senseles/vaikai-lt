@@ -220,7 +220,14 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
         initialType={type}
         initialSort={sort}
         totalPages={totalPages}
+        totalCounts={{
+          darzeliai: kindergartenTotal,
+          aukles: aukleTotal,
+          bureliai: burelisTotal,
+          specialistai: specialistTotal,
+        }}
         currentPage={page}
+        perPage={PER_PAGE}
         areas={allAreas}
       />
     </div>

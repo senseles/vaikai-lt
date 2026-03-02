@@ -21,7 +21,7 @@ export default function ForumSubNav() {
     <div className="sticky top-16 z-40 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-b border-gray-200 dark:border-slate-700 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <nav
-          className="flex items-center gap-1 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 py-2"
+          className="flex items-center gap-1 overflow-x-auto scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 py-2"
           aria-label="Forumo navigacija"
         >
           {subNavItems.map((item) => {
@@ -38,7 +38,7 @@ export default function ForumSubNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium transition-colors flex-shrink-0 ${
+                className={`whitespace-nowrap px-4 py-2 min-h-[44px] flex items-center rounded-lg text-sm font-medium transition-colors flex-shrink-0 ${
                   item.isCreate
                     ? 'bg-[#2d6a4f] hover:bg-[#40916c] text-white ml-auto'
                     : active
