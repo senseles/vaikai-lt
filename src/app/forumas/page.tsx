@@ -27,29 +27,67 @@ function timeAgo(date: Date): string {
   return date.toLocaleDateString('lt-LT');
 }
 
-async function getForumData() {
-  const [categories, topPosts] = await Promise.all([
-    prisma.forumCategory.findMany({
-      orderBy: { order: 'asc' },
-      include: {
-        _count: { select: { posts: true } },
-      },
-    }),
-    prisma.forumPost.findMany({
-      orderBy: [{ upvotes: 'desc' }, { createdAt: 'desc' }],
-      take: 10,
-      include: {
-        category: { select: { name: true, slug: true } },
-        _count: { select: { comments: true } },
-      },
-    }),
-  ]);
-
-  return { categories, topPosts };
+interface PageProps {
+  searchParams: { q?: string; view?: string };
 }
 
-export default async function ForumPage() {
-  const { categories, topPosts } = await getForumData();
+export default async function ForumPage({ searchParams }: PageProps) {
+  const searchQuery = searchParams.q?.trim() || '';
+  const view = searchParams.view || '';
+
+  const categories = await prisma.forumCategory.findMany({
+    orderBy: { order: 'asc' },
+    include: { _count: { select: { posts: true } } },
+  });
+
+  const postInclude = {
+    category: { select: { name: true, slug: true } },
+    _count: { select: { comments: true } },
+  } as const;
+
+  // Determine which posts to show and section title
+  let displayPosts: Awaited<ReturnType<typeof prisma.forumPost.findMany<{ include: typeof postInclude }>>>;
+  let sectionTitle: string;
+  let isSearch = false;
+  let noResults = false;
+
+  if (searchQuery.length >= 2) {
+    // Search mode
+    isSearch = true;
+    displayPosts = await prisma.forumPost.findMany({
+      where: {
+        OR: [
+          { title: { contains: searchQuery } },
+          { content: { contains: searchQuery } },
+        ],
+      },
+      orderBy: [{ upvotes: 'desc' }, { createdAt: 'desc' }],
+      take: 30,
+      include: postInclude,
+    });
+    sectionTitle = `Paieškos rezultatai (${displayPosts.length})`;
+    noResults = displayPosts.length === 0;
+  } else if (view === 'naujausi' || view === 'populiariausi') {
+    // View mode: all posts sorted
+    displayPosts = await prisma.forumPost.findMany({
+      orderBy: view === 'populiariausi'
+        ? [{ upvotes: 'desc' }, { createdAt: 'desc' }]
+        : [{ createdAt: 'desc' }],
+      take: 30,
+      include: postInclude,
+    });
+    sectionTitle = view === 'naujausi' ? 'Naujausi įrašai' : 'Populiariausi įrašai';
+  } else {
+    // Default: top posts for the home view
+    displayPosts = await prisma.forumPost.findMany({
+      orderBy: [{ upvotes: 'desc' }, { createdAt: 'desc' }],
+      take: 10,
+      include: postInclude,
+    });
+    sectionTitle = 'Populiariausi įrašai';
+  }
+
+  const showCategories = !isSearch && view !== 'naujausi' && view !== 'populiariausi';
 
   return (
     <>
@@ -63,6 +101,22 @@ export default async function ForumPage() {
             Klauskite, dalinkitės patirtimi ir gaukite patarimų iš kitų tėvelių.
             Diskusijos apie darželius, aukles, būrelius ir vaikų auginimą.
           </p>
+          {/* Forum search bar */}
+          <form action="/forumas" method="GET" className="max-w-xl mx-auto mb-6">
+            <div className="relative">
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                name="q"
+                defaultValue={searchQuery}
+                placeholder="Ieškoti forume..."
+                className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/95 dark:bg-slate-800/95 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 border-0 shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50 text-sm"
+              />
+            </div>
+          </form>
+
           <Link
             href="/forumas/naujas"
             className="inline-flex items-center gap-2 bg-white text-[#2d6a4f] font-semibold px-6 py-3 rounded-xl hover:bg-green-50 transition-colors shadow-lg min-h-[48px] text-sm sm:text-base"
@@ -75,7 +129,22 @@ export default async function ForumPage() {
         </div>
       </section>
 
-      {/* Categories Grid — 1 col mobile, 2 col tablet, 4 col desktop */}
+      {/* No search results */}
+      {noResults && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+          <div className="text-center py-8">
+            <p className="text-slate-500 dark:text-slate-400 text-base mb-2">
+              Nerasta rezultatų pagal &bdquo;{searchQuery}&ldquo;
+            </p>
+            <Link href="/forumas" className="text-[#2d6a4f] dark:text-green-400 font-medium hover:underline text-sm">
+              Grįžti į forumą
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {/* Categories Grid — hide when searching or viewing all */}
+      {showCategories && (
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-14">
         <h2 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white mb-5 sm:mb-6">
           Kategorijos
@@ -85,8 +154,14 @@ export default async function ForumPage() {
             <Link
               key={cat.id}
               href={`/forumas/${cat.slug}`}
-              className="bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-lg transition-shadow p-4 sm:p-5 group border border-gray-100 dark:border-slate-700 active:scale-[0.98]"
+              className="bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-lg transition-all p-4 sm:p-5 group border border-gray-100 dark:border-slate-700 active:scale-[0.98] hover:border-green-200 dark:hover:border-green-800 relative"
             >
+              {/* Post count badge */}
+              {cat._count.posts > 0 && (
+                <span className="absolute top-3 right-3 bg-[#2d6a4f]/10 dark:bg-green-900/30 text-[#2d6a4f] dark:text-green-400 text-xs font-bold px-2 py-0.5 rounded-full">
+                  {cat._count.posts}
+                </span>
+              )}
               <div className="flex items-start gap-3">
                 <span className="text-2xl sm:text-3xl shrink-0" role="img" aria-hidden="true">
                   {CATEGORY_ICONS[cat.slug] || '💬'}
@@ -107,16 +182,17 @@ export default async function ForumPage() {
           ))}
         </div>
       </section>
+      )}
 
-      {/* Top Posts */}
-      {topPosts.length > 0 && (
+      {/* Posts Section */}
+      {displayPosts.length > 0 && (
         <section className="bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-14">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white mb-5 sm:mb-6">
-              Populiariausi įrašai
+              {sectionTitle}
             </h2>
             <div className="space-y-2 sm:space-y-3">
-              {topPosts.map((post) => {
+              {displayPosts.map((post) => {
                 const score = post.upvotes - post.downvotes;
                 return (
                   <Link

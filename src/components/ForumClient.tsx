@@ -30,6 +30,141 @@ function timeAgo(date: string | Date): string {
   return d.toLocaleDateString('lt-LT');
 }
 
+// ===== Name Hash for Avatar Color =====
+function nameToColor(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const colors = [
+    'bg-emerald-500', 'bg-blue-500', 'bg-purple-500', 'bg-amber-500',
+    'bg-rose-500', 'bg-cyan-500', 'bg-indigo-500', 'bg-teal-500',
+    'bg-orange-500', 'bg-pink-500', 'bg-lime-600', 'bg-fuchsia-500',
+  ];
+  return colors[Math.abs(hash) % colors.length];
+}
+
+// ===== Author Avatar =====
+interface AuthorAvatarProps {
+  name: string;
+  size?: 'sm' | 'md';
+}
+
+export function AuthorAvatar({ name, size = 'md' }: AuthorAvatarProps) {
+  const initial = name.charAt(0).toUpperCase();
+  const bgColor = nameToColor(name);
+  const sizeClass = size === 'sm' ? 'w-6 h-6 text-[10px]' : 'w-8 h-8 text-xs';
+
+  return (
+    <div
+      className={`${sizeClass} ${bgColor} rounded-full flex items-center justify-center text-white font-bold flex-shrink-0`}
+      aria-hidden="true"
+      title={name}
+    >
+      {initial}
+    </div>
+  );
+}
+
+// ===== Share Button =====
+interface ShareButtonProps {
+  url: string;
+  title: string;
+}
+
+export function ShareButton({ url, title }: ShareButtonProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const fullUrl = typeof window !== 'undefined'
+      ? `${window.location.origin}${url}`
+      : url;
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title, url: fullUrl });
+        return;
+      } catch {
+        // User cancelled or share failed, fall through to clipboard
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API not available
+    }
+  };
+
+  return (
+    <button
+      onClick={handleShare}
+      className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-[#2d6a4f] dark:hover:text-green-400 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 min-h-[44px]"
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+      </svg>
+      {copied ? 'Nukopijuota!' : 'Dalintis'}
+    </button>
+  );
+}
+
+// ===== Report Button =====
+interface ReportButtonProps {
+  type: 'post' | 'comment';
+  id: string;
+}
+
+export function ReportButton({ type, id }: ReportButtonProps) {
+  const [reported, setReported] = useState(false);
+
+  const handleReport = () => {
+    const key = `reported_${type}_${id}`;
+    if (typeof window !== 'undefined' && localStorage.getItem(key)) {
+      setReported(true);
+      return;
+    }
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(key, '1');
+    }
+    setReported(true);
+
+    fetch('/api/forum/report', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: JSON.stringify({ type, id }),
+    }).catch(() => {
+      // Silent fail
+    });
+  };
+
+  if (reported) {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 dark:text-slate-500 px-3 py-1.5">
+        Pranešta
+      </span>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleReport}
+      className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 min-h-[44px]"
+    >
+      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+      </svg>
+      Pranešti
+    </button>
+  );
+}
+
 // ===== Vote Buttons =====
 interface VoteButtonsProps {
   postId?: string;

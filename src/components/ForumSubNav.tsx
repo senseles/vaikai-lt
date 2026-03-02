@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 const subNavItems = [
-  { href: '/forumas', label: 'Visi įrašai', matchExact: true },
+  { href: '/forumas', label: 'Visos kategorijos', matchExact: true },
   { href: '/forumas?view=naujausi', label: 'Naujausi', param: 'naujausi' },
   { href: '/forumas?view=populiariausi', label: 'Populiariausi', param: 'populiariausi' },
   { href: '/forumas/naujas', label: 'Sukurti naują', isCreate: true },

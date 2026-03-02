@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
+import ForumSubNav from '@/components/ForumSubNav';
 
 export const metadata: Metadata = {
   title: 'Tėvų forumas — Vaikai.lt',
@@ -54,6 +56,11 @@ export default function ForumLayout({
           </ol>
         </div>
       </nav>
+
+      {/* Sub-navigation */}
+      <Suspense fallback={null}>
+        <ForumSubNav />
+      </Suspense>
 
       {children}
     </div>

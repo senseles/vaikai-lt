@@ -188,3 +188,13 @@
 1. Build broken — forum comments API route type error must be fixed before deploy
 
 **Next:** Fix the `parent` type annotation in forum comments route, then verify clean build.
+
+## SYNC 2026-03-01 19:21 (ET)
+- **Commits:** 20 recent (latest: `51ab84d` cleanup worktrees). Major work: forum schema/admin, 31K+ reviews seeded, mobile polish, animations, a11y fixes
+- **Build:** ❌ FAILED — 2 lint errors in `src/app/forumas/[category]/[slug]/page.tsx`: unused imports `ShareButton` and `ReportButton`
+- **DB:** ✅ Healthy — 2,531 KG, 150 aukles, 164 bureliai, 124 specialists, 58,731 reviews (massive growth from 2 → 58K reviews!)
+- **Blockers:**
+  1. Build broken — unused imports (`ShareButton`, `ReportButton`) in forum post page. Quick fix: remove or prefix with `_`.
+  2. Google Font preconnect warning in `layout.tsx` (non-blocking but should fix)
+
+**Next:** Remove unused imports in forum page to unblock build. Then deploy candidate.

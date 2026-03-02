@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
-import { VoteButtons, CommentSection } from '@/components/ForumClient';
+import { VoteButtons, CommentSection, AuthorAvatar } from '@/components/ForumClient';
 import type { Metadata } from 'next';
 
 interface CommentNode {
@@ -174,9 +174,12 @@ export default async function PostPage({ params }: PageProps) {
                 {post.title}
               </h1>
 
-              {/* Meta — stacks on very narrow screens */}
+              {/* Meta with author avatar — stacks on very narrow screens */}
               <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-1 sm:gap-2 text-xs text-slate-500 dark:text-slate-400 mb-4 sm:mb-5">
-                <span className="font-semibold text-slate-700 dark:text-slate-300">{post.authorName}</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <AuthorAvatar name={post.authorName} size="sm" />
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">{post.authorName}</span>
+                </span>
                 <div className="flex flex-wrap items-center gap-2">
                   <time>{timeAgo(post.createdAt)}</time>
                   <span aria-hidden="true">·</span>
