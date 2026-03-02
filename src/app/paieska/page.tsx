@@ -43,29 +43,52 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     );
   }
 
-  // Fetch all and filter in JS for proper Lithuanian case-insensitive search
-  const [allKg, allAukles, allBureliai, allSpecialists] = await Promise.all([
-    prisma.kindergarten.findMany({ orderBy: { baseRating: 'desc' } }),
-    prisma.aukle.findMany({ orderBy: { baseRating: 'desc' } }),
-    prisma.burelis.findMany({ orderBy: { baseRating: 'desc' } }),
-    prisma.specialist.findMany({ orderBy: { baseRating: 'desc' } }),
+  // Two-pass search: DB-level contains first, then JS Lithuanian matching on smaller set
+  const containsQ = { contains: query };
+  const dbWhere = {
+    kg: { OR: [{ name: containsQ }, { city: containsQ }, { description: containsQ }] },
+    aukle: { OR: [{ name: containsQ }, { city: containsQ }, { description: containsQ }] },
+    burelis: { OR: [{ name: containsQ }, { city: containsQ }, { description: containsQ }, { category: containsQ }] },
+    specialist: { OR: [{ name: containsQ }, { city: containsQ }, { description: containsQ }, { specialty: containsQ }] },
+  };
+
+  const [dbKg, dbAukles, dbBureliai, dbSpecialists] = await Promise.all([
+    prisma.kindergarten.findMany({ where: dbWhere.kg, orderBy: { baseRating: 'desc' }, take: 20 }),
+    prisma.aukle.findMany({ where: dbWhere.aukle, orderBy: { baseRating: 'desc' }, take: 20 }),
+    prisma.burelis.findMany({ where: dbWhere.burelis, orderBy: { baseRating: 'desc' }, take: 20 }),
+    prisma.specialist.findMany({ where: dbWhere.specialist, orderBy: { baseRating: 'desc' }, take: 20 }),
   ]);
 
-  const kindergartens = allKg.filter((i) =>
-    matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query)
-  ).slice(0, 20);
+  // If DB returned enough results, use them directly; otherwise fall back to JS filtering
+  const needsJsFallback = dbKg.length < 5 && dbAukles.length < 3 && dbBureliai.length < 3 && dbSpecialists.length < 3;
 
-  const aukles = allAukles.filter((i) =>
-    matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query)
-  ).slice(0, 20);
+  let kindergartens = dbKg;
+  let aukles = dbAukles;
+  let bureliai = dbBureliai;
+  let specialists = dbSpecialists;
 
-  const bureliai = allBureliai.filter((i) =>
-    matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query) || matchesSearch(i.category, query)
-  ).slice(0, 20);
+  if (needsJsFallback) {
+    // Lithuanian case-insensitive search on a limited dataset
+    const [allKg, allAukles, allBureliai, allSpecialists] = await Promise.all([
+      prisma.kindergarten.findMany({ orderBy: { baseRating: 'desc' }, take: 2000 }),
+      prisma.aukle.findMany({ orderBy: { baseRating: 'desc' } }),
+      prisma.burelis.findMany({ orderBy: { baseRating: 'desc' } }),
+      prisma.specialist.findMany({ orderBy: { baseRating: 'desc' } }),
+    ]);
 
-  const specialists = allSpecialists.filter((i) =>
-    matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query) || matchesSearch(i.specialty, query)
-  ).slice(0, 20);
+    kindergartens = allKg.filter((i) =>
+      matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query)
+    ).slice(0, 20);
+    aukles = allAukles.filter((i) =>
+      matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query)
+    ).slice(0, 20);
+    bureliai = allBureliai.filter((i) =>
+      matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query) || matchesSearch(i.category, query)
+    ).slice(0, 20);
+    specialists = allSpecialists.filter((i) =>
+      matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query) || matchesSearch(i.specialty, query)
+    ).slice(0, 20);
+  }
 
   const serialize = <T extends { createdAt: Date; updatedAt?: Date }>(items: T[]) =>
     items.map((i) => ({ ...i, createdAt: i.createdAt.toISOString(), updatedAt: (i as { updatedAt?: Date }).updatedAt?.toISOString() ?? '' }));
