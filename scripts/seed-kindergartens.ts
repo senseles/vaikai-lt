@@ -667,11 +667,13 @@ async function main() {
 
   // Show distribution by city
   console.log('Distribution by city:');
-  const cityCounts = await prisma.$queryRawUnsafe<{ city: string; count: number }[]>(
-    `SELECT city, COUNT(*) as count FROM Kindergarten GROUP BY city ORDER BY count DESC`
-  );
+  const cityCounts = await prisma.kindergarten.groupBy({
+    by: ['city'],
+    _count: { city: true },
+    orderBy: { _count: { city: 'desc' } },
+  });
   for (const row of cityCounts) {
-    console.log(`  ${row.city}: ${row.count}`);
+    console.log(`  ${row.city}: ${row._count.city}`);
   }
 
   console.log('');
