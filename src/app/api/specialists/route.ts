@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getPagination, cachedJsonResponse, errorResponse, matchesSearch } from '@/lib/api-utils';
+import { getPagination, cachedJsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { getCached, setCache, CACHE_TTL } from '@/lib/cache';
 
@@ -22,29 +22,20 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const ids = searchParams.getAll('ids');
 
-    const where: Record<string, unknown> = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: Record<string, any> = {};
     if (ids.length > 0) where.id = { in: ids };
     if (city) where.city = city;
     if (region) where.region = region;
     if (specialty) where.specialty = specialty;
 
     if (search) {
-      const allItems = await prisma.specialist.findMany({ where, orderBy: { name: 'asc' } });
-      const filtered = allItems.filter((item) =>
-        matchesSearch(item.name, search) ||
-        matchesSearch(item.city, search) ||
-        matchesSearch(item.description, search) ||
-        matchesSearch(item.specialty, search)
-      );
-      const total = filtered.length;
-      const paginated = filtered.slice(skip, skip + limit);
-
-      const result = {
-        data: paginated,
-        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-      };
-      setCache(cacheKey, result, CACHE_TTL.LIST);
-      return cachedJsonResponse(result);
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' as const } },
+        { city: { contains: search, mode: 'insensitive' as const } },
+        { description: { contains: search, mode: 'insensitive' as const } },
+        { specialty: { contains: search, mode: 'insensitive' as const } },
+      ];
     }
 
     const [items, total] = await Promise.all([
