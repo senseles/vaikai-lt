@@ -1,0 +1,74 @@
+[
+  {
+    "id": "cmm8j7of30000iukdfumo2b70",
+    "name": "Darželiai",
+    "slug": "darzeliai",
+    "description": "Klausimai apie darželius",
+    "icon": "🏫",
+    "order": 1,
+    "createdAt": "2026-03-02T02:00:21.855Z"
+  },
+  {
+    "id": "cmm8j7ofd0001iukdwij7m8jc",
+    "name": "Auklės",
+    "slug": "aukles",
+    "description": "Auklių paieška ir patarimai",
+    "icon": "👩‍👧",
+    "order": 2,
+    "createdAt": "2026-03-02T02:00:21.865Z"
+  },
+  {
+    "id": "cmm8j7ofj0002iukdsb1jyfc6",
+    "name": "Būreliai",
+    "slug": "bureliai",
+    "description": "Būrelių rekomendacijos",
+    "icon": "🎨",
+    "order": 3,
+    "createdAt": "2026-03-02T02:00:21.872Z"
+  },
+  {
+    "id": "cmm8j7ofr0003iukdhovvh77t",
+    "name": "Specialistai",
+    "slug": "specialistai",
+    "description": "Gydytojai, logopedai, psichologai",
+    "icon": "👨‍⚕️",
+    "order": 4,
+    "createdAt": "2026-03-02T02:00:21.880Z"
+  },
+  {
+    "id": "cmm8j7ofz0004iukdxuo3vtm4",
+    "name": "Tėvystė",
+    "slug": "tevyste",
+    "description": "Bendri klausimai apie vaikų auginimą",
+    "icon": "👨‍👩‍👧‍👦",
+    "order": 5,
+    "createdAt": "2026-03-02T02:00:21.887Z"
+  },
+  {
+    "id": "cmm8j7og70005iukdqacjolu8",
+    "name": "Mokyklos",
+    "slug": "mokyklos",
+    "description": "Pasiruošimas mokyklai",
+    "icon": "📚",
+    "order": 6,
+    "createdAt": "2026-03-02T02:00:21.895Z"
+  },
+  {
+    "id": "cmm8j7oge0006iukdjiilfach",
+    "name": "Sveikata",
+    "slug": "sveikata",
+    "description": "Vaikų sveikata ir mityba",
+    "icon": "🏥",
+    "order": 7,
+    "createdAt": "2026-03-02T02:00:21.903Z"
+  },
+  {
+    "id": "cmm8j7ogm0007iukd7cx9il6g",
+    "name": "Laisvalaikis",
+    "slug": "laisvalaikis",
+    "description": "Renginiai, žaidimai, kelionės",
+    "icon": "🎪",
+    "order": 8,
+    "createdAt": "2026-03-02T02:00:21.910Z"
+  }
+]

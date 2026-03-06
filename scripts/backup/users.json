@@ -1,0 +1,18 @@
+[
+  {
+    "id": "cmm810gbp0002qr5yilbnbkh0",
+    "email": "qatest@test.lt",
+    "name": "QA Testeris",
+    "passwordHash": "5f20cff2af13811c4cc9c2afac09d98c:fcc3f0b0eb0f8c8aa5cf0b73c454e5ca0ccb2a6fd7f74384994ff28dd6275254",
+    "role": "USER",
+    "createdAt": "2026-03-01T17:30:51.686Z"
+  },
+  {
+    "id": "cmm8idwz10002mnsensvshgkx",
+    "email": "test@test.com",
+    "name": "Test User",
+    "passwordHash": "scrypt:2aba0cdc1479e83b68388f281e821c9a:ef7cd1a76b11d24383544d4ece621d28bbb14a0e203bb23c63e86650ac3f6bc88019c89c66f78780102b4557d5217510ba9ea2297a82a9a27b2836b49bb4f466",
+    "role": "USER",
+    "createdAt": "2026-03-02T01:37:13.262Z"
+  }
+]
