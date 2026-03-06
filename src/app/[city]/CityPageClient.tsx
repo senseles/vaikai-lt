@@ -97,7 +97,7 @@ export default function CityPageClient({
     setCompareIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
-      else if (next.size < 4) next.add(id);
+      else if (next.size < 3) next.add(id);
       return next;
     });
   }, []);

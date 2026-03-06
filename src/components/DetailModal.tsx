@@ -20,8 +20,13 @@ interface DetailModalProps {
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+const SWIPE_THRESHOLD = 100;
+
 export default function DetailModal({ item, itemType, onClose }: DetailModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [dragY, setDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef<{ y: number; scrollTop: number } | null>(null);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') { onClose(); return; }
@@ -39,6 +44,31 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
     }
   }, [onClose]);
 
+  // Swipe-to-close for mobile
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const scrollTop = modalRef.current?.scrollTop ?? 0;
+    dragStartRef.current = { y: e.touches[0].clientY, scrollTop };
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!dragStartRef.current) return;
+    const dy = e.touches[0].clientY - dragStartRef.current.y;
+    // Only allow dragging down when scrolled to top
+    if (dragStartRef.current.scrollTop <= 0 && dy > 0) {
+      setDragY(dy);
+      setIsDragging(true);
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (dragY > SWIPE_THRESHOLD) {
+      onClose();
+    }
+    setDragY(0);
+    setIsDragging(false);
+    dragStartRef.current = null;
+  }, [dragY, onClose]);
+
   useEffect(() => {
     if (!item) return;
     addToRecentlyViewed({
@@ -50,7 +80,6 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
     });
     document.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
-    // Focus the close button when the modal opens
     const closeBtn = modalRef.current?.querySelector<HTMLButtonElement>('[data-modal-close]');
     closeBtn?.focus();
     return () => {
@@ -136,14 +165,28 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
     }
   };
 
+  const backdropOpacity = isDragging ? Math.max(0, 1 - dragY / 300) : 1;
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label={item.name} onClick={onClose}>
-      <div className="fixed inset-0 bg-black/40 animate-backdrop" />
+      <div className="fixed inset-0 bg-black/40 animate-backdrop" style={{ opacity: backdropOpacity }} />
       <div
         ref={modalRef}
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white dark:bg-slate-800 w-full sm:max-w-lg sm:rounded-xl rounded-t-2xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto overflow-x-hidden overscroll-contain p-4 sm:p-5 animate-modal-enter"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className="relative bg-white dark:bg-slate-800 w-full sm:max-w-lg sm:rounded-xl rounded-t-2xl h-[100dvh] sm:h-auto sm:max-h-[90vh] overflow-y-auto overflow-x-hidden overscroll-contain p-4 sm:p-5 animate-modal-enter"
+        style={{
+          transform: isDragging ? `translateY(${dragY}px)` : undefined,
+          transition: isDragging ? 'none' : undefined,
+        }}
       >
+        {/* Mobile drag handle */}
+        <div className="sm:hidden flex justify-center pb-3 -mt-1" aria-hidden="true">
+          <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-slate-600" />
+        </div>
+
         <button
           data-modal-close
           onClick={onClose}
