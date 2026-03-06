@@ -152,7 +152,7 @@
   }
 
   @keyframes fade-in-up {
-    from { opacity: 0; transform: translateY(16px); will-change: opacity, transform; }
+    from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
@@ -271,6 +271,16 @@
   @keyframes shimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
+  }
+}
+
+/* Reduce motion for users who prefer it — saves battery on mobile */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

@@ -3,11 +3,11 @@ import { Inter } from "next/font/google";
 import dynamic from "next/dynamic";
 import "./globals.css";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import BackToTop from "@/components/BackToTop";
-import MobileBottomNav from "@/components/MobileBottomNav";
 import { LanguageProvider } from "@/lib/LanguageContext";
 
+const Footer = dynamic(() => import("@/components/Footer"));
+const BackToTop = dynamic(() => import("@/components/BackToTop"), { ssr: false });
+const MobileBottomNav = dynamic(() => import("@/components/MobileBottomNav"), { ssr: false });
 const CookieConsent = dynamic(() => import("@/components/CookieConsent"), {
   ssr: false,
 });
@@ -67,11 +67,11 @@ export default function RootLayout({
   return (
     <html lang="lt" className={inter.variable} suppressHydrationWarning>
       <head>
-        {/* dns-prefetch / preconnect for external domains used in the app */}
-        <link rel="dns-prefetch" href="https://www.google.com" />
+        {/* preconnect / dns-prefetch for external domains */}
         <link rel="preconnect" href="https://www.google.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="https://www.google.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
         {/* Analytics — uncomment and set domain when going live */}
         {/* <script defer data-domain="vaikai.lt" src="https://plausible.io/js/script.js" /> */}

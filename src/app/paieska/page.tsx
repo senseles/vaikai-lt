@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import prisma from '@/lib/prisma';
 
 import SearchResultsClient from './SearchResultsClient';
+import SearchLoading from './loading';
 
 interface SearchPageProps {
   readonly searchParams: { q?: string };
@@ -91,13 +93,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {totalResults === 0 ? (
         <p className="text-center text-gray-400 dark:text-gray-500 py-12">Nieko nerasta pagal &bdquo;{query}&ldquo;. Pabandykite kitą paieškos frazę.</p>
       ) : (
-        <SearchResultsClient
-          query={query}
-          kindergartens={serialize(kindergartens) as never[]}
-          aukles={serialize(aukles) as never[]}
-          bureliai={serialize(bureliai) as never[]}
-          specialists={serialize(specialists) as never[]}
-        />
+        <Suspense fallback={<SearchLoading />}>
+          <SearchResultsClient
+            query={query}
+            kindergartens={serialize(kindergartens) as never[]}
+            aukles={serialize(aukles) as never[]}
+            bureliai={serialize(bureliai) as never[]}
+            specialists={serialize(specialists) as never[]}
+          />
+        </Suspense>
       )}
     </div>
   );

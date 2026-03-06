@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import prisma from '@/lib/prisma';
 import { CITY_NAMES, CITY_SLUG_LIST } from '@/lib/cities';
 import CityPageClient from './CityPageClient';
@@ -210,26 +211,33 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
         </div>
       )}
 
-      <CityPageClient
-        citySlug={citySlug}
-        kindergartens={serialize(kindergartens) as never[]}
-        aukles={serialize(aukles) as never[]}
-        bureliai={serialize(bureliai) as never[]}
-        specialists={serialize(specialists) as never[]}
-        initialCategory={category}
-        initialType={type}
-        initialSort={sort}
-        totalPages={totalPages}
-        totalCounts={{
-          darzeliai: kindergartenTotal,
-          aukles: aukleTotal,
-          bureliai: burelisTotal,
-          specialistai: specialistTotal,
-        }}
-        currentPage={page}
-        perPage={PER_PAGE}
-        areas={allAreas}
-      />
+      <Suspense fallback={
+        <div className="animate-pulse">
+          <div className="flex gap-2 mb-6">{[1,2,3,4].map(i => <div key={i} className="h-10 w-28 bg-gray-200 dark:bg-slate-700 rounded-full" />)}</div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">{[1,2,3,4,5,6].map(i => <div key={i} className="h-48 bg-gray-200 dark:bg-slate-700 rounded-xl" />)}</div>
+        </div>
+      }>
+        <CityPageClient
+          citySlug={citySlug}
+          kindergartens={serialize(kindergartens) as never[]}
+          aukles={serialize(aukles) as never[]}
+          bureliai={serialize(bureliai) as never[]}
+          specialists={serialize(specialists) as never[]}
+          initialCategory={category}
+          initialType={type}
+          initialSort={sort}
+          totalPages={totalPages}
+          totalCounts={{
+            darzeliai: kindergartenTotal,
+            aukles: aukleTotal,
+            bureliai: burelisTotal,
+            specialistai: specialistTotal,
+          }}
+          currentPage={page}
+          perPage={PER_PAGE}
+          areas={allAreas}
+        />
+      </Suspense>
     </div>
   );
 }

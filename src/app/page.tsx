@@ -1,9 +1,24 @@
 import dynamicImport from "next/dynamic";
 export const dynamic = "force-dynamic";
 import Link from "next/link";
+import { Suspense } from "react";
 import SearchBar from "@/components/SearchBar";
-import CitySelector from "@/components/CitySelector";
 import prisma from "@/lib/prisma";
+
+const CitySelector = dynamicImport(() => import("@/components/CitySelector"), {
+  loading: () => (
+    <section className="py-12 md:py-16 animate-pulse">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="h-8 w-48 bg-gray-200 dark:bg-slate-700 rounded mx-auto mb-8" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-24 bg-gray-200 dark:bg-slate-700 rounded-xl" />
+          ))}
+        </div>
+      </div>
+    </section>
+  ),
+});
 
 const RecentlyViewed = dynamicImport(() => import("@/components/RecentlyViewed"), {
   ssr: false,
@@ -132,6 +147,7 @@ export default async function HomePage() {
           </p>
           <Link
             href="/forumas"
+            prefetch={true}
             className="inline-flex items-center gap-2 bg-[#2d6a4f] hover:bg-[#40916c] text-white font-semibold px-6 py-3 rounded-xl transition-colors shadow-md"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
