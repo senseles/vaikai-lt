@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
         authorName: cleanAuthor,
         rating: rating as number,
         text: cleanText,
-        isApproved: false,
+        isApproved: true,
       },
     });
 

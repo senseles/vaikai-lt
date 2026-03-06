@@ -128,12 +128,45 @@ export default function CityPageClient({
     });
   };
 
+  // Lithuanian character normalization map for fuzzy search
+  const ltNorm = (s: string): string =>
+    s.toLowerCase()
+      .replace(/ą/g, 'a').replace(/č/g, 'c').replace(/ę/g, 'e')
+      .replace(/ė/g, 'e').replace(/į/g, 'i').replace(/š/g, 's')
+      .replace(/ų/g, 'u').replace(/ū/g, 'u').replace(/ž/g, 'z');
+
+  // Simple fuzzy match: allows 1 character mismatch for words >= 4 chars
+  const fuzzyMatch = (text: string, query: string): boolean => {
+    const nt = ltNorm(text);
+    const nq = ltNorm(query);
+    // Direct includes (normalized)
+    if (nt.includes(nq)) return true;
+    // Split query into words and check each
+    const words = nq.split(/\s+/).filter(w => w.length > 0);
+    return words.every(word => {
+      if (nt.includes(word)) return true;
+      // For short words, only exact normalized match
+      if (word.length < 4) return false;
+      // Allow 1 character difference (Levenshtein-like sliding window)
+      for (let i = 0; i <= nt.length - word.length + 1; i++) {
+        const chunk = nt.substring(i, i + word.length);
+        let diffs = 0;
+        for (let j = 0; j < word.length; j++) {
+          if (chunk[j] !== word[j]) diffs++;
+          if (diffs > 1) break;
+        }
+        if (diffs <= 1) return true;
+      }
+      return false;
+    });
+  };
+
   const filterBySearch = <T extends { name: string; description?: string | null; address?: string | null; area?: string | null; category?: string | null; specialty?: string | null }>(items: T[]): T[] => {
     if (!searchQuery.trim()) return items;
-    const q = searchQuery.toLowerCase().trim();
+    const q = searchQuery.trim();
     return items.filter((item) => {
       const fields = [item.name, item.description, item.address, item.area, item.category, item.specialty];
-      return fields.some((f) => f?.toLowerCase().includes(q));
+      return fields.some((f) => f ? fuzzyMatch(f, q) : false);
     });
   };
 
