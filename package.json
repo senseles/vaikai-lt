@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@netlify/plugin-nextjs": "^5.15.8",
     "@prisma/client": "^5.22.0",
     "better-sqlite3": "^12.6.2",
     "next": "14.2.35",
