@@ -89,10 +89,19 @@ export async function GET(request: NextRequest) {
         rating: i.baseRating,
         citySlug: getCitySlug(i.city),
       })),
-    ].slice(0, 8).map(s => ({
-      ...s,
-      url: s.citySlug ? `/${s.citySlug}?category=${categoryMap[s.itemType] || 'darzeliai'}` : `/paieska?q=${encodeURIComponent(s.name)}`,
-    }));
+    ].slice(0, 8).map(s => {
+      let url: string;
+      if (s.itemType === 'aukle') {
+        url = `/aukles/${s.slug}`;
+      } else if (s.itemType === 'burelis') {
+        url = `/bureliai/${s.slug}`;
+      } else if (s.citySlug) {
+        url = `/${s.citySlug}?category=${categoryMap[s.itemType] || 'darzeliai'}`;
+      } else {
+        url = `/paieska?q=${encodeURIComponent(s.name)}`;
+      }
+      return { ...s, url };
+    });
 
     return NextResponse.json({ suggestions }, {
       headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' },
