@@ -71,6 +71,7 @@ export default function CityPageClient({
   const [selectedItemType, setSelectedItemType] = useState<ItemType>('kindergarten');
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
   const [showCompare, setShowCompare] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const category = (searchParams.get('category') as Category) || initialCategory;
   const type = searchParams.get('type') ?? initialType;
@@ -127,12 +128,21 @@ export default function CityPageClient({
     });
   };
 
+  const filterBySearch = <T extends { name: string; description?: string | null; address?: string | null; area?: string | null; category?: string | null; specialty?: string | null }>(items: T[]): T[] => {
+    if (!searchQuery.trim()) return items;
+    const q = searchQuery.toLowerCase().trim();
+    return items.filter((item) => {
+      const fields = [item.name, item.description, item.address, item.area, item.category, item.specialty];
+      return fields.some((f) => f?.toLowerCase().includes(q));
+    });
+  };
+
   const itemsForCategory = () => {
     switch (category) {
-      case 'darzeliai': return kindergartens;
-      case 'aukles': return filterByPrice(aukles);
-      case 'bureliai': return bureliai;
-      case 'specialistai': return filterByPrice(specialists);
+      case 'darzeliai': return filterBySearch(kindergartens);
+      case 'aukles': return filterBySearch(filterByPrice(aukles));
+      case 'bureliai': return filterBySearch(bureliai);
+      case 'specialistai': return filterBySearch(filterByPrice(specialists));
     }
   };
 
@@ -159,6 +169,34 @@ export default function CityPageClient({
           </button>
         ))}
       </nav>
+
+      {/* Search */}
+      <div className="relative mb-4">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder={`Ieškoti tarp ${categoryTabs.find(t => t.id === category)?.label.toLowerCase() ?? 'rezultatų'}...`}
+          className="w-full pl-10 pr-10 py-2.5 min-h-[44px] text-base border border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+          aria-label="Ieškoti šiame mieste"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            aria-label="Išvalyti paiešką"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-6">
@@ -219,6 +257,12 @@ export default function CityPageClient({
 
       {/* Cards */}
       <h2 className="sr-only">{categoryTabs.find(t => t.id === category)?.label ?? 'Rezultatai'}</h2>
+      {searchQuery && (
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          Rasta: <span className="font-semibold text-gray-700 dark:text-gray-200">{items.length}</span> {items.length === 1 ? 'rezultatas' : items.length < 10 ? 'rezultatai' : 'rezultatų'}
+          {' '}pagal &bdquo;<span className="font-medium">{searchQuery}</span>&ldquo;
+        </p>
+      )}
       {items.length === 0 ? (
         <EmptyState
           icon="filter"
@@ -228,7 +272,7 @@ export default function CityPageClient({
       ) : (
         <ErrorBoundary fallback={<EmptyState icon="filter" title="Klaida" description="Nepavyko atvaizduoti rezultatų. Pabandykite perkrauti puslapį." />}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {category === 'darzeliai' && kindergartens.map((item, i) => (
+            {category === 'darzeliai' && (items as Kindergarten[]).map((item, i) => (
               <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
                 <KindergartenCard
                   item={item}
@@ -238,17 +282,17 @@ export default function CityPageClient({
                 />
               </ScrollReveal>
             ))}
-            {category === 'aukles' && (filterByPrice(aukles) as Aukle[]).map((item, i) => (
+            {category === 'aukles' && (items as Aukle[]).map((item, i) => (
               <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
                 <AukleCard item={item} onSelect={(it) => openDetail(it, 'aukle')} />
               </ScrollReveal>
             ))}
-            {category === 'bureliai' && bureliai.map((item, i) => (
+            {category === 'bureliai' && (items as Burelis[]).map((item, i) => (
               <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
                 <BurelisCard item={item} onSelect={(it) => openDetail(it, 'burelis')} />
               </ScrollReveal>
             ))}
-            {category === 'specialistai' && (filterByPrice(specialists) as Specialist[]).map((item, i) => (
+            {category === 'specialistai' && (items as Specialist[]).map((item, i) => (
               <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
                 <SpecialistCard item={item} onSelect={(it) => openDetail(it, 'specialist')} />
               </ScrollReveal>
