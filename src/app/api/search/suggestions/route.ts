@@ -3,7 +3,6 @@ import prisma from '@/lib/prisma';
 import { CITIES } from '@/lib/cities';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
-// Build a city name -> slug lookup for fast resolution
 const cityNameToSlug: Record<string, string> = {};
 for (const c of CITIES) {
   cityNameToSlug[c.name.toLocaleLowerCase('lt')] = c.slug;
@@ -11,9 +10,7 @@ for (const c of CITIES) {
 
 function getCitySlug(cityName: string): string {
   const lower = cityName.toLocaleLowerCase('lt');
-  // Direct match
   if (cityNameToSlug[lower]) return cityNameToSlug[lower];
-  // Partial match (e.g. "Vilnius m." -> "vilnius")
   for (const [name, slug] of Object.entries(cityNameToSlug)) {
     if (lower.includes(name) || name.includes(lower)) return slug;
   }
@@ -27,6 +24,34 @@ const categoryMap: Record<string, string> = {
   specialist: 'specialistai',
 };
 
+interface RawResult {
+  id: string;
+  name: string;
+  city: string;
+  slug: string;
+  base_rating: number;
+}
+
+async function searchWithUnaccent(
+  table: string,
+  fields: string[],
+  q: string,
+  limit: number
+): Promise<RawResult[]> {
+  const pattern = `%${q}%`;
+  const orClauses = fields
+    .map((f) => `unaccent(${f}) ILIKE unaccent($1)`)
+    .join(' OR ');
+  
+  const sql = `SELECT id, name, city, slug, "baseRating" as base_rating 
+    FROM "${table}" 
+    WHERE ${orClauses}
+    ORDER BY "baseRating" DESC 
+    LIMIT ${limit}`;
+  
+  return prisma.$queryRawUnsafe(sql, pattern) as Promise<RawResult[]>;
+}
+
 export async function GET(request: NextRequest) {
   const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.PUBLIC_GET);
   if (rateLimitResponse) return rateLimitResponse;
@@ -36,71 +61,38 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ suggestions: [] });
   }
 
+  // Sanitize: only allow alphanumeric, spaces, Lithuanian chars, basic punctuation
+  const sanitized = q.replace(/[^a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ0-9\s\-.,]/g, '').slice(0, 100);
+  if (sanitized.length < 2) {
+    return NextResponse.json({ suggestions: [] });
+  }
+
   try {
     const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
-      prisma.kindergarten.findMany({
-        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { address: { contains: q, mode: 'insensitive' as const } }] },
-        select: { id: true, name: true, city: true, slug: true, baseRating: true },
-        take: 4,
-        orderBy: { baseRating: 'desc' },
-      }),
-      prisma.aukle.findMany({
-        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }] },
-        select: { id: true, name: true, city: true, slug: true, baseRating: true },
-        take: 3,
-        orderBy: { baseRating: 'desc' },
-      }),
-      prisma.burelis.findMany({
-        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { category: { contains: q, mode: 'insensitive' as const } }] },
-        select: { id: true, name: true, city: true, slug: true, baseRating: true },
-        take: 3,
-        orderBy: { baseRating: 'desc' },
-      }),
-      prisma.specialist.findMany({
-        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { specialty: { contains: q, mode: 'insensitive' as const } }] },
-        select: { id: true, name: true, city: true, slug: true, baseRating: true },
-        take: 3,
-        orderBy: { baseRating: 'desc' },
-      }),
+      searchWithUnaccent('Kindergarten', ['name', 'city', 'address'], sanitized, 4),
+      searchWithUnaccent('Aukle', ['name', 'city'], sanitized, 3),
+      searchWithUnaccent('Burelis', ['name', 'city', 'category'], sanitized, 3),
+      searchWithUnaccent('Specialist', ['name', 'city', 'specialty'], sanitized, 3),
     ]);
 
     const suggestions = [
-      ...kindergartens.map(i => ({
-        id: i.id, name: i.name, city: i.city, slug: i.slug,
-        type: 'darzeliai' as const, itemType: 'kindergarten' as const,
-        rating: i.baseRating,
-        citySlug: getCitySlug(i.city),
-      })),
-      ...aukles.map(i => ({
-        id: i.id, name: i.name, city: i.city, slug: i.slug,
-        type: 'aukles' as const, itemType: 'aukle' as const,
-        rating: i.baseRating,
-        citySlug: getCitySlug(i.city),
-      })),
-      ...bureliai.map(i => ({
-        id: i.id, name: i.name, city: i.city, slug: i.slug,
-        type: 'bureliai' as const, itemType: 'burelis' as const,
-        rating: i.baseRating,
-        citySlug: getCitySlug(i.city),
-      })),
-      ...specialists.map(i => ({
-        id: i.id, name: i.name, city: i.city, slug: i.slug,
-        type: 'specialistai' as const, itemType: 'specialist' as const,
-        rating: i.baseRating,
-        citySlug: getCitySlug(i.city),
-      })),
+      ...kindergartens.map(i => ({ ...i, type: 'darzeliai' as const, itemType: 'kindergarten' as const })),
+      ...aukles.map(i => ({ ...i, type: 'aukles' as const, itemType: 'aukle' as const })),
+      ...bureliai.map(i => ({ ...i, type: 'bureliai' as const, itemType: 'burelis' as const })),
+      ...specialists.map(i => ({ ...i, type: 'specialistai' as const, itemType: 'specialist' as const })),
     ].slice(0, 8).map(s => {
+      const citySlug = getCitySlug(s.city);
       let url: string;
       if (s.itemType === 'aukle') {
         url = `/aukles/${s.slug}`;
       } else if (s.itemType === 'burelis') {
         url = `/bureliai/${s.slug}`;
-      } else if (s.citySlug) {
-        url = `/${s.citySlug}?category=${categoryMap[s.itemType] || 'darzeliai'}`;
+      } else if (citySlug) {
+        url = `/${citySlug}?category=${categoryMap[s.itemType] || 'darzeliai'}`;
       } else {
         url = `/paieska?q=${encodeURIComponent(s.name)}`;
       }
-      return { ...s, url };
+      return { id: s.id, name: s.name, city: s.city, slug: s.slug, type: s.type, rating: s.base_rating, url };
     });
 
     return NextResponse.json({ suggestions }, {

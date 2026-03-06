@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
-import { matchesSearch } from '@/lib/api-utils';
+
 import SearchResultsClient from './SearchResultsClient';
 
 interface SearchPageProps {
@@ -43,55 +43,35 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     );
   }
 
-  // Two-pass search: DB-level contains first, then JS Lithuanian matching on smaller set
-  const containsQ = { contains: query, mode: 'insensitive' as const };
-  const dbWhere = {
-    kg: { OR: [{ name: containsQ }, { city: containsQ }, { description: containsQ }] },
-    aukle: { OR: [{ name: containsQ }, { city: containsQ }, { description: containsQ }] },
-    burelis: { OR: [{ name: containsQ }, { city: containsQ }, { description: containsQ }, { category: containsQ }] },
-    specialist: { OR: [{ name: containsQ }, { city: containsQ }, { description: containsQ }, { specialty: containsQ }] },
-  };
+  // Use PostgreSQL unaccent for Lithuanian diacritics-insensitive search
+  const pattern = `%${query.replace(/[%_]/g, '')}%`;
 
-  const [dbKg, dbAukles, dbBureliai, dbSpecialists] = await Promise.all([
-    prisma.kindergarten.findMany({ where: dbWhere.kg, orderBy: { baseRating: 'desc' }, take: 20 }),
-    prisma.aukle.findMany({ where: dbWhere.aukle, orderBy: { baseRating: 'desc' }, take: 20 }),
-    prisma.burelis.findMany({ where: dbWhere.burelis, orderBy: { baseRating: 'desc' }, take: 20 }),
-    prisma.specialist.findMany({ where: dbWhere.specialist, orderBy: { baseRating: 'desc' }, take: 20 }),
-  ]);
+  const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
+    prisma.$queryRawUnsafe(
+      `SELECT * FROM "Kindergarten" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
+      pattern
+    ),
+    prisma.$queryRawUnsafe(
+      `SELECT * FROM "Aukle" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
+      pattern
+    ),
+    prisma.$queryRawUnsafe(
+      `SELECT * FROM "Burelis" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) OR unaccent(COALESCE(category,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
+      pattern
+    ),
+    prisma.$queryRawUnsafe(
+      `SELECT * FROM "Specialist" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) OR unaccent(COALESCE(specialty,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
+      pattern
+    ),
+  ]) as [unknown[], unknown[], unknown[], unknown[]];
 
-  // If DB returned enough results, use them directly; otherwise fall back to JS filtering
-  const needsJsFallback = dbKg.length < 5 && dbAukles.length < 3 && dbBureliai.length < 3 && dbSpecialists.length < 3;
-
-  let kindergartens = dbKg;
-  let aukles = dbAukles;
-  let bureliai = dbBureliai;
-  let specialists = dbSpecialists;
-
-  if (needsJsFallback) {
-    // Lithuanian case-insensitive search on a limited dataset
-    const [allKg, allAukles, allBureliai, allSpecialists] = await Promise.all([
-      prisma.kindergarten.findMany({ orderBy: { baseRating: 'desc' }, take: 2000 }),
-      prisma.aukle.findMany({ orderBy: { baseRating: 'desc' } }),
-      prisma.burelis.findMany({ orderBy: { baseRating: 'desc' } }),
-      prisma.specialist.findMany({ orderBy: { baseRating: 'desc' } }),
-    ]);
-
-    kindergartens = allKg.filter((i) =>
-      matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query)
-    ).slice(0, 20);
-    aukles = allAukles.filter((i) =>
-      matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query)
-    ).slice(0, 20);
-    bureliai = allBureliai.filter((i) =>
-      matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query) || matchesSearch(i.category, query)
-    ).slice(0, 20);
-    specialists = allSpecialists.filter((i) =>
-      matchesSearch(i.name, query) || matchesSearch(i.city, query) || matchesSearch(i.description, query) || matchesSearch(i.specialty, query)
-    ).slice(0, 20);
-  }
-
-  const serialize = <T extends { createdAt: Date; updatedAt?: Date }>(items: T[]) =>
-    items.map((i) => ({ ...i, createdAt: i.createdAt.toISOString(), updatedAt: (i as { updatedAt?: Date }).updatedAt?.toISOString() ?? '' }));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const serialize = (items: any[]) =>
+    items.map((i) => ({
+      ...i,
+      createdAt: i.createdAt instanceof Date ? i.createdAt.toISOString() : (i.createdAt ?? ''),
+      updatedAt: i.updatedAt instanceof Date ? i.updatedAt.toISOString() : (i.updatedAt ?? ''),
+    }));
 
   const totalResults = kindergartens.length + aukles.length + bureliai.length + specialists.length;
 

@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
     if (type) where.type = type;
 
     if (search) {
+      // Use raw SQL fragment for unaccent Lithuanian search
       where.OR = [
         { name: { contains: search, mode: 'insensitive' as const } },
         { city: { contains: search, mode: 'insensitive' as const } },
