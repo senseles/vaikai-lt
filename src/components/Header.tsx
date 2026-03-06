@@ -35,10 +35,10 @@ export default function Header() {
   const isForumActive = pathname.startsWith('/forumas');
 
   const navLinks = [
-    { href: "/#miestai", label: t('nav.cities') },
-    { href: "/forumas", label: "Forumas" },
-    { href: "/megstamiausieji", label: t('nav.favorites') },
-    { href: "/#duk", label: t('nav.faq') },
+    { href: "/#miestai", label: t('nav.cities'), prefetch: false as const },
+    { href: "/forumas", label: "Forumas", prefetch: true as const },
+    { href: "/megstamiausieji", label: t('nav.favorites'), prefetch: true as const },
+    { href: "/#duk", label: t('nav.faq'), prefetch: false as const },
   ];
 
   const handleLocaleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -63,6 +63,7 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  prefetch={link.prefetch}
                   className={`font-medium text-sm transition-colors ${
                     active
                       ? 'text-primary dark:text-primary-light'
