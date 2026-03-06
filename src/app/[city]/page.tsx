@@ -145,9 +145,15 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   const areaSet = new Set([...kgAreas, ...aukleAreas, ...burelisAreas, ...specAreas].map(a => a.area).filter(Boolean) as string[]);
   const allAreas = Array.from(areaSet).sort((a, b) => a.localeCompare(b, 'lt'));
 
-  // Serialize dates for client component
-  const serialize = <T extends { createdAt: Date; updatedAt?: Date }>(items: T[]) =>
-    items.map((i) => ({ ...i, createdAt: i.createdAt.toISOString(), updatedAt: (i as { updatedAt?: Date }).updatedAt?.toISOString() ?? '' }));
+  // Serialize dates for client component (handles both Date objects and cached strings)
+  const serialize = <T extends { createdAt: Date | string; updatedAt?: Date | string }>(items: T[]) =>
+    items.map((i) => ({
+      ...i,
+      createdAt: typeof i.createdAt === 'string' ? i.createdAt : i.createdAt.toISOString(),
+      updatedAt: typeof (i as { updatedAt?: Date | string }).updatedAt === 'string'
+        ? (i as { updatedAt?: string }).updatedAt ?? ''
+        : ((i as { updatedAt?: Date }).updatedAt?.toISOString() ?? ''),
+    }));
 
   const totalPages = {
     darzeliai: Math.max(1, Math.ceil(kindergartenTotal / PER_PAGE)),
