@@ -39,25 +39,25 @@ export async function GET(request: NextRequest) {
   try {
     const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
       prisma.kindergarten.findMany({
-        where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { address: { contains: q } }] },
+        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { address: { contains: q, mode: 'insensitive' as const } }] },
         select: { id: true, name: true, city: true, slug: true, baseRating: true },
         take: 4,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.aukle.findMany({
-        where: { OR: [{ name: { contains: q } }, { city: { contains: q } }] },
+        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }] },
         select: { id: true, name: true, city: true, slug: true, baseRating: true },
         take: 3,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.burelis.findMany({
-        where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { category: { contains: q } }] },
+        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { category: { contains: q, mode: 'insensitive' as const } }] },
         select: { id: true, name: true, city: true, slug: true, baseRating: true },
         take: 3,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.specialist.findMany({
-        where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { specialty: { contains: q } }] },
+        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { specialty: { contains: q, mode: 'insensitive' as const } }] },
         select: { id: true, name: true, city: true, slug: true, baseRating: true },
         take: 3,
         orderBy: { baseRating: 'desc' },

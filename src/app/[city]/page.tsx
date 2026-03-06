@@ -94,7 +94,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   if (area) burelisWhere.area = area;
 
   const specialistWhere: Record<string, unknown> = { city: cityName };
-  if (spec) specialistWhere.specialty = { contains: spec };
+  if (spec) specialistWhere.specialty = { contains: spec, mode: 'insensitive' as const };
   if (area) specialistWhere.area = area;
 
   // Fetch areas + data for ALL categories in a single parallel batch

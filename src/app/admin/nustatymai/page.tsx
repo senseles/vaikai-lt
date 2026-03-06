@@ -67,7 +67,7 @@ export default function AdminNustatymai() {
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
               <dt className="text-gray-500 dark:text-gray-400">Platforma</dt>
-              <dd className="text-gray-900 dark:text-gray-100 font-medium">Next.js 14 + Prisma + SQLite</dd>
+              <dd className="text-gray-900 dark:text-gray-100 font-medium">Next.js 14 + Prisma + PostgreSQL</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-500 dark:text-gray-400">Versija</dt>

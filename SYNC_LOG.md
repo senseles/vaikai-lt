@@ -217,3 +217,130 @@
 - **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Spec: 160 | Reviews: 58,736
 - **Blockers:** None
 - **Notes:** Project appears stable post-polish phase. Forum, admin, mobile, SEO, and security work all landed. Good shape.
+
+## SYNC 2026-03-01 21:43 ET (Sun)
+- **Commits (last 20):** 20 commits, latest: `9c67199` — admin stats auth, endpoint hardening, final QA pass
+- **Build:** ✅ PASS — Next.js production build clean, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Spec: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** New commit since last sync: `9c67199` (admin stats auth + endpoint hardening). DB counts unchanged. Project stable — in maintenance/polish phase.
+
+---
+
+### SYNC 2026-03-02 00:23 (ET)
+- **Commits (last 20):** 20 commits, latest: `9c67199` — admin stats auth, endpoint hardening, final QA pass
+- **Build:** ✅ PASS — Next.js production build clean, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Spec: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. DB counts unchanged. Project remains stable in maintenance/polish phase.
+
+## SYNC 2026-03-02 01:03 (ET)
+- **Commits (last 20):** 20 commits, latest: `9c67199` — admin stats auth, endpoint hardening, final QA pass
+- **Build:** ✅ PASS — Next.js production build clean, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Spec: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. DB counts unchanged. Project stable in polish/maintenance phase.
+
+## SYNC 2026-03-02 01:43 EST (Mon)
+- **Commits (last 20):** 20 commits, latest: `9c67199` — admin stats auth, endpoint hardening, final QA pass
+- **Build:** ✅ PASS — Next.js production build clean, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Spec: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. DB counts unchanged. Project stable in polish/maintenance phase.
+
+## SYNC 2026-03-02 02:23 ET
+- **Commits (last 20):** 20 commits, latest: `9c67199` — admin stats auth, endpoint hardening, final QA pass
+- **Build:** ✅ PASS — Next.js production build clean, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Spec: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. DB counts unchanged. Project stable in polish/maintenance phase.
+
+## SYNC 2026-03-02 03:03 (ET) / 10:03 (Vilnius)
+- **Commits (last 20):** 20 commits, latest: `9c67199` — admin stats auth, endpoint hardening, final QA pass
+- **Build:** ✅ PASS — Next.js production build clean, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Spec: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. DB counts stable. Project in maintenance/polish phase — all 25 tests passing per latest commit.
+
+## SYNC 2026-03-02 03:43 EST (Mon)
+- **Commits (last 20):** 20 commits, latest: `9c67199` — admin stats auth, endpoint hardening, final QA pass
+- **Build:** ✅ PASS — Next.js production build clean, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Spec: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. DB counts stable. Project in solid shape — polish/QA phase complete.
+
+---
+
+### SYNC 2026-03-02 04:23 ET (Mon)
+
+- **Commits (last 20):** 20 commits, latest: `9c67199` — admin stats auth, endpoint hardening, final QA pass
+- **Build:** ✅ PASS — Next.js production build clean, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Spec: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. DB counts stable. All systems nominal — project in maintenance/polish phase.
+
+## SYNC 2026-03-02 05:03 EST (Mon)
+- **Commits (last 20):** 20 commits, latest: `9c67199` — admin stats auth, endpoint hardening, final QA pass
+- **Build:** ✅ PASS — Next.js production build clean, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Spec: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. DB counts stable. Project remains in maintenance/polish phase — all green.
+
+## SYNC 2026-03-02 05:43 ET (12:43 EET)
+- **Commits (last 20):** 20 commits visible — latest: `9c67199 fix: admin stats auth, endpoint hardening, final QA pass`
+- **Build:** ✅ SUCCESS — Next.js build clean, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Specialists: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** Project in solid state. Recent work focused on QA, security hardening, dark mode polish, forum features, and admin CRUD. 25/25 tests passing per commit messages.
+
+---
+
+## SYNC 2026-03-02 06:23 EST (Mon)
+
+- **Commits (last 20):** 20 commits — latest: `9c67199 fix: admin stats auth, endpoint hardening, final QA pass`
+- **Build:** ✅ SUCCESS — Next.js build clean, all routes compiled
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Specialists: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No changes since last sync. Project stable — QA/security hardening complete, 25/25 tests passing.
+
+---
+
+## SYNC — 2026-03-02 07:03 (ET) / 14:03 (EET)
+
+- **Commits (last 20):** 20 commits — latest: `9c67199 fix: admin stats auth, endpoint hardening, final QA pass`
+- **Build:** ✅ SUCCESS — Next.js build clean, all routes compiled
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Specialists: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No changes since last sync. Project remains stable — admin auth hardened, QA pass complete.
+
+## SYNC 2026-03-02 07:43 (ET)
+- **Commits (last 20):** 20 commits — latest: `9c67199 fix: admin stats auth, endpoint hardening, final QA pass`
+- **Build:** ✅ SUCCESS — Next.js build clean, all routes compiled
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Specialists: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. Project stable — build clean, DB populated, no action needed.
+
+---
+
+### SYNC 2026-03-02 08:23 (ET)
+- **Commits (last 20):** 20 commits — latest: `9c67199 fix: admin stats auth, endpoint hardening, final QA pass`
+- **Build:** ✅ SUCCESS — Next.js build clean, all routes compiled, no warnings
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Specialists: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. Project remains stable and deployment-ready.
+
+---
+
+### SYNC 2026-03-02 09:03 (ET)
+- **Commits (last 20):** 20 commits — latest: `9c67199 fix: admin stats auth, endpoint hardening, final QA pass`
+- **Build:** ✅ SUCCESS — Next.js build clean, all routes compiled, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Specialists: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. Project stable, build green, DB fully seeded.
+
+## SYNC 2026-03-02 11:03 (ET)
+- **Commits (last 20):** 20 commits — latest: `9c67199 fix: admin stats auth, endpoint hardening, final QA pass`
+- **Build:** ✅ SUCCESS — Next.js build clean, all routes compiled, no errors
+- **DB:** ✅ Healthy — KG: 7,075 | Aukles: 210 | Bureliai: 210 | Specialists: 160 | Reviews: 58,736
+- **Blockers:** None
+- **Notes:** No new commits since last sync. Project stable and green. All QA/polish work from prior sprint landed.

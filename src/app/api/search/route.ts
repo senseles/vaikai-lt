@@ -15,25 +15,25 @@ export async function GET(request: NextRequest) {
     // Search across all entity types — match name, city, or type-specific fields
     const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
       prisma.kindergarten.findMany({
-        where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { address: { contains: q } }] },
+        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { address: { contains: q, mode: 'insensitive' as const } }] },
         select: { name: true, city: true, slug: true, baseRating: true },
         take: 3,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.aukle.findMany({
-        where: { OR: [{ name: { contains: q } }, { city: { contains: q } }] },
+        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }] },
         select: { name: true, city: true, slug: true, baseRating: true },
         take: 2,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.burelis.findMany({
-        where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { category: { contains: q } }] },
+        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { category: { contains: q, mode: 'insensitive' as const } }] },
         select: { name: true, city: true, slug: true, category: true, baseRating: true },
         take: 2,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.specialist.findMany({
-        where: { OR: [{ name: { contains: q } }, { city: { contains: q } }, { specialty: { contains: q } }] },
+        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { specialty: { contains: q, mode: 'insensitive' as const } }] },
         select: { name: true, city: true, slug: true, specialty: true, baseRating: true },
         take: 2,
         orderBy: { baseRating: 'desc' },

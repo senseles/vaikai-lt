@@ -44,7 +44,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   }
 
   // Two-pass search: DB-level contains first, then JS Lithuanian matching on smaller set
-  const containsQ = { contains: query };
+  const containsQ = { contains: query, mode: 'insensitive' as const };
   const dbWhere = {
     kg: { OR: [{ name: containsQ }, { city: containsQ }, { description: containsQ }] },
     aukle: { OR: [{ name: containsQ }, { city: containsQ }, { description: containsQ }] },

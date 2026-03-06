@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   const skip = (page - 1) * limit;
 
   const where = search
-    ? { OR: [{ name: { contains: search } }, { city: { contains: search } }] }
+    ? { OR: [{ name: { contains: search, mode: 'insensitive' as const } }, { city: { contains: search, mode: 'insensitive' as const } }] }
     : {};
 
   const validSortFields = ['name', 'city', 'baseRating', 'baseReviewCount', 'specialty', 'createdAt'];

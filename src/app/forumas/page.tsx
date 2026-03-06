@@ -57,8 +57,8 @@ export default async function ForumPage({ searchParams }: PageProps) {
     displayPosts = await prisma.forumPost.findMany({
       where: {
         OR: [
-          { title: { contains: searchQuery } },
-          { content: { contains: searchQuery } },
+          { title: { contains: searchQuery, mode: 'insensitive' as const } },
+          { content: { contains: searchQuery, mode: 'insensitive' as const } },
         ],
       },
       orderBy: [{ upvotes: 'desc' }, { createdAt: 'desc' }],

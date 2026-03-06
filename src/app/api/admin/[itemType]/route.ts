@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, { params }: Params) {
   const model = (prisma as any)[itemType];
 
   const where = search
-    ? { OR: [{ name: { contains: search } }, { city: { contains: search } }] }
+    ? { OR: [{ name: { contains: search, mode: 'insensitive' as const } }, { city: { contains: search, mode: 'insensitive' as const } }] }
     : {};
 
   const orderBy = sort === 'baseRating' ? { baseRating: 'desc' as const } : sort === 'city' ? { city: 'asc' as const } : { name: 'asc' as const };
