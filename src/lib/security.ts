@@ -27,7 +27,7 @@ export function checkCsrf(request: NextRequest): NextResponse | null {
   if (origin) {
     try {
       const originHost = new URL(origin).hostname;
-      if (originHost === SITE_HOSTNAME || originHost === 'localhost' || originHost === '127.0.0.1' || originHost.endsWith('.trycloudflare.com')) {
+      if (originHost === SITE_HOSTNAME || originHost === 'localhost' || originHost === '127.0.0.1' || originHost.endsWith('.trycloudflare.com') || originHost.endsWith('.netlify.app')) {
         return null;
       }
     } catch {
@@ -44,7 +44,7 @@ export function checkCsrf(request: NextRequest): NextResponse | null {
   if (referer) {
     try {
       const refererHost = new URL(referer).hostname;
-      if (refererHost === SITE_HOSTNAME || refererHost === 'localhost' || refererHost === '127.0.0.1' || refererHost.endsWith('.trycloudflare.com')) {
+      if (refererHost === SITE_HOSTNAME || refererHost === 'localhost' || refererHost === '127.0.0.1' || refererHost.endsWith('.trycloudflare.com') || refererHost.endsWith('.netlify.app')) {
         return null;
       }
     } catch {
