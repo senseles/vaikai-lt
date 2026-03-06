@@ -1,17 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getPagination } from '@/lib/api-utils';
 
 function json<T>(data: T, status = 200) {
   return NextResponse.json(data, { status });
 }
 
-/** GET /api/admin/reviews — list reviews with filters */
+/** GET /api/admin/reviews — list reviews with filters and pagination */
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
+  const { page, limit, skip } = getPagination(searchParams);
   const pending = searchParams.get('pending') === 'true';
   const approved = searchParams.get('approved') === 'true';
   const itemType = searchParams.get('itemType');
   const rating = searchParams.get('rating');
+  const search = searchParams.get('search');
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = {};
@@ -28,17 +31,24 @@ export async function GET(request: NextRequest) {
     if (r >= 1 && r <= 5) where.rating = r;
   }
 
-  // Get total count for the current filter
+  if (search) {
+    where.OR = [
+      { authorName: { contains: search, mode: 'insensitive' as const } },
+      { text: { contains: search, mode: 'insensitive' as const } },
+    ];
+  }
+
   const [reviews, totalCount] = await Promise.all([
     prisma.review.findMany({
       where,
       orderBy: { createdAt: 'desc' },
-      take: 100,
+      skip,
+      take: limit,
     }),
     prisma.review.count({ where }),
   ]);
 
-  // Resolve entity names for each review
+  // Resolve entity names for each review (batched to avoid N+1)
   const itemIds: Record<string, Set<string>> = {
     kindergarten: new Set(),
     aukle: new Set(),
@@ -77,7 +87,11 @@ export async function GET(request: NextRequest) {
     itemName: nameMap.get(r.itemId) ?? undefined,
   }));
 
-  return json({ reviews: enrichedReviews, total: totalCount });
+  return json({
+    reviews: enrichedReviews,
+    total: totalCount,
+    pagination: { page, limit, total: totalCount, totalPages: Math.ceil(totalCount / limit) },
+  });
 }
 
 /** PATCH /api/admin/reviews — bulk approve or reject */
@@ -104,12 +118,12 @@ export async function PATCH(request: NextRequest) {
 
     const isApproved = action === 'approve';
 
-    await prisma.review.updateMany({
+    const result = await prisma.review.updateMany({
       where: { id: { in: ids } },
       data: { isApproved },
     });
 
-    return json({ success: true, updated: ids.length });
+    return json({ success: true, updated: result.count });
   } catch (err) {
     console.error('Admin bulk review action error:', err);
     return json({ success: false, error: 'Nepavyko atlikti veiksmo' }, 500);

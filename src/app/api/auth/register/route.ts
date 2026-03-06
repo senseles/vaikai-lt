@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   const csrfResponse = checkCsrf(request);
   if (csrfResponse) return csrfResponse;
 
-  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.ADMIN_LOGIN);
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.AUTH_REGISTER);
   if (rateLimitResponse) return rateLimitResponse;
 
   try {

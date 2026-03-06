@@ -69,6 +69,10 @@ export const RATE_LIMITS = {
   FORUM_COMMENT: { maxRequests: 10, windowSeconds: 300, identifier: 'forum-comment' } satisfies RateLimitOptions,
   /** Forum voting: 30 votes per minute */
   FORUM_VOTE: { maxRequests: 30, windowSeconds: 60, identifier: 'forum-vote' } satisfies RateLimitOptions,
+  /** User registration: 3 attempts per 15 minutes */
+  AUTH_REGISTER: { maxRequests: 3, windowSeconds: 900, identifier: 'auth-register' } satisfies RateLimitOptions,
+  /** User login: 10 attempts per 15 minutes */
+  AUTH_LOGIN: { maxRequests: 10, windowSeconds: 900, identifier: 'auth-login' } satisfies RateLimitOptions,
 } as const;
 
 const RATE_LIMIT_MESSAGE = 'Per daug užklausų. Bandykite vėliau.';
