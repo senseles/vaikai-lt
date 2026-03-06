@@ -1,15 +1,16 @@
-import dynamic from "next/dynamic";
+import dynamicImport from "next/dynamic";
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import CitySelector from "@/components/CitySelector";
 import prisma from "@/lib/prisma";
 
-const RecentlyViewed = dynamic(() => import("@/components/RecentlyViewed"), {
+const RecentlyViewed = dynamicImport(() => import("@/components/RecentlyViewed"), {
   ssr: false,
   loading: () => <div className="h-32" />,
 });
 
-const Testimonials = dynamic(() => import("@/components/Testimonials"), {
+const Testimonials = dynamicImport(() => import("@/components/Testimonials"), {
   loading: () => (
     <div className="py-12 md:py-16 animate-pulse">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -22,7 +23,7 @@ const Testimonials = dynamic(() => import("@/components/Testimonials"), {
   ),
 });
 
-const FaqAccordion = dynamic(() => import("@/components/FaqAccordion"), {
+const FaqAccordion = dynamicImport(() => import("@/components/FaqAccordion"), {
   loading: () => (
     <div className="py-12 md:py-16 bg-gray-50 dark:bg-slate-800/50 animate-pulse">
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
