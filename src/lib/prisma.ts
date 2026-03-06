@@ -11,4 +11,7 @@ export const prisma =
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
+// Keep connection alive in production — prevents cold starts on serverless
+if (process.env.NODE_ENV === 'production') globalForPrisma.prisma = prisma;
+
 export default prisma;

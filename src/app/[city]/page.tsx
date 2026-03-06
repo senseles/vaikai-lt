@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { unstable_cache } from 'next/cache';
 import prisma from '@/lib/prisma';
 import { CITY_NAMES, CITY_SLUG_LIST } from '@/lib/cities';
 import CityPageClient from './CityPageClient';
@@ -14,6 +15,7 @@ export function generateStaticParams() {
   return CITY_SLUG_LIST.map((city) => ({ city }));
 }
 export const dynamicParams = false;
+export const revalidate = 300; // ISR: regenerate every 5 minutes
 
 type SortField = 'rating' | 'name' | 'reviews' | 'price_asc' | 'price_desc';
 
@@ -97,26 +99,48 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   if (spec) specialistWhere.specialty = { contains: spec, mode: 'insensitive' as const };
   if (area) specialistWhere.area = area;
 
-  // Fetch areas + data for ALL categories in a single parallel batch
-  const [
+  // Cache key based on all query params
+  const cacheKey = `city-${citySlug}-${category}-${type}-${sort}-${page}-${sub}-${spec}-${area}`;
+
+  const getCityData = unstable_cache(
+    async () => {
+      const [
+        kgAreas_, aukleAreas_, burelisAreas_, specAreas_,
+        kindergartens_, kindergartenTotal_, aukles_, aukleTotal_, bureliai_, burelisTotal_, specialists_, specialistTotal_,
+        forumPostCount_,
+      ] = await Promise.all([
+        prisma.kindergarten.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
+        prisma.aukle.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
+        prisma.burelis.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
+        prisma.specialist.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
+        prisma.kindergarten.findMany({ where: kindergartenWhere, orderBy, skip: category === 'darzeliai' ? skip : 0, take: PER_PAGE }),
+        prisma.kindergarten.count({ where: kindergartenWhere }),
+        prisma.aukle.findMany({ where: aukleWhere, orderBy, skip: category === 'aukles' ? skip : 0, take: PER_PAGE }),
+        prisma.aukle.count({ where: aukleWhere }),
+        prisma.burelis.findMany({ where: burelisWhere, orderBy, skip: category === 'bureliai' ? skip : 0, take: PER_PAGE }),
+        prisma.burelis.count({ where: burelisWhere }),
+        prisma.specialist.findMany({ where: specialistWhere, orderBy, skip: category === 'specialistai' ? skip : 0, take: PER_PAGE }),
+        prisma.specialist.count({ where: specialistWhere }),
+        prisma.forumPost.count({ where: { city: cityName } }),
+      ]);
+      return {
+        kgAreas: kgAreas_, aukleAreas: aukleAreas_, burelisAreas: burelisAreas_, specAreas: specAreas_,
+        kindergartens: kindergartens_, kindergartenTotal: kindergartenTotal_,
+        aukles: aukles_, aukleTotal: aukleTotal_,
+        bureliai: bureliai_, burelisTotal: burelisTotal_,
+        specialists: specialists_, specialistTotal: specialistTotal_,
+        forumPostCount: forumPostCount_,
+      };
+    },
+    [cacheKey],
+    { revalidate: 300 }
+  );
+
+  const {
     kgAreas, aukleAreas, burelisAreas, specAreas,
     kindergartens, kindergartenTotal, aukles, aukleTotal, bureliai, burelisTotal, specialists, specialistTotal,
     forumPostCount,
-  ] = await Promise.all([
-    prisma.kindergarten.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
-    prisma.aukle.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
-    prisma.burelis.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
-    prisma.specialist.findMany({ where: { city: cityName, area: { not: null } }, select: { area: true }, distinct: ['area'] }),
-    prisma.kindergarten.findMany({ where: kindergartenWhere, orderBy, skip: category === 'darzeliai' ? skip : 0, take: PER_PAGE }),
-    prisma.kindergarten.count({ where: kindergartenWhere }),
-    prisma.aukle.findMany({ where: aukleWhere, orderBy, skip: category === 'aukles' ? skip : 0, take: PER_PAGE }),
-    prisma.aukle.count({ where: aukleWhere }),
-    prisma.burelis.findMany({ where: burelisWhere, orderBy, skip: category === 'bureliai' ? skip : 0, take: PER_PAGE }),
-    prisma.burelis.count({ where: burelisWhere }),
-    prisma.specialist.findMany({ where: specialistWhere, orderBy, skip: category === 'specialistai' ? skip : 0, take: PER_PAGE }),
-    prisma.specialist.count({ where: specialistWhere }),
-    prisma.forumPost.count({ where: { city: cityName } }),
-  ]);
+  } = await getCityData();
   const areaSet = new Set([...kgAreas, ...aukleAreas, ...burelisAreas, ...specAreas].map(a => a.area).filter(Boolean) as string[]);
   const allAreas = Array.from(areaSet).sort((a, b) => a.localeCompare(b, 'lt'));
 

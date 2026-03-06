@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { unstable_cache } from 'next/cache';
 import prisma from '@/lib/prisma';
 
 import SearchResultsClient from './SearchResultsClient';
@@ -46,24 +47,33 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   // Use PostgreSQL unaccent for Lithuanian diacritics-insensitive search
   const pattern = `%${query.replace(/[%_]/g, '')}%`;
 
-  const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
-    prisma.$queryRawUnsafe(
-      `SELECT * FROM "Kindergarten" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
-      pattern
-    ),
-    prisma.$queryRawUnsafe(
-      `SELECT * FROM "Aukle" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
-      pattern
-    ),
-    prisma.$queryRawUnsafe(
-      `SELECT * FROM "Burelis" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) OR unaccent(COALESCE(category,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
-      pattern
-    ),
-    prisma.$queryRawUnsafe(
-      `SELECT * FROM "Specialist" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) OR unaccent(COALESCE(specialty,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
-      pattern
-    ),
-  ]) as [unknown[], unknown[], unknown[], unknown[]];
+  const getSearchResults = unstable_cache(
+    async (p: string) => {
+      const [kg, au, bu, sp] = await Promise.all([
+        prisma.$queryRawUnsafe(
+          `SELECT id, name, slug, city, address, type, phone, website, language, hours, "ageFrom", groups, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Kindergarten" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
+          p
+        ),
+        prisma.$queryRawUnsafe(
+          `SELECT id, name, slug, city, phone, email, "hourlyRate", languages, experience, "ageRange", availability, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Aukle" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
+          p
+        ),
+        prisma.$queryRawUnsafe(
+          `SELECT id, name, slug, city, category, "ageRange", price, schedule, phone, website, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Burelis" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) OR unaccent(COALESCE(category,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
+          p
+        ),
+        prisma.$queryRawUnsafe(
+          `SELECT id, name, slug, city, specialty, clinic, phone, price, website, languages, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Specialist" WHERE unaccent(name) ILIKE unaccent($1) OR unaccent(city) ILIKE unaccent($1) OR unaccent(COALESCE(description,'')) ILIKE unaccent($1) OR unaccent(COALESCE(specialty,'')) ILIKE unaccent($1) ORDER BY "baseRating" DESC LIMIT 20`,
+          p
+        ),
+      ]) as [unknown[], unknown[], unknown[], unknown[]];
+      return { kg, au, bu, sp };
+    },
+    [`search-${query.toLowerCase()}`],
+    { revalidate: 120 }
+  );
+
+  const { kg: kindergartens, au: aukles, bu: bureliai, sp: specialists } = await getSearchResults(pattern);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const serialize = (items: any[]) =>

@@ -1,9 +1,11 @@
 import dynamicImport from "next/dynamic";
-export const dynamic = "force-dynamic";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import CitySelector from "@/components/CitySelector";
 import prisma from "@/lib/prisma";
+
+export const revalidate = 300; // ISR: regenerate every 5 minutes
 
 const RecentlyViewed = dynamicImport(() => import("@/components/RecentlyViewed"), {
   ssr: false,
@@ -36,19 +38,23 @@ const FaqAccordion = dynamicImport(() => import("@/components/FaqAccordion"), {
   ),
 });
 
-async function getStats() {
-  const [kindergartens, aukles, bureliai, specialists, reviews] = await Promise.all([
-    prisma.kindergarten.count(),
-    prisma.aukle.count(),
-    prisma.burelis.count(),
-    prisma.specialist.count(),
-    prisma.review.count(),
-  ]);
+const getStats = unstable_cache(
+  async () => {
+    const [kindergartens, aukles, bureliai, specialists, reviews] = await Promise.all([
+      prisma.kindergarten.count(),
+      prisma.aukle.count(),
+      prisma.burelis.count(),
+      prisma.specialist.count(),
+      prisma.review.count(),
+    ]);
 
-  const cities = await prisma.kindergarten.groupBy({ by: ['city'] });
+    const cities = await prisma.kindergarten.groupBy({ by: ['city'] });
 
-  return { kindergartens, aukles, bureliai, specialists, reviews, cities: cities.length };
-}
+    return { kindergartens, aukles, bureliai, specialists, reviews, cities: cities.length };
+  },
+  ['home-stats'],
+  { revalidate: 300 }
+);
 
 export default async function HomePage() {
   const s = await getStats();
