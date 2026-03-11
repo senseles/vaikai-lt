@@ -1,0 +1,308 @@
+{
+  "timestamp": "2026-03-11T18:31:07.039Z",
+  "totalKindergartens": 771,
+  "findings": [
+    {
+      "city": "Alytus",
+      "entity": "Alytaus l-d Nykštukas",
+      "type": "DATA_MISMATCH",
+      "details": [
+        "ADDRESS MISMATCH: DB=\"Nykštukų g. 1\" vs REAL=\"A. Juozapavičiaus g. 44, LT-62256 Alytus\"",
+        "PHONE MISMATCH: DB=\"+370 672 91 826\" vs REAL=\"+370 315 76521\""
+      ],
+      "realData": {
+        "name": "Alytaus lopšelis-darželis Nykštukas",
+        "address": "A. Juozapavičiaus g. 44, LT-62256 Alytus",
+        "phone": "+370 315 76521"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus l-d Obelėlė",
+      "type": "DATA_MISMATCH",
+      "details": [
+        "ADDRESS MISMATCH: DB=\"Obelų g. 1\" vs REAL=\"Šaltinių g. 3, LT-62346 Alytus\"",
+        "PHONE MISMATCH: DB=\"+370 315 543 76\" vs REAL=\"+370 315 72930\""
+      ],
+      "realData": {
+        "name": "Alytaus lopšelis-darželis Obelėlė",
+        "address": "Šaltinių g. 3, LT-62346 Alytus",
+        "phone": "+370 315 72930"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus l-d Pasaka",
+      "type": "DATA_MISMATCH",
+      "details": [
+        "ADDRESS MISMATCH: DB=\"Pasakų g. 1\" vs REAL=\"Vingio g. 7a, LT-63219 Alytus\"",
+        "PHONE MISMATCH: DB=\"+370 315 704 86\" vs REAL=\"+370 315 76600\""
+      ],
+      "realData": {
+        "name": "Alytaus lopšelis-darželis Pasaka",
+        "address": "Vingio g. 7a, LT-63219 Alytus",
+        "phone": "+370 315 76600"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus l-d Putinėlis",
+      "type": "DATA_MISMATCH",
+      "details": [
+        "ADDRESS MISMATCH: DB=\"Kalnėnų g. 2\" vs REAL=\"Putinų g. 18, LT-62324 Alytus\"",
+        "PHONE MISMATCH: DB=\"+370 315 168 25\" vs REAL=\"+370 315 76510\""
+      ],
+      "realData": {
+        "name": "Alytaus lopšelis-darželis Putinėlis",
+        "address": "Putinų g. 18, LT-62324 Alytus",
+        "phone": "+370 315 76510"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus l-d Pušynėlis",
+      "type": "DATA_MISMATCH",
+      "details": [
+        "ADDRESS MISMATCH: DB=\"Pušyno g. 1\" vs REAL=\"Margio g. 1, LT-62153 Alytus\"",
+        "PHONE MISMATCH: DB=\"+370 645 58 492\" vs REAL=\"+370 315 76551\""
+      ],
+      "realData": {
+        "name": "Alytaus lopšelis-darželis Pušynėlis",
+        "address": "Margio g. 1, LT-62153 Alytus",
+        "phone": "+370 315 76551"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus l-d Saulutė",
+      "type": "DATA_MISMATCH",
+      "details": [
+        "ADDRESS MISMATCH: DB=\"Saulės g. 1\" vs REAL=\"Naujoji g. 32, LT-63254 Alytus\"",
+        "PHONE MISMATCH: DB=\"+370 315 105 20\" vs REAL=\"+370 315 72960\""
+      ],
+      "realData": {
+        "name": "Alytaus lopšelis-darželis Saulutė",
+        "address": "Naujoji g. 32, LT-63254 Alytus",
+        "phone": "+370 315 72960"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus l-d Vyturėlis",
+      "type": "DATA_MISMATCH",
+      "details": [
+        "ADDRESS MISMATCH: DB=\"Vyturių g. 1\" vs REAL=\"Miklusėnų g. 38a, LT-62332 Alytus\"",
+        "PHONE MISMATCH: DB=\"+370 315 035 83\" vs REAL=\"+370 315 72921\""
+      ],
+      "realData": {
+        "name": "Alytaus lopšelis-darželis Vyturėlis",
+        "address": "Miklusėnų g. 38a, LT-62332 Alytus",
+        "phone": "+370 315 72921"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus l-d Šaltinėlis",
+      "type": "DATA_MISMATCH",
+      "details": [
+        "PHONE MISMATCH: DB=\"+370 645 94 733\" vs REAL=\"+370 315 72940\""
+      ],
+      "realData": {
+        "name": "Alytaus lopšelis-darželis Šaltinėlis",
+        "address": "Šaltinių g. 26, LT-62341 Alytus",
+        "phone": "+370 315 72940"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Lopšelis-darželis „Dobiliukas\"",
+      "type": "NOT_FOUND_IN_REAL",
+      "details": "Kindergarten not in official Alytus list"
+    },
+    {
+      "city": "Alytus",
+      "entity": "Lopšelis-darželis „Laumžirgis\"",
+      "type": "NOT_FOUND_IN_REAL",
+      "details": "Kindergarten not in official Alytus list"
+    },
+    {
+      "city": "Alytus",
+      "entity": "Lopšelis-darželis „Liūtukas\"",
+      "type": "NOT_FOUND_IN_REAL",
+      "details": "Kindergarten not in official Alytus list"
+    },
+    {
+      "city": "Alytus",
+      "entity": "Lopšelis-darželis „Vyturėlis\"",
+      "type": "DATA_MISMATCH",
+      "details": [
+        "ADDRESS MISMATCH: DB=\"Laisvės al. 83\" vs REAL=\"Miklusėnų g. 38a, LT-62332 Alytus\"",
+        "PHONE MISMATCH: DB=\"+370 315 550 28\" vs REAL=\"+370 315 72921\""
+      ],
+      "realData": {
+        "name": "Alytaus lopšelis-darželis Vyturėlis",
+        "address": "Miklusėnų g. 38a, LT-62332 Alytus",
+        "phone": "+370 315 72921"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Privatus lopšelis-darželis „Obuolėlis\"",
+      "type": "NOT_FOUND_IN_REAL",
+      "details": "Kindergarten not in official Alytus list"
+    },
+    {
+      "city": "Alytus",
+      "entity": "Privatus lopšelis-darželis „Uosiukas\"",
+      "type": "NOT_FOUND_IN_REAL",
+      "details": "Kindergarten not in official Alytus list"
+    },
+    {
+      "city": "Alytus",
+      "entity": "Privatus lopšelis-darželis „Voveraitė\"",
+      "type": "NOT_FOUND_IN_REAL",
+      "details": "Kindergarten not in official Alytus list"
+    },
+    {
+      "city": "Alytus",
+      "entity": "Privatus lopšelis-darželis „Žiogelis\"",
+      "type": "NOT_FOUND_IN_REAL",
+      "details": "Kindergarten not in official Alytus list"
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus Drevinuko mokykla-darželis",
+      "type": "MISSING_FROM_DB",
+      "details": {
+        "name": "Alytaus Drevinuko mokykla-darželis",
+        "address": "Topolių g. 19, LT-63331 Alytus",
+        "phone": "+370 315 70525"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus vaikų darželis Boružėlė",
+      "type": "MISSING_FROM_DB",
+      "details": {
+        "name": "Alytaus vaikų darželis Boružėlė",
+        "address": "Likiškėlių g. 14, LT-63163 Alytus",
+        "phone": "+370 315 76620"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus lopšelis-darželis Du Gaideliai",
+      "type": "MISSING_FROM_DB",
+      "details": {
+        "name": "Alytaus lopšelis-darželis Du Gaideliai",
+        "address": "Jaunimo g. 15, LT-63314 Alytus",
+        "phone": "+370 315 76581"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus lopšelis-darželis Eglutė",
+      "type": "MISSING_FROM_DB",
+      "details": {
+        "name": "Alytaus lopšelis-darželis Eglutė",
+        "address": "Vilties g. 28a, LT-63205 Alytus",
+        "phone": "+370 315 76650"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus lopšelis-darželis Gintarėlis",
+      "type": "MISSING_FROM_DB",
+      "details": {
+        "name": "Alytaus lopšelis-darželis Gintarėlis",
+        "address": "Jaunimo g. 3, LT-63348 Alytus",
+        "phone": "+370 315 76571"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus lopšelis-darželis Girinukas",
+      "type": "MISSING_FROM_DB",
+      "details": {
+        "name": "Alytaus lopšelis-darželis Girinukas",
+        "address": "Daugų g. 8, LT-62172 Alytus",
+        "phone": "+370 315 76560"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus lopšelis-darželis Linelis",
+      "type": "MISSING_FROM_DB",
+      "details": {
+        "name": "Alytaus lopšelis-darželis Linelis",
+        "address": "Jaunimo g. 13, LT-63313 Alytus",
+        "phone": "+370 315 76630"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus lopšelis-darželis Volungėlė",
+      "type": "MISSING_FROM_DB",
+      "details": {
+        "name": "Alytaus lopšelis-darželis Volungėlė",
+        "address": "Volungės g. 25, LT-63175 Alytus",
+        "phone": "+370 315 76590"
+      }
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus l-d Nykštukas",
+      "type": "LIKELY_FABRICATED_ADDRESS",
+      "details": "Address \"Nykštukų g. 1\" matches name pattern and uses house number 1"
+    },
+    {
+      "city": "Alytus",
+      "entity": "Alytaus l-d Šaltinėlis",
+      "type": "LIKELY_FABRICATED_ADDRESS",
+      "details": "Address \"Šaltinių g. 1\" matches name pattern and uses house number 1"
+    },
+    {
+      "city": "Vilnius",
+      "entity": "Vilniaus l-d Rugilė",
+      "type": "LIKELY_FABRICATED_ADDRESS",
+      "details": "Address \"Rugilės g. 1\" matches name pattern and uses house number 1"
+    },
+    {
+      "city": "Vilnius",
+      "entity": "Vilniaus l-d „Salininkai\"",
+      "type": "LIKELY_FABRICATED_ADDRESS",
+      "details": "Address \"Salininkų g. 1\" matches name pattern and uses house number 1"
+    },
+    {
+      "city": "Šiauliai",
+      "entity": "Šiaulių l-d Bitė",
+      "type": "LIKELY_FABRICATED_ADDRESS",
+      "details": "Address \"Bitės g. 1\" matches name pattern and uses house number 1"
+    },
+    {
+      "city": "Šiauliai",
+      "entity": "Šiaulių l-d Gintarėlis",
+      "type": "LIKELY_FABRICATED_ADDRESS",
+      "details": "Address \"Gintaro g. 1\" matches name pattern and uses house number 1"
+    },
+    {
+      "city": "Šiauliai",
+      "entity": "Šiaulių l-d Gluosnis",
+      "type": "LIKELY_FABRICATED_ADDRESS",
+      "details": "Address \"Gluosnių g. 1\" matches name pattern and uses house number 1"
+    },
+    {
+      "city": "Šiauliai",
+      "entity": "Šiaulių l-d Žiogelis",
+      "type": "LIKELY_FABRICATED_ADDRESS",
+      "details": "Address \"Žiogelio g. 1\" matches name pattern and uses house number 1"
+    }
+  ],
+  "summary": {
+    "dataMismatches": 9,
+    "notFoundInReal": 7,
+    "missingFromDB": 8,
+    "fabricatedAddresses": 8,
+    "vagueAddresses": 78
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-03-11T18:32:14.819Z",
+  "totalReviews": 6144,
+  "uniqueTexts": 272,
+  "duplicatePercentage": "95.6%",
+  "ratingDistribution": {
+    "2": 185,
+    "3": 1211,
+    "4": 2177,
+    "5": 2571
+  },
+  "averageRating": "4.16",
+  "testReviews": 10,
+  "uniqueAuthors": 298,
+  "avgReviewLength": "89",
+  "avgReviewsPerItem": "5.6",
+  "reviewsPerItemStdDev": "3.5",
+  "findings": [
+    "CRITICAL: Only 272 unique texts out of 6144 (4.4% unique)",
+    "CRITICAL: No 1-star reviews at all — unrealistic distribution",
+    "WARNING: 10 test/XSS reviews still in database",
+    "WARNING: Top duplicate text appears 100 times",
+    "INFO: Average rating 4.16 (skews positive, missing 1-star)"
+  ]
+}
