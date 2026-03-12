@@ -88,3 +88,35 @@ Every entity web-searched. Real ones confirmed via official websites, Facebook, 
 - Many "Vilniaus l-d" / "Kauno l-d" entries have addresses that look plausible but can't be verified without individual lookup
 - Phone numbers may still be fabricated even when format is correct
 - Some cities left with 0 kindergartens (Neringa, Švenčionys, Kazlų Rūda, etc.) — need to add real entries
+
+---
+
+## 2026-03-12 — Review Quality Checker — COMPLETE
+
+**Status:** DONE
+
+### Audit findings
+- **Before:** 6,144 reviews, only 435 unique texts (most repeated 35x!)
+- Reviews were completely generic — same text on 30+ different kindergartens
+- No reviews referenced entity-specific features (Logopedas, Baseinas, etc.)
+- 10 entities had >15 reviews
+
+### What was fixed
+Rewrote `scripts/seed-reviews.ts` with:
+1. **Feature injection** — 50+ feature types mapped to natural review snippets (logopedė, baseinas, Montessori, etc.)
+2. **Category-specific** reviews for būreliai (Robotika, Šokiai, Sportas)
+3. **Specialty-specific** reviews for specialists (Logopedas, Psichologas)
+4. **Location-aware** reviews ("šalia Pavilnio parko")
+5. **Real parent concerns** — eilė ilga, adaptuotis sunku, per didelės grupės
+6. **Max 15 reviews/entity** enforced
+7. **baseReviewCount + baseRating synced** and verified
+
+### Results
+| Metric | Before | After |
+|--------|--------|-------|
+| Total reviews | 6,144 | 3,850 |
+| Unique texts | 435 | 884 |
+| Max text repetition | 35x | 17x |
+| Feature-specific reviews | 0 | ~336 |
+| Max reviews/entity | 18 | 15 |
+| Rating distribution | ✓ | ✓ (5/10/20/35/30%) |
