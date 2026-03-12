@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
-import type { Kindergarten, Aukle, Burelis, Specialist, ItemType } from '@/types';
+import type { Kindergarten, Aukle, Burelis, Specialist } from '@/types';
 import KindergartenCard from '@/components/KindergartenCard';
 import AukleCard from '@/components/AukleCard';
 import BurelisCard from '@/components/BurelisCard';
@@ -15,10 +15,6 @@ import EmptyState from '@/components/EmptyState';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import Pagination from '@/components/Pagination';
 import ScrollReveal from '@/components/ScrollReveal';
-
-const DetailModal = dynamic(() => import('@/components/DetailModal'), {
-  loading: () => <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"><div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>,
-});
 const CompareTable = dynamic(() => import('@/components/CompareTable'), {
   loading: () => <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"><div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>,
 });
@@ -48,8 +44,6 @@ interface CityPageClientProps {
   readonly areas: string[];
 }
 
-type AnyItem = Kindergarten | Aukle | Burelis | Specialist;
-
 export default function CityPageClient({
   citySlug,
   kindergartens,
@@ -67,8 +61,6 @@ export default function CityPageClient({
 }: CityPageClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [selectedItem, setSelectedItem] = useState<AnyItem | null>(null);
-  const [selectedItemType, setSelectedItemType] = useState<ItemType>('kindergarten');
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
   const [showCompare, setShowCompare] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -88,11 +80,6 @@ export default function CityPageClient({
     if (!('page' in updates)) params.delete('page');
     router.push(`/${citySlug}?${params.toString()}`);
   }, [router, citySlug, searchParams]);
-
-  const openDetail = (item: AnyItem, itemType: ItemType) => {
-    setSelectedItem(item);
-    setSelectedItemType(itemType);
-  };
 
   const toggleCompare = useCallback((id: string) => {
     setCompareIds((prev) => {
@@ -309,7 +296,7 @@ export default function CityPageClient({
               <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
                 <KindergartenCard
                   item={item}
-                  onSelect={(it) => openDetail(it, 'kindergarten')}
+                  href={`/${citySlug}/darzeliai/${item.slug}`}
                   compareSelected={compareIds.has(item.id)}
                   onCompareToggle={toggleCompare}
                 />
@@ -317,17 +304,17 @@ export default function CityPageClient({
             ))}
             {category === 'aukles' && (items as Aukle[]).map((item, i) => (
               <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
-                <AukleCard item={item} onSelect={(it) => openDetail(it, 'aukle')} />
+                <AukleCard item={item} href={`/${citySlug}/aukles/${item.slug}`} />
               </ScrollReveal>
             ))}
             {category === 'bureliai' && (items as Burelis[]).map((item, i) => (
               <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
-                <BurelisCard item={item} onSelect={(it) => openDetail(it, 'burelis')} />
+                <BurelisCard item={item} href={`/${citySlug}/bureliai/${item.slug}`} />
               </ScrollReveal>
             ))}
             {category === 'specialistai' && (items as Specialist[]).map((item, i) => (
               <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
-                <SpecialistCard item={item} onSelect={(it) => openDetail(it, 'specialist')} />
+                <SpecialistCard item={item} href={`/${citySlug}/specialistai/${item.slug}`} />
               </ScrollReveal>
             ))}
           </div>
@@ -371,14 +358,6 @@ export default function CityPageClient({
         />
       )}
 
-      {/* Detail Modal */}
-      {selectedItem && (
-        <DetailModal
-          item={selectedItem}
-          itemType={selectedItemType}
-          onClose={() => setSelectedItem(null)}
-        />
-      )}
     </>
   );
 }

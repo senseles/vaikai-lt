@@ -82,16 +82,10 @@ export async function GET(request: NextRequest) {
       ...specialists.map(i => ({ ...i, type: 'specialistai' as const, itemType: 'specialist' as const })),
     ].slice(0, 8).map(s => {
       const citySlug = getCitySlug(s.city);
-      let url: string;
-      if (s.itemType === 'aukle') {
-        url = `/aukles/${s.slug}`;
-      } else if (s.itemType === 'burelis') {
-        url = `/bureliai/${s.slug}`;
-      } else if (citySlug) {
-        url = `/${citySlug}?category=${categoryMap[s.itemType] || 'darzeliai'}`;
-      } else {
-        url = `/paieska?q=${encodeURIComponent(s.name)}`;
-      }
+      const categoryPath = categoryMap[s.itemType] || 'darzeliai';
+      const url = citySlug
+        ? `/${citySlug}/${categoryPath}/${s.slug}`
+        : `/paieska?q=${encodeURIComponent(s.name)}`;
       return { id: s.id, name: s.name, city: s.city, slug: s.slug, type: s.type, rating: s.base_rating, url };
     });
 

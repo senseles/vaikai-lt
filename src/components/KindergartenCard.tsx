@@ -1,6 +1,7 @@
 'use client';
 
 import { memo } from 'react';
+import Link from 'next/link';
 import type { Kindergarten } from '@/types';
 import StarRating from './StarRating';
 import FavoriteButton from './FavoriteButton';
@@ -8,7 +9,8 @@ import PlaceholderImage from './PlaceholderImage';
 
 interface KindergartenCardProps {
   readonly item: Kindergarten;
-  readonly onSelect: (item: Kindergarten) => void;
+  readonly onSelect?: (item: Kindergarten) => void;
+  readonly href?: string;
   readonly compareSelected?: boolean;
   readonly onCompareToggle?: (id: string) => void;
 }
@@ -18,49 +20,65 @@ const typeBadge: Record<string, { label: string; cls: string }> = {
   privatus: { label: 'Privatus', cls: 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300' },
 };
 
-export default memo(function KindergartenCard({ item, onSelect, compareSelected = false, onCompareToggle }: KindergartenCardProps) {
+const cardClasses = "bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 active:shadow-sm transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden group";
+
+export default memo(function KindergartenCard({ item, onSelect, href, compareSelected = false, onCompareToggle }: KindergartenCardProps) {
   const badge = typeBadge[item.type] ?? { label: item.type, cls: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' };
+
+  const content = (
+    <>
+      <PlaceholderImage category="darzeliai" name={item.name} />
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1 min-w-0">
+              <h3 className="font-semibold text-gray-900 dark:text-white truncate min-w-0">{item.name}</h3>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${badge.cls}`}>{badge.label}</span>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{item.city}{item.address ? `, ${item.address}` : ''}</p>
+          </div>
+          <FavoriteButton itemId={item.id} itemType="kindergarten" />
+        </div>
+
+        <div className="flex items-center justify-between mt-3">
+          <div className="flex items-center gap-2">
+            <StarRating rating={item.baseRating} size="sm" />
+            <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount})</span>
+          </div>
+
+          {onCompareToggle && (
+            <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400" onClick={(e) => e.stopPropagation()}>
+              <input
+                type="checkbox"
+                checked={compareSelected}
+                onChange={() => onCompareToggle(item.id)}
+                className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+              />
+              Palyginti
+            </label>
+          )}
+        </div>
+      </div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className={`block ${cardClasses}`}>
+        {content}
+      </Link>
+    );
+  }
 
   return (
     <div
       role="button"
       tabIndex={0}
-      onClick={() => onSelect(item)}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(item); } }}
-      className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 active:shadow-sm transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden group"
+      onClick={() => onSelect?.(item)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect?.(item); } }}
+      className={cardClasses}
     >
-      <PlaceholderImage category="darzeliai" name={item.name} />
-      <div className="p-4">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 dark:text-white truncate min-w-0">{item.name}</h3>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${badge.cls}`}>{badge.label}</span>
-          </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{item.city}{item.address ? `, ${item.address}` : ''}</p>
-        </div>
-        <FavoriteButton itemId={item.id} itemType="kindergarten" />
-      </div>
-
-      <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-2">
-          <StarRating rating={item.baseRating} size="sm" />
-          <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount})</span>
-        </div>
-
-        {onCompareToggle && (
-          <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400" onClick={(e) => e.stopPropagation()}>
-            <input
-              type="checkbox"
-              checked={compareSelected}
-              onChange={() => onCompareToggle(item.id)}
-              className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
-            />
-            Palyginti
-          </label>
-        )}
-      </div>
-      </div>
+      {content}
     </div>
   );
-})
+});

@@ -91,6 +91,49 @@ Every entity web-searched. Real ones confirmed via official websites, Facebook, 
 
 ---
 
+## 2026-03-12 — Address & Contact Fixer — Progress Update 2
+
+**Time:** ~30 min into session
+**Status:** Address verification in progress — 5 research agents running
+
+### Completed since last update
+| Action | Count |
+|---|---|
+| Vilnius fabricated entries cross-referenced against lrvalstybe.lt registry | 19 deleted |
+| Re-added incorrectly deleted "Vilniaus darželis-mokykla „Vilija"" | 1 restored |
+| Entity verification complete (aukles, bureliai, specialists) | 194 removed, 10 added |
+
+### Current database state
+| Entity | Count |
+|---|---|
+| Kindergartens | 307 |
+| Aukles | 27 (all verified service portals) |
+| Bureliai | 96 (all verified) |
+| Specialists | 72 (all verified) |
+
+### Kindergartens by top cities
+| City | Count | Address status |
+|---|---|---|
+| Kaunas | 70 | 27 vague (researching now) |
+| Vilnius | 65 | 15 need postal codes (researching now) |
+| Klaipėda | 33 | OK |
+| Šiauliai | 24 | 1 vague |
+| Panevėžys | 24 | 1 vague |
+| Alytus | 8 | All verified |
+| Other (37 cities) | 83 | ~12 vague |
+
+### In progress
+- 5 background agents researching addresses for 41 remaining vague entries
+- Vilnius: 15 entries need postal codes verified
+- Kaunas: 27 entries need real street addresses
+- Marijampolė (5), Jonava (4), Šiauliai (1), Panevėžys (1) need addresses
+
+### Remaining issues
+- Phone numbers pass format validation but may still be fabricated (verified only for Alytus)
+- Some small cities have only 1-2 kindergartens
+
+---
+
 ## 2026-03-12 — Review Quality Checker — COMPLETE
 
 **Status:** DONE

@@ -41,10 +41,10 @@ export async function GET(request: NextRequest) {
     ]);
 
     const suggestions = [
-      ...kindergartens.map(i => ({ name: i.name, city: i.city, type: 'darzeliai' as const, rating: i.baseRating })),
-      ...aukles.map(i => ({ name: i.name, city: i.city, type: 'aukles' as const, rating: i.baseRating })),
-      ...bureliai.map(i => ({ name: i.name, city: i.city, type: 'bureliai' as const, rating: i.baseRating })),
-      ...specialists.map(i => ({ name: i.name, city: i.city, type: 'specialistai' as const, rating: i.baseRating })),
+      ...kindergartens.map(i => ({ name: i.name, city: i.city, slug: i.slug, type: 'darzeliai' as const, rating: i.baseRating })),
+      ...aukles.map(i => ({ name: i.name, city: i.city, slug: i.slug, type: 'aukles' as const, rating: i.baseRating })),
+      ...bureliai.map(i => ({ name: i.name, city: i.city, slug: i.slug, type: 'bureliai' as const, rating: i.baseRating })),
+      ...specialists.map(i => ({ name: i.name, city: i.city, slug: i.slug, type: 'specialistai' as const, rating: i.baseRating })),
     ].slice(0, 8);
 
     return NextResponse.json({ suggestions }, {
