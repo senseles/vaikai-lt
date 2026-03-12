@@ -3,7 +3,7 @@ import { verifyAdminToken } from '@/lib/admin-tokens';
 import { VALID_CITY_SLUGS } from '@/lib/cities';
 
 /** Known top-level routes that are NOT city slugs */
-const KNOWN_ROUTES = new Set(['', 'megstamiausieji', 'paieska', 'admin', 'prisijungti', 'privatumo-politika', 'forumas', 'aukles', 'bureliai']);
+const KNOWN_ROUTES = new Set(['', 'megstamiausieji', 'paieska', 'admin', 'prisijungti', 'registracija', 'privatumo-politika', 'forumas', 'aukles', 'bureliai']);
 
 /** Minimal 404 HTML — styled to match the site */
 const NOT_FOUND_HTML = `<!DOCTYPE html>
@@ -80,10 +80,10 @@ export async function middleware(request: NextRequest) {
     "img-src 'self' data: https:",
     // Fonts: self and data: URIs
     "font-src 'self' data:",
-    // Connect: self for API calls
-    "connect-src 'self'",
-    // Frames: only Google Maps embeds
-    "frame-src https://www.google.com https://maps.google.com",
+    // Connect: self for API calls + OAuth providers
+    "connect-src 'self' https://accounts.google.com https://www.facebook.com",
+    // Frames: Google Maps + OAuth
+    "frame-src https://www.google.com https://maps.google.com https://accounts.google.com https://www.facebook.com",
     // Objects: none (block Flash, Java, etc.)
     "object-src 'none'",
     // Base URI: self only (prevent <base> tag hijacking)

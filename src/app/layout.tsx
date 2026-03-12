@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import dynamic from "next/dynamic";
 import "./globals.css";
 import Header from "@/components/Header";
+import SessionWrapper from "@/components/SessionWrapper";
 import { LanguageProvider } from "@/lib/LanguageContext";
 
 const Footer = dynamic(() => import("@/components/Footer"));
@@ -114,14 +115,16 @@ export default function RootLayout({
             Ši svetainė reikalauja JavaScript. Prašome įjungti JavaScript savo naršyklėje.
           </div>
         </noscript>
-        <LanguageProvider>
-          <Header />
-          <main id="main-content" className="flex-1 pb-20 md:pb-0 animate-fade-in">{children}</main>
-          <Footer />
-          <MobileBottomNav />
-          <CookieConsent />
-          <BackToTop />
-        </LanguageProvider>
+        <SessionWrapper>
+          <LanguageProvider>
+            <Header />
+            <main id="main-content" className="flex-1 pb-20 md:pb-0 animate-fade-in">{children}</main>
+            <Footer />
+            <MobileBottomNav />
+            <CookieConsent />
+            <BackToTop />
+          </LanguageProvider>
+        </SessionWrapper>
       </body>
     </html>
   );

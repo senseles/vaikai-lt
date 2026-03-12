@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || !verifyPassword(password, user.passwordHash)) {
+    if (!user || !user.passwordHash || !verifyPassword(password, user.passwordHash)) {
       return json({ success: false, error: 'Neteisingas el. paštas arba slaptažodis' }, 401);
     }
 

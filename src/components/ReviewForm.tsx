@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import type { ItemType } from '@/types';
 import StarRating from './StarRating';
 
@@ -11,12 +13,69 @@ interface ReviewFormProps {
 }
 
 export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewFormProps) {
+  const { data: session, status } = useSession();
   const [rating, setRating] = useState(0);
   const [text, setText] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  // Pre-fill author name from session
+  useEffect(() => {
+    if (session?.user?.name && !authorName) {
+      setAuthorName(session.user.name);
+    }
+  }, [session, authorName]);
+
+  // Auto-hide success message
+  useEffect(() => {
+    if (!success) return;
+    const timer = setTimeout(() => setSuccess(false), 5000);
+    return () => clearTimeout(timer);
+  }, [success]);
+
+  // Loading state
+  if (status === 'loading') {
+    return (
+      <div className="mt-4 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
+        <div className="animate-pulse flex items-center gap-3">
+          <div className="w-5 h-5 bg-gray-200 dark:bg-slate-700 rounded" />
+          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-48" />
+        </div>
+      </div>
+    );
+  }
+
+  // Not logged in — show login prompt
+  if (!session) {
+    return (
+      <div className="mt-4 p-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+        <div className="flex items-start gap-3">
+          <svg className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m0 0v2m0-2h2m-2 0H10m-4.757 3.757A9.97 9.97 0 0112 21a9.97 9.97 0 016.757-2.243M15 9A3 3 0 119 9a3 3 0 016 0z" />
+          </svg>
+          <div>
+            <p className="font-medium text-amber-800 dark:text-amber-300 mb-1">
+              Prisijunkite, kad galėtumėte rašyti atsiliepimą
+            </p>
+            <p className="text-sm text-amber-700 dark:text-amber-400 mb-3">
+              Norėdami palikti atsiliepimą, turite būti prisijungę prie savo paskyros.
+            </p>
+            <Link
+              href="/prisijungti"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+              </svg>
+              Prisijungti
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +99,7 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
       setSuccess(true);
       setRating(0);
       setText('');
-      setAuthorName('');
+      setAuthorName(session?.user?.name || '');
       onSubmitted?.();
     } catch {
       setError('Klaida siunčiant atsiliepimą. Bandykite dar kartą.');
@@ -48,12 +107,6 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
       setSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    if (!success) return;
-    const timer = setTimeout(() => setSuccess(false), 5000);
-    return () => clearTimeout(timer);
-  }, [success]);
 
   if (success) {
     return (
