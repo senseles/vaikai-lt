@@ -30,12 +30,25 @@ interface ForumComment {
   createdAt: string;
 }
 
-type ActiveTab = 'posts' | 'comments';
+interface ForumReport {
+  id: string;
+  type: string;
+  targetId: string;
+  reason: string | null;
+  reporterIp: string | null;
+  status: string;
+  createdAt: string;
+  reviewedAt: string | null;
+}
+
+type ActiveTab = 'posts' | 'comments' | 'reports';
 
 export default function AdminForumas() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('posts');
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [comments, setComments] = useState<ForumComment[]>([]);
+  const [reports, setReports] = useState<ForumReport[]>([]);
+  const [reportCount, setReportCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -65,10 +78,41 @@ export default function AdminForumas() {
     }
   }, []);
 
+  const loadReports = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/reports');
+      if (res.ok) {
+        const data = await res.json();
+        setReports(data.reports ?? []);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Load pending report count for tab badge
+  const loadReportCount = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/reports?status=pending');
+      if (res.ok) {
+        const data = await res.json();
+        setReportCount((data.reports ?? []).length);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    loadReportCount();
+  }, [loadReportCount]);
+
   useEffect(() => {
     if (activeTab === 'posts') loadPosts();
-    else loadComments();
-  }, [activeTab, loadPosts, loadComments]);
+    else if (activeTab === 'comments') loadComments();
+    else loadReports();
+  }, [activeTab, loadPosts, loadComments, loadReports]);
 
   const showMessage = (type: 'success' | 'error', text: string) => {
     setActionMessage({ type, text });
@@ -84,10 +128,10 @@ export default function AdminForumas() {
         body: JSON.stringify({ id, isPinned: !currentValue }),
       });
       if (!res.ok) throw new Error();
-      showMessage('success', currentValue ? 'Įrašas atsegtas' : 'Įrašas prisegtas');
+      showMessage('success', currentValue ? 'Irasas atsegtas' : 'Irasas prisegtas');
       loadPosts();
     } catch {
-      showMessage('error', 'Nepavyko atnaujinti įrašo');
+      showMessage('error', 'Nepavyko atnaujinti iraso');
     }
   };
 
@@ -99,15 +143,15 @@ export default function AdminForumas() {
         body: JSON.stringify({ id, isLocked: !currentValue }),
       });
       if (!res.ok) throw new Error();
-      showMessage('success', currentValue ? 'Įrašas atrakintas' : 'Įrašas užrakintas');
+      showMessage('success', currentValue ? 'Irasas atrakintas' : 'Irasas uzrakintas');
       loadPosts();
     } catch {
-      showMessage('error', 'Nepavyko atnaujinti įrašo');
+      showMessage('error', 'Nepavyko atnaujinti iraso');
     }
   };
 
   const deletePost = async (id: string) => {
-    if (!confirm('Ar tikrai norite ištrinti šį forumo įrašą? Bus ištrintos ir visos diskusijos.')) return;
+    if (!confirm('Ar tikrai norite istrinti si forumo irasa? Bus istrintos ir visos diskusijos.')) return;
     try {
       const res = await fetch('/api/admin/forum', {
         method: 'DELETE',
@@ -115,15 +159,15 @@ export default function AdminForumas() {
         body: JSON.stringify({ id }),
       });
       if (!res.ok) throw new Error();
-      showMessage('success', 'Forumo įrašas ištrintas');
+      showMessage('success', 'Forumo irasas istrintas');
       loadPosts();
     } catch {
-      showMessage('error', 'Nepavyko ištrinti forumo įrašo');
+      showMessage('error', 'Nepavyko istrinti forumo iraso');
     }
   };
 
   const deleteComment = async (id: string) => {
-    if (!confirm('Ar tikrai norite ištrinti šį komentarą?')) return;
+    if (!confirm('Ar tikrai norite istrinti si komentara?')) return;
     try {
       const res = await fetch('/api/admin/forum/comments', {
         method: 'DELETE',
@@ -131,10 +175,39 @@ export default function AdminForumas() {
         body: JSON.stringify({ id }),
       });
       if (!res.ok) throw new Error();
-      showMessage('success', 'Komentaras ištrintas');
+      showMessage('success', 'Komentaras istrintas');
       loadComments();
     } catch {
-      showMessage('error', 'Nepavyko ištrinti komentaro');
+      showMessage('error', 'Nepavyko istrinti komentaro');
+    }
+  };
+
+  const updateReportStatus = async (id: string, status: string) => {
+    try {
+      const res = await fetch('/api/admin/reports', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status }),
+      });
+      if (!res.ok) throw new Error();
+      showMessage('success', status === 'reviewed' ? 'Pranešimas peržiūrėtas' : 'Pranešimas atmestas');
+      loadReports();
+      loadReportCount();
+    } catch {
+      showMessage('error', 'Nepavyko atnaujinti pranešimo');
+    }
+  };
+
+  const statusBadge = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 font-medium">Laukia</span>;
+      case 'reviewed':
+        return <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 font-medium">Peržiūrėta</span>;
+      case 'dismissed':
+        return <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-gray-400 font-medium">Atmesta</span>;
+      default:
+        return null;
     }
   };
 
@@ -153,7 +226,7 @@ export default function AdminForumas() {
             : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400'
         }`}>
           <span>{actionMessage.text}</span>
-          <button onClick={() => setActionMessage(null)} className="opacity-50 hover:opacity-100 ml-2">✕</button>
+          <button onClick={() => setActionMessage(null)} className="opacity-50 hover:opacity-100 ml-2">&#x2715;</button>
         </div>
       )}
 
@@ -174,6 +247,19 @@ export default function AdminForumas() {
           }`}
         >
           Komentarai
+        </button>
+        <button
+          onClick={() => setActiveTab('reports')}
+          className={`px-4 py-2 text-sm rounded-md transition-colors font-medium relative ${
+            activeTab === 'reports' ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+          }`}
+        >
+          Pranešimai
+          {reportCount > 0 && (
+            <span className="ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold rounded-full bg-red-500 text-white">
+              {reportCount}
+            </span>
+          )}
         </button>
       </div>
 
@@ -244,7 +330,7 @@ export default function AdminForumas() {
                             <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-gray-400 font-medium">Užrakintas</span>
                           )}
                           {!post.isPinned && !post.isLocked && (
-                            <span className="text-xs text-gray-300 dark:text-gray-600">—</span>
+                            <span className="text-xs text-gray-300 dark:text-gray-600">&mdash;</span>
                           )}
                         </div>
                       </td>
@@ -277,7 +363,7 @@ export default function AdminForumas() {
             </div>
           </div>
         )
-      ) : (
+      ) : activeTab === 'comments' ? (
         /* Comments list */
         comments.length === 0 ? (
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-12 text-center">
@@ -291,7 +377,7 @@ export default function AdminForumas() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <span className="font-medium text-gray-900 dark:text-white text-sm">{comment.authorName}</span>
-                      <span className="text-xs text-gray-400 dark:text-gray-500">→</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">&rarr;</span>
                       <span className="text-xs text-blue-600 dark:text-blue-400 font-medium truncate max-w-[200px]">{comment.postTitle}</span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{comment.content}</p>
@@ -317,6 +403,82 @@ export default function AdminForumas() {
                   >
                     Ištrinti
                   </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      ) : (
+        /* Reports list */
+        reports.length === 0 ? (
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-12 text-center">
+            <p className="text-gray-400 dark:text-gray-500 text-sm">Nėra pranešimų</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {reports.map((report) => (
+              <div key={report.id} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-medium uppercase">
+                        {report.type === 'post' ? 'Įrašas' : 'Komentaras'}
+                      </span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">
+                        ID: {report.targetId.slice(0, 12)}...
+                      </span>
+                      {statusBadge(report.status)}
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mt-1">
+                      {report.reason || <span className="italic text-gray-400 dark:text-gray-500">Nepateikta priežastis</span>}
+                    </p>
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        {new Date(report.createdAt).toLocaleDateString('lt-LT', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                      {report.reviewedAt && (
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                          Peržiūrėta: {new Date(report.reviewedAt).toLocaleDateString('lt-LT', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 flex-shrink-0">
+                    {report.status === 'pending' && (
+                      <>
+                        <button
+                          onClick={() => updateReportStatus(report.id, 'reviewed')}
+                          className="px-3 py-1.5 text-xs bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/40 font-medium transition-colors"
+                        >
+                          Peržiūrėta
+                        </button>
+                        <button
+                          onClick={() => updateReportStatus(report.id, 'dismissed')}
+                          className="px-3 py-1.5 text-xs bg-gray-50 text-gray-600 dark:bg-slate-700 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 font-medium transition-colors"
+                        >
+                          Atmesta
+                        </button>
+                      </>
+                    )}
+                    {report.status !== 'pending' && (
+                      <button
+                        onClick={() => updateReportStatus(report.id, 'pending')}
+                        className="px-3 py-1.5 text-xs bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400 rounded-lg hover:bg-yellow-100 dark:hover:bg-yellow-900/40 font-medium transition-colors"
+                      >
+                        Grąžinti
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

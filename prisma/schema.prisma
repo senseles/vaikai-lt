@@ -318,3 +318,28 @@ model Notification {
   @@index([userId, isRead])
   @@index([createdAt])
 }
+
+model NewsletterSubscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  isActive     Boolean  @default(true)
+  subscribedAt DateTime @default(now())
+  unsubscribedAt DateTime?
+
+  @@index([email])
+  @@index([isActive])
+}
+
+model ForumReport {
+  id         String   @id @default(cuid())
+  type       String   // 'post' or 'comment'
+  targetId   String
+  reason     String?
+  reporterIp String?
+  status     String   @default("pending") // pending, reviewed, dismissed
+  createdAt  DateTime @default(now())
+  reviewedAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([targetId, type])
+}

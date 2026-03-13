@@ -2,16 +2,17 @@
 
 import { useState, FormEvent } from "react";
 
-const STORAGE_KEY = "vaikai_newsletter_email";
-
 export default function NewsletterSignup() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
 
     const trimmed = email.trim();
     if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
@@ -19,23 +20,34 @@ export default function NewsletterSignup() {
       return;
     }
 
+    setLoading(true);
     try {
-      const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-      if (!existing.includes(trimmed)) {
-        existing.push(trimmed);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
-      }
-    } catch {
-      // localStorage unavailable — ignore silently
-    }
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmed }),
+      });
 
-    setSubscribed(true);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Klaida. Bandykite vėliau.");
+        return;
+      }
+
+      setSuccessMessage(data.message || "Prenumerata patvirtinta!");
+      setSubscribed(true);
+    } catch {
+      setError("Nepavyko prisijungti. Bandykite vėliau.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (subscribed) {
     return (
       <p className="text-sm text-green-600 dark:text-green-400 mt-3 font-medium">
-        Ačiū! Prenumerata patvirtinta.
+        {successMessage || "Ačiū! Prenumerata patvirtinta."}
       </p>
     );
   }
@@ -52,13 +64,15 @@ export default function NewsletterSignup() {
           placeholder="jūsų@paštas.lt"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full min-w-0 text-base rounded-l-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 px-3 py-2.5 min-h-[44px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+          disabled={loading}
+          className="w-full min-w-0 text-base rounded-l-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 px-3 py-2.5 min-h-[44px] focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors disabled:opacity-50"
         />
         <button
           type="submit"
-          className="shrink-0 bg-primary hover:bg-primary/90 active:bg-primary-dark text-white text-sm font-medium px-4 py-2.5 min-h-[44px] rounded-r-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+          disabled={loading}
+          className="shrink-0 bg-primary hover:bg-primary/90 active:bg-primary-dark text-white text-sm font-medium px-4 py-2.5 min-h-[44px] rounded-r-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Prenumeruoti
+          {loading ? "Siunčiama..." : "Prenumeruoti"}
         </button>
       </form>
       {error && (

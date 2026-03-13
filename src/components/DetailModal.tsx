@@ -6,6 +6,7 @@ import type { Kindergarten, Aukle, Burelis, Specialist, ItemType } from '@/types
 import StarRating from './StarRating';
 import ReviewList from './ReviewList';
 import ReviewForm from './ReviewForm';
+import SimilarEntities from './SimilarEntities';
 import { addToRecentlyViewed } from './RecentlyViewed';
 import { toSlug } from '@/lib/utils';
 import ErrorBoundary from './ErrorBoundary';
@@ -227,6 +228,28 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
         <ErrorBoundary>
           <ReviewForm itemId={item.id} itemType={itemType} />
         </ErrorBoundary>
+
+        <SimilarEntities itemId={item.id} itemType={itemType} city={item.city} />
+
+        {item.baseRating > 0 && item.baseReviewCount > 0 && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': itemType === 'kindergarten' ? 'ChildCare' : 'LocalBusiness',
+                name: item.name,
+                aggregateRating: {
+                  '@type': 'AggregateRating',
+                  ratingValue: item.baseRating.toFixed(1),
+                  reviewCount: item.baseReviewCount,
+                  bestRating: 5,
+                  worstRating: 1,
+                },
+              }),
+            }}
+          />
+        )}
 
         <ShareButtons itemName={item.name} />
       </div>

@@ -12,6 +12,10 @@ const MobileBottomNav = dynamic(() => import("@/components/MobileBottomNav"), { 
 const CookieConsent = dynamic(() => import("@/components/CookieConsent"), {
   ssr: false,
 });
+const ServiceWorkerRegistration = dynamic(
+  () => import("@/components/ServiceWorkerRegistration"),
+  { ssr: false }
+);
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -123,6 +127,7 @@ export default function RootLayout({
             <MobileBottomNav />
             <CookieConsent />
             <BackToTop />
+            <ServiceWorkerRegistration />
           </LanguageProvider>
         </SessionWrapper>
       </body>

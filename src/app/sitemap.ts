@@ -4,13 +4,39 @@ import prisma from '@/lib/prisma';
 
 const BASE_URL = 'https://vaikai.lt';
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+const CATEGORIES = ['darzeliai', 'aukles', 'bureliai', 'specialistai'] as const;
+
+/**
+ * Generate sitemap index entries.
+ * ID 0: static pages + city pages (with category variants)
+ * ID 1: forum pages (categories + individual posts)
+ */
+export async function generateSitemaps() {
+  return [{ id: 0 }, { id: 1 }];
+}
+
+export default async function sitemap({
+  id,
+}: {
+  id: number;
+}): Promise<MetadataRoute.Sitemap> {
+  if (id === 0) {
+    return generateStaticAndCitySitemap();
+  }
+  if (id === 1) {
+    return generateForumSitemap();
+  }
+  return [];
+}
+
+async function generateStaticAndCitySitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
     { url: `${BASE_URL}/paieska`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
     { url: `${BASE_URL}/privatumo-politika`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
   ];
 
+  // Base city pages (no category filter)
   const cityPages: MetadataRoute.Sitemap = CITY_SLUG_LIST.map((slug) => ({
     url: `${BASE_URL}/${slug}`,
     lastModified: new Date(),
@@ -18,7 +44,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // Forum pages
+  // City + category pages: /{city}?category=darzeliai, etc.
+  const cityCategoryPages: MetadataRoute.Sitemap = CITY_SLUG_LIST.flatMap((slug) =>
+    CATEGORIES.map((category) => ({
+      url: `${BASE_URL}/${slug}?category=${category}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    }))
+  );
+
+  return [...staticPages, ...cityPages, ...cityCategoryPages];
+}
+
+async function generateForumSitemap(): Promise<MetadataRoute.Sitemap> {
   const [forumCategories, forumPosts] = await Promise.all([
     prisma.forumCategory.findMany({
       select: { slug: true, createdAt: true },
@@ -30,7 +69,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   ]);
 
-  // Most recent forum activity date for the main forum page
   const latestForumDate = forumPosts.length > 0
     ? forumPosts[0].updatedAt
     : new Date();
@@ -45,7 +83,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const forumCategoryPages: MetadataRoute.Sitemap = forumCategories.map((cat) => {
-    // Find most recent post in this category for lastModified
     const latestPost = forumPosts.find((p) => p.category.slug === cat.slug);
     return {
       url: `${BASE_URL}/forumas/${cat.slug}`,
@@ -62,11 +99,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [
-    ...staticPages,
-    ...cityPages,
-    ...forumMainPage,
-    ...forumCategoryPages,
-    ...forumPostPages,
-  ];
+  return [...forumMainPage, ...forumCategoryPages, ...forumPostPages];
 }

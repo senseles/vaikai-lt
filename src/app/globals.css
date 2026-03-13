@@ -37,8 +37,9 @@
     padding-right: env(safe-area-inset-right);
   }
 
-  :focus-visible {
-    @apply outline-2 outline-primary outline-offset-2;
+  *:focus-visible {
+    outline: 2px solid #2d6a4f;
+    outline-offset: 2px;
   }
 
   /* Prevent images/embeds from causing horizontal overflow */

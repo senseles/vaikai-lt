@@ -4,6 +4,7 @@ import { jsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { checkCsrf, checkHoneypot, checkSubmitTiming, stripHtml } from '@/lib/security';
 import { createNotification } from '@/lib/create-notification';
+import { filterBannedContent } from '@/lib/banned-words';
 
 /** Check nesting depth of a comment by walking up the parent chain */
 async function getCommentDepth(parentId: string): Promise<number> {
@@ -76,6 +77,15 @@ export async function POST(request: NextRequest) {
   }
   if (cleanContent.length > 2000) {
     return errorResponse('Komentaras negali viršyti 2000 simbolių', 400);
+  }
+
+  // Banned words check
+  const contentCheck = filterBannedContent(cleanContent);
+  if (!contentCheck.clean) {
+    return errorResponse(
+      `Komentare rasti neleistini žodžiai: ${contentCheck.found.join(', ')}`,
+      400,
+    );
   }
 
   // Validate authorName

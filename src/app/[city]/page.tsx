@@ -18,15 +18,13 @@ export function generateStaticParams() {
 export const dynamicParams = false;
 export const revalidate = 300; // ISR: regenerate every 5 minutes
 
-type SortField = 'rating' | 'name' | 'reviews' | 'price_asc' | 'price_desc';
+type SortField = 'rating' | 'name' | 'reviews';
 
 function getOrderBy(sort: SortField): Record<string, 'asc' | 'desc'> {
   switch (sort) {
     case 'rating': return { baseRating: 'desc' };
     case 'reviews': return { baseReviewCount: 'desc' };
     case 'name': return { name: 'asc' };
-    case 'price_asc': return { baseRating: 'asc' };  // fallback — price is string, sorted client-side
-    case 'price_desc': return { baseRating: 'desc' };
     default: return { baseRating: 'desc' };
   }
 }

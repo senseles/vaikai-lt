@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { jsonResponse, cachedJsonResponse, errorResponse, getPagination } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { checkCsrf, checkHoneypot, checkSubmitTiming, stripHtml } from '@/lib/security';
+import { filterBannedContent } from '@/lib/banned-words';
 
 /** Generate a URL-safe slug from a Lithuanian title */
 function slugify(text: string): string {
@@ -197,6 +198,22 @@ export async function POST(request: NextRequest) {
   }
   if (cleanContent.length > 5000) {
     return errorResponse('Turinys negali viršyti 5000 simbolių', 400);
+  }
+
+  // Banned words check (title + content)
+  const titleCheck = filterBannedContent(cleanTitle);
+  if (!titleCheck.clean) {
+    return errorResponse(
+      `Pavadinime rasti neleistini žodžiai: ${titleCheck.found.join(', ')}`,
+      400,
+    );
+  }
+  const contentCheck = filterBannedContent(cleanContent);
+  if (!contentCheck.clean) {
+    return errorResponse(
+      `Turinyje rasti neleistini žodžiai: ${contentCheck.found.join(', ')}`,
+      400,
+    );
   }
 
   // Validate authorName
