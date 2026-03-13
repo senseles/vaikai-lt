@@ -7,10 +7,10 @@ import { stripHtml } from '@/lib/security';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as { id?: string }).id) {
+  if (!session?.user || !session.user?.id) {
     return errorResponse('Neprisijungęs', 401);
   }
-  const userId = (session.user as { id: string }).id;
+  const userId = session.user.id;
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -65,10 +65,10 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as { id?: string }).id) {
+  if (!session?.user || !session.user?.id) {
     return errorResponse('Neprisijungęs', 401);
   }
-  const userId = (session.user as { id: string }).id;
+  const userId = session.user.id;
 
   let body: Record<string, unknown>;
   try {
@@ -96,10 +96,10 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as { id?: string }).id) {
+  if (!session?.user || !session.user?.id) {
     return errorResponse('Neprisijungęs', 401);
   }
-  const userId = (session.user as { id: string }).id;
+  const userId = session.user.id;
 
   // GDPR: Delete user and all related data (cascading via Prisma)
   await prisma.user.delete({ where: { id: userId } });

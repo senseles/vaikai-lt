@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
   // T8: Prefer userId from session, fallback to sessionId for backwards compat
   const session = await getServerSession(authOptions);
-  const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
+  const userId = session?.user?.id ?? null;
 
   // Require either userId or sessionId
   if (!userId && (!sessionId || typeof sessionId !== 'string')) {

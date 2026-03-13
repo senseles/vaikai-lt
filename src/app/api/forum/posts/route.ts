@@ -1,28 +1,12 @@
 import { NextRequest } from 'next/server';
+import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
+import { authOptions } from '@/lib/auth';
 import { jsonResponse, cachedJsonResponse, errorResponse, getPagination } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { checkCsrf, checkHoneypot, checkSubmitTiming, stripHtml } from '@/lib/security';
 import { filterBannedContent } from '@/lib/banned-words';
-
-/** Generate a URL-safe slug from a Lithuanian title */
-function slugify(text: string): string {
-  const map: Record<string, string> = {
-    'ą': 'a', 'č': 'c', 'ę': 'e', 'ė': 'e', 'į': 'i',
-    'š': 's', 'ų': 'u', 'ū': 'u', 'ž': 'z',
-    'Ą': 'a', 'Č': 'c', 'Ę': 'e', 'Ė': 'e', 'Į': 'i',
-    'Š': 's', 'Ų': 'u', 'Ū': 'u', 'Ž': 'z',
-  };
-
-  return text
-    .toLowerCase()
-    .split('')
-    .map((ch) => map[ch] || ch)
-    .join('')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 120);
-}
+import { slugify } from '@/lib/lithuanian';
 
 export async function GET(request: NextRequest) {
   const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.PUBLIC_GET);
@@ -141,8 +125,14 @@ export async function POST(request: NextRequest) {
   const csrfResponse = checkCsrf(request);
   if (csrfResponse) return csrfResponse;
 
-  // Rate limiting: 3 posts per 5 minutes
-  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.FORUM_POST);
+  // Require authenticated session
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return errorResponse('Prisijunkite, kad galėtumėte kurti įrašus forume', 401);
+  }
+
+  // Rate limiting: 3 posts per 5 minutes (per user)
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.FORUM_POST, session.user.id);
   if (rateLimitResponse) return rateLimitResponse;
 
   let body: unknown;
@@ -253,6 +243,7 @@ export async function POST(request: NextRequest) {
         slug,
         content: cleanContent,
         authorName: cleanAuthor,
+        authorId: session.user.id,
         categoryId: category.id,
         city: cleanCity,
       },

@@ -34,7 +34,11 @@ export function verifyPassword(password: string, stored: string): boolean {
   const [salt, hash] = stored.split(':');
   if (!salt || !hash) return false;
   const check = createHash('sha256').update(salt + password).digest('hex');
-  return check === hash;
+  // Use constant-time comparison to prevent timing attacks
+  const checkBuf = Buffer.from(check, 'hex');
+  const hashBuf = Buffer.from(hash, 'hex');
+  if (checkBuf.length !== hashBuf.length) return false;
+  return timingSafeEqual(checkBuf, hashBuf);
 }
 
 /**

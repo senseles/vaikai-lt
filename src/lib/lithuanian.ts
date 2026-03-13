@@ -1,8 +1,10 @@
 /**
- * Lithuanian character normalization for search.
- * Maps accented Lithuanian letters to ASCII equivalents.
+ * Shared Lithuanian character utilities.
+ * Single source of truth for diacritics mapping, normalization, and slugification.
  */
-const LT_CHAR_MAP: Record<string, string> = {
+
+/** Lithuanian diacritics → ASCII mapping (lowercase + uppercase) */
+export const LT_CHAR_MAP: Record<string, string> = {
   'ą': 'a', 'č': 'c', 'ę': 'e', 'ė': 'e', 'į': 'i',
   'š': 's', 'ų': 'u', 'ū': 'u', 'ž': 'z',
   'Ą': 'A', 'Č': 'C', 'Ę': 'E', 'Ė': 'E', 'Į': 'I',
@@ -13,6 +15,18 @@ const LT_CHAR_MAP: Record<string, string> = {
 /** Strip Lithuanian diacritics: Žiogelis → Ziogelis */
 export function normalizeLt(text: string): string {
   return text.replace(/[ąčęėįšųūžĄČĘĖĮŠŲŪŽ„""–]/g, (ch) => LT_CHAR_MAP[ch] ?? ch);
+}
+
+/**
+ * Convert a string to a URL-friendly slug.
+ * Handles Lithuanian diacritics (ą→a, č→c, etc.).
+ */
+export function slugify(text: string, maxLength = 120): string {
+  return normalizeLt(text)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, maxLength);
 }
 
 /**

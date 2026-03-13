@@ -1,16 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { checkCsrf } from '@/lib/security';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
+  // CSRF protection
+  const csrfResponse = checkCsrf(request);
+  if (csrfResponse) return csrfResponse;
+
+  // Rate limiting
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.NEWSLETTER);
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const email = (body.email ?? '').trim().toLowerCase();
 
     if (!email || !EMAIL_RE.test(email)) {
       return NextResponse.json(
-        { error: 'Prašome įvesti galiojantį el. pašto adresą.' },
+        { success: false, error: 'Prašome įvesti galiojantį el. pašto adresą.' },
         { status: 400 },
       );
     }
@@ -22,7 +32,7 @@ export async function POST(request: NextRequest) {
     if (existing) {
       if (existing.isActive) {
         return NextResponse.json(
-          { message: 'Jau prenumeruojate' },
+          { success: true, data: { message: 'Jau prenumeruojate' } },
           { status: 200 },
         );
       }
@@ -34,7 +44,7 @@ export async function POST(request: NextRequest) {
       });
 
       return NextResponse.json(
-        { message: 'Prenumerata sėkmingai atnaujinta!' },
+        { success: true, data: { message: 'Prenumerata sėkmingai atnaujinta!' } },
         { status: 200 },
       );
     }
@@ -44,26 +54,30 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: 'Prenumerata patvirtinta!' },
+      { success: true, data: { message: 'Prenumerata patvirtinta!' } },
       { status: 201 },
     );
   } catch (error) {
     console.error('Newsletter POST error:', error);
     return NextResponse.json(
-      { error: 'Serverio klaida. Bandykite vėliau.' },
+      { success: false, error: 'Serverio klaida. Bandykite vėliau.' },
       { status: 500 },
     );
   }
 }
 
 export async function DELETE(request: NextRequest) {
+  // CSRF protection
+  const csrfResponse = checkCsrf(request);
+  if (csrfResponse) return csrfResponse;
+
   try {
     const body = await request.json();
     const email = (body.email ?? '').trim().toLowerCase();
 
     if (!email || !EMAIL_RE.test(email)) {
       return NextResponse.json(
-        { error: 'Prašome įvesti galiojantį el. pašto adresą.' },
+        { success: false, error: 'Prašome įvesti galiojantį el. pašto adresą.' },
         { status: 400 },
       );
     }
@@ -74,7 +88,7 @@ export async function DELETE(request: NextRequest) {
 
     if (!existing || !existing.isActive) {
       return NextResponse.json(
-        { message: 'El. paštas nerastas prenumeratorių sąraše.' },
+        { success: false, error: 'El. paštas nerastas prenumeratorių sąraše.' },
         { status: 404 },
       );
     }
@@ -85,13 +99,13 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: 'Prenumerata atšaukta.' },
+      { success: true, data: { message: 'Prenumerata atšaukta.' } },
       { status: 200 },
     );
   } catch (error) {
     console.error('Newsletter DELETE error:', error);
     return NextResponse.json(
-      { error: 'Serverio klaida. Bandykite vėliau.' },
+      { success: false, error: 'Serverio klaida. Bandykite vėliau.' },
       { status: 500 },
     );
   }

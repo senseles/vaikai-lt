@@ -6,10 +6,10 @@ import { jsonResponse, errorResponse } from '@/lib/api-utils';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as { id?: string }).id) {
+  if (!session?.user || !session.user?.id) {
     return errorResponse('Neprisijungęs', 401);
   }
-  const userId = (session.user as { id: string }).id;
+  const userId = session.user.id;
 
   const [notifications, unreadCount] = await Promise.all([
     prisma.notification.findMany({
@@ -27,10 +27,10 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as { id?: string }).id) {
+  if (!session?.user || !session.user?.id) {
     return errorResponse('Neprisijungęs', 401);
   }
-  const userId = (session.user as { id: string }).id;
+  const userId = session.user.id;
 
   let body: Record<string, unknown>;
   try {

@@ -184,6 +184,7 @@ model Review {
   text       String
   isApproved Boolean  @default(false)
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
   userId     String?
   user       User?    @relation(fields: [userId], references: [id])
   replies    ReviewReply[]
@@ -199,7 +200,7 @@ model Favorite {
   id        String   @id @default(cuid())
   itemId    String
   itemType  String
-  sessionId String
+  sessionId String?
   userId    String?
   createdAt DateTime @default(now())
 
@@ -326,7 +327,6 @@ model NewsletterSubscriber {
   subscribedAt DateTime @default(now())
   unsubscribedAt DateTime?
 
-  @@index([email])
   @@index([isActive])
 }
 

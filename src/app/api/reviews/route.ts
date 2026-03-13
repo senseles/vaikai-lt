@@ -52,11 +52,11 @@ export async function POST(request: NextRequest) {
 
   // P1.5: Require authenticated session
   const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as { id?: string }).id) {
+  if (!session?.user?.id) {
     return errorResponse('Prisijunkite, kad galėtumėte rašyti atsiliepimą', 401);
   }
 
-  const userId = (session.user as { id: string }).id;
+  const userId = session.user.id;
 
   // Rate limiting by userId instead of just IP
   const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.REVIEW_POST, userId);
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   // Verify the referenced entity exists
   const entityModel = getEntityModel(itemType as string);
   if (!entityModel) return errorResponse('Netinkamas tipas', 400);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma union types not compatible with each other
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma union delegate types incompatible
   const entityExists = await (entityModel as any).findUnique({
     where: { id: itemId as string },
     select: { id: true },

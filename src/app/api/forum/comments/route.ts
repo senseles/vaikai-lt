@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
+import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
+import { authOptions } from '@/lib/auth';
 import { jsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { checkCsrf, checkHoneypot, checkSubmitTiming, stripHtml } from '@/lib/security';
@@ -29,8 +31,14 @@ export async function POST(request: NextRequest) {
   const csrfResponse = checkCsrf(request);
   if (csrfResponse) return csrfResponse;
 
-  // Rate limiting: 10 comments per 5 minutes
-  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.FORUM_COMMENT);
+  // Require authenticated session
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return errorResponse('Prisijunkite, kad galėtumėte komentuoti', 401);
+  }
+
+  // Rate limiting: 10 comments per 5 minutes (per user)
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.FORUM_COMMENT, session.user.id);
   if (rateLimitResponse) return rateLimitResponse;
 
   let body: unknown;
@@ -130,6 +138,7 @@ export async function POST(request: NextRequest) {
         parentId: validParentId,
         content: cleanContent,
         authorName: cleanAuthor,
+        authorId: session.user.id,
       },
     });
 

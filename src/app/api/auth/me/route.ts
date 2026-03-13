@@ -1,40 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
-import { computeTokenHmac } from '@/lib/user-tokens';
+import { authOptions } from '@/lib/auth';
 
-export async function GET(request: NextRequest) {
-  const cookie = request.cookies.get('user_token')?.value;
-  if (!cookie) {
-    return NextResponse.json({ user: null });
-  }
-
-  // Token format: userId:randomHex:hmac
-  const parts = cookie.split(':');
-  if (parts.length !== 3) {
-    return NextResponse.json({ user: null });
-  }
-
-  const [userId, randomPart, providedHmac] = parts;
-  if (!userId || !randomPart || !providedHmac) {
-    return NextResponse.json({ user: null });
-  }
-
-  // Validate HMAC — constant-time comparison
-  const expectedHmac = computeTokenHmac(userId, randomPart);
-  if (expectedHmac.length !== providedHmac.length) {
-    return NextResponse.json({ user: null });
-  }
-  let mismatch = 0;
-  for (let i = 0; i < expectedHmac.length; i++) {
-    mismatch |= expectedHmac.charCodeAt(i) ^ providedHmac.charCodeAt(i);
-  }
-  if (mismatch !== 0) {
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
     return NextResponse.json({ user: null });
   }
 
   try {
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: session.user.id },
       select: { id: true, email: true, name: true, role: true },
     });
 

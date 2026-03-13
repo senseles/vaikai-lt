@@ -6,7 +6,11 @@ interface RateLimitEntry {
   resetAt: number;
 }
 
-/** In-memory store: key (ip + identifier) -> request count & window expiry */
+/**
+ * In-memory store: key (ip + identifier) -> request count & window expiry.
+ * NOTE: This does NOT work across multiple serverless instances or after cold starts.
+ * For production with >1 instance, replace with Redis/Upstash.
+ */
 const store = new Map<string, RateLimitEntry>();
 
 /** Clean up expired entries every 60 seconds */
@@ -75,6 +79,8 @@ export const RATE_LIMITS = {
   AUTH_LOGIN: { maxRequests: 10, windowSeconds: 900, identifier: 'auth-login' } satisfies RateLimitOptions,
   /** Password reset: 3 requests per hour */
   PASSWORD_RESET: { maxRequests: 3, windowSeconds: 3600, identifier: 'password-reset' } satisfies RateLimitOptions,
+  /** Newsletter subscribe: 5 requests per 15 minutes */
+  NEWSLETTER: { maxRequests: 5, windowSeconds: 900, identifier: 'newsletter' } satisfies RateLimitOptions,
 } as const;
 
 const RATE_LIMIT_MESSAGE = 'Per daug užklausų. Bandykite vėliau.';

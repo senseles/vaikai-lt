@@ -8,10 +8,10 @@ const VALID_TYPES = ['kindergarten', 'aukle', 'burelis', 'specialist'];
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as { id?: string }).id) {
+  if (!session?.user || !session.user?.id) {
     return errorResponse('Neprisijungęs', 401);
   }
-  const userId = (session.user as { id: string }).id;
+  const userId = session.user.id;
   const { searchParams } = request.nextUrl;
   const itemId = searchParams.get('itemId');
   const itemType = searchParams.get('itemType');
@@ -33,10 +33,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as { id?: string }).id) {
+  if (!session?.user || !session.user?.id) {
     return errorResponse('Neprisijungęs', 401);
   }
-  const userId = (session.user as { id: string }).id;
+  const userId = session.user.id;
 
   const body = await request.json();
   const { itemId, itemType } = body;
@@ -60,10 +60,10 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || !(session.user as { id?: string }).id) {
+  if (!session?.user || !session.user?.id) {
     return errorResponse('Neprisijungęs', 401);
   }
-  const userId = (session.user as { id: string }).id;
+  const userId = session.user.id;
 
   const body = await request.json();
   const { itemId, itemType } = body;

@@ -4,31 +4,14 @@
 
 import { CITY_TO_REGION } from './regions';
 import type { CategoryType } from './types';
-
-// ─── Lithuanian diacritics map ───
-
-const LT_CHAR_MAP: Record<string, string> = {
-  'ą': 'a', 'č': 'c', 'ę': 'e', 'ė': 'e', 'į': 'i',
-  'š': 's', 'ų': 'u', 'ū': 'u', 'ž': 'z',
-  'Ą': 'A', 'Č': 'C', 'Ę': 'E', 'Ė': 'E', 'Į': 'I',
-  'Š': 'S', 'Ų': 'U', 'Ū': 'U', 'Ž': 'Z',
-};
-
-const LT_CHAR_RE = new RegExp(
-  '[' + Object.keys(LT_CHAR_MAP).join('') + ']',
-  'g',
-);
+import { slugify } from './lithuanian';
 
 /**
  * Convert a string to a URL-friendly slug.
  * Handles Lithuanian diacritics (ą→a, č→c, etc.).
  */
 export function toSlug(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(LT_CHAR_RE, (ch) => LT_CHAR_MAP[ch] ?? ch)
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
+  return slugify(str);
 }
 
 /**

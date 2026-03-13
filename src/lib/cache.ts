@@ -11,6 +11,10 @@ interface CacheEntry<T> {
   expiresAt: number;
 }
 
+/**
+ * NOTE: In-memory cache does NOT persist across serverless cold starts
+ * or multiple instances. For production with >1 instance, replace with Redis/Upstash.
+ */
 const cache = new Map<string, CacheEntry<unknown>>();
 
 /** Default TTL values in seconds */

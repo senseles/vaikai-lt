@@ -8,10 +8,6 @@ if (!ADMIN_PASSWORD) {
   console.error('ADMIN_PASSWORD aplinkos kintamasis nerastas');
 }
 
-function json<T>(data: T, status = 200) {
-  return NextResponse.json(data, { status });
-}
-
 export async function POST(request: NextRequest) {
   const csrfResponse = checkCsrf(request);
   if (csrfResponse) return csrfResponse;
@@ -24,15 +20,15 @@ export async function POST(request: NextRequest) {
     const { password } = body as { password?: string };
 
     if (!password || typeof password !== 'string') {
-      return json({ success: false, error: 'Slaptažodis privalomas' }, 400);
+      return NextResponse.json({ success: false, error: 'Slaptažodis privalomas' }, { status: 400 });
     }
 
     if (password !== ADMIN_PASSWORD) {
-      return json({ success: false, error: 'Neteisingas slaptažodis' }, 401);
+      return NextResponse.json({ success: false, error: 'Neteisingas slaptažodis' }, { status: 401 });
     }
 
     const token = await createAdminToken();
-    const response = json({ success: true, data: { token } });
+    const response = NextResponse.json({ success: true, data: { token } });
     response.cookies.set('admin_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -43,6 +39,6 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch {
-    return json({ success: false, error: 'Netinkamas užklausos formatas' }, 400);
+    return NextResponse.json({ success: false, error: 'Netinkamas užklausos formatas' }, { status: 400 });
   }
 }

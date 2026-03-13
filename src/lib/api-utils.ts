@@ -27,14 +27,7 @@ export function errorResponse(message: string, status: number): NextResponse {
   return NextResponse.json({ error: message }, { status });
 }
 
-const LT_MAP: Record<string, string> = {
-  'ą':'a','č':'c','ę':'e','ė':'e','į':'i','š':'s','ų':'u','ū':'u','ž':'z',
-  'Ą':'A','Č':'C','Ę':'E','Ė':'E','Į':'I','Š':'S','Ų':'U','Ū':'U','Ž':'Z',
-  '„':'','\u201c':'','\u201d':'',
-};
-function stripLt(s: string): string {
-  return s.replace(/[ąčęėįšųūžĄČĘĖĮŠŲŪŽ„""]/g, ch => LT_MAP[ch] ?? ch);
-}
+import { normalizeLt } from './lithuanian';
 
 /** Case-insensitive search that works with Lithuanian characters (ą,č,ę,ė,į,š,ų,ū,ž) */
 export function matchesSearch(value: string | null | undefined, query: string): boolean {
@@ -42,5 +35,5 @@ export function matchesSearch(value: string | null | undefined, query: string): 
   const v = value.toLocaleLowerCase('lt');
   const q = query.toLocaleLowerCase('lt');
   // Match both with and without diacritics
-  return v.includes(q) || stripLt(v).includes(stripLt(q));
+  return v.includes(q) || normalizeLt(v).includes(normalizeLt(q));
 }

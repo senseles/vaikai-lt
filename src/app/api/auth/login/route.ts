@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { randomBytes } from 'crypto';
 import prisma from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { checkCsrf } from '@/lib/security';
 import { verifyPassword, hashPassword, needsRehash } from '@/lib/password';
-import { computeTokenHmac } from '@/lib/user-tokens';
-
-function json<T>(data: T, status = 200) {
-  return NextResponse.json(data, { status });
-}
 
 export async function POST(request: NextRequest) {
   const csrfResponse = checkCsrf(request);
@@ -22,12 +16,12 @@ export async function POST(request: NextRequest) {
     const { email, password } = body as { email?: string; password?: string };
 
     if (!email || !password) {
-      return json({ success: false, error: 'El. paštas ir slaptažodis privalomi' }, 400);
+      return NextResponse.json({ success: false, error: 'El. paštas ir slaptažodis privalomi' }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || !user.passwordHash || !verifyPassword(password, user.passwordHash)) {
-      return json({ success: false, error: 'Neteisingas el. paštas arba slaptažodis' }, 401);
+      return NextResponse.json({ success: false, error: 'Neteisingas el. paštas arba slaptažodis' }, { status: 401 });
     }
 
     // Rehash legacy SHA-256 passwords to scrypt
@@ -39,25 +33,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Create HMAC-signed session token
-    const randomPart = randomBytes(32).toString('hex');
-    const hmac = computeTokenHmac(user.id, randomPart);
-
-    const response = json({
+    return NextResponse.json({
       success: true,
       data: { id: user.id, email: user.email, name: user.name },
     });
-
-    response.cookies.set('user_token', `${user.id}:${randomPart}:${hmac}`, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: '/',
-    });
-
-    return response;
   } catch {
-    return json({ success: false, error: 'Prisijungimo klaida' }, 500);
+    return NextResponse.json({ success: false, error: 'Prisijungimo klaida' }, { status: 500 });
   }
 }
