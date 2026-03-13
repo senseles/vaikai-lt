@@ -15,10 +15,10 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const cityName = CITY_NAMES[params.city];
-  if (!cityName) return { title: 'Nerastas | Vaikai.lt' };
+  if (!cityName) notFound();
 
   const item = await prisma.kindergarten.findUnique({ where: { slug: params.slug } });
-  if (!item || item.city !== cityName) return { title: 'Nerastas | Vaikai.lt' };
+  if (!item || item.city !== cityName) notFound();
 
   const title = `${item.name} — darželis ${cityName} | Vaikai.lt`;
   const description = item.description

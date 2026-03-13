@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getPagination, cachedJsonResponse, errorResponse } from '@/lib/api-utils';
+import { getPagination, cachedJsonResponse, errorResponse, matchesSearch } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { getCached, setCache, CACHE_TTL } from '@/lib/cache';
 
@@ -38,10 +38,25 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const [items, total] = await Promise.all([
+    let [items, total] = await Promise.all([
       prisma.kindergarten.findMany({ where, skip, take: limit, orderBy: { name: 'asc' } }),
       prisma.kindergarten.count({ where }),
     ]);
+
+    // Two-pass fallback: if DB search returned nothing, use JS Lithuanian-aware matching
+    if (search && total === 0) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { OR: _ignored, ...baseWhere } = where;
+      const allItems = await prisma.kindergarten.findMany({
+        where: baseWhere,
+        orderBy: { name: 'asc' },
+      });
+      const filtered = allItems.filter(
+        (i) => matchesSearch(i.name, search) || matchesSearch(i.city, search) || matchesSearch(i.description, search)
+      );
+      total = filtered.length;
+      items = filtered.slice(skip, skip + limit);
+    }
 
     const result = {
       data: items.map((i) => { try { return { ...i, features: JSON.parse(i.features) }; } catch { return { ...i, features: [] }; } }),

@@ -6,30 +6,7 @@ const BASE_URL = 'https://vaikai.lt';
 
 const CATEGORIES = ['darzeliai', 'aukles', 'bureliai', 'specialistai'] as const;
 
-/**
- * Generate sitemap index entries.
- * ID 0: static pages + city pages (with category variants)
- * ID 1: forum pages (categories + individual posts)
- */
-export async function generateSitemaps() {
-  return [{ id: 0 }, { id: 1 }];
-}
-
-export default async function sitemap({
-  id,
-}: {
-  id: number;
-}): Promise<MetadataRoute.Sitemap> {
-  if (id === 0) {
-    return generateStaticAndCitySitemap();
-  }
-  if (id === 1) {
-    return generateForumSitemap();
-  }
-  return [];
-}
-
-async function generateStaticAndCitySitemap(): Promise<MetadataRoute.Sitemap> {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
     { url: `${BASE_URL}/paieska`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
@@ -54,10 +31,7 @@ async function generateStaticAndCitySitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
-  return [...staticPages, ...cityPages, ...cityCategoryPages];
-}
-
-async function generateForumSitemap(): Promise<MetadataRoute.Sitemap> {
+  // Forum pages
   const [forumCategories, forumPosts] = await Promise.all([
     prisma.forumCategory.findMany({
       select: { slug: true, createdAt: true },
@@ -99,5 +73,12 @@ async function generateForumSitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [...forumMainPage, ...forumCategoryPages, ...forumPostPages];
+  return [
+    ...staticPages,
+    ...cityPages,
+    ...cityCategoryPages,
+    ...forumMainPage,
+    ...forumCategoryPages,
+    ...forumPostPages,
+  ];
 }
