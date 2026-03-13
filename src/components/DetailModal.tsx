@@ -74,6 +74,7 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
     if (!item) return;
     addToRecentlyViewed({
       id: item.id,
+      slug: item.slug,
       name: item.name,
       city: item.city,
       itemType,

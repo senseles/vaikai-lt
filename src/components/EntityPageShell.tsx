@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import type { ItemType } from '@/types';
 import ReviewList from './ReviewList';
 import ReviewForm from './ReviewForm';
@@ -19,10 +20,12 @@ interface EntityPageShellProps {
 export default function EntityPageShell({ itemId, itemType, itemName, itemCity, baseRating, address }: EntityPageShellProps) {
   const [copied, setCopied] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const pathname = usePathname();
+  const slug = pathname?.split('/').pop() || itemId;
 
   useEffect(() => {
-    addToRecentlyViewed({ id: itemId, name: itemName, city: itemCity, itemType, baseRating });
-  }, [itemId, itemName, itemCity, itemType, baseRating]);
+    addToRecentlyViewed({ id: itemId, slug, name: itemName, city: itemCity, itemType, baseRating });
+  }, [itemId, slug, itemName, itemCity, itemType, baseRating]);
 
   const handleCopy = async () => {
     try {

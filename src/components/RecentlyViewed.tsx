@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import StarRating from './StarRating';
 
 const STORAGE_KEY = 'recently-viewed';
@@ -9,6 +10,7 @@ const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export interface RecentlyViewedItem {
   id: string;
+  slug: string;
   name: string;
   city: string;
   itemType: 'kindergarten' | 'aukle' | 'burelis' | 'specialist';
@@ -63,6 +65,7 @@ function getRecentlyViewed(): RecentlyViewedItem[] {
 
 export function addToRecentlyViewed(item: {
   id: string;
+  slug?: string;
   name: string;
   city: string;
   itemType: string;
@@ -74,6 +77,7 @@ export function addToRecentlyViewed(item: {
     const filtered = existing.filter((i) => i.id !== item.id);
     const newItem: RecentlyViewedItem = {
       id: item.id,
+      slug: item.slug || item.id,
       name: item.name,
       city: item.city,
       itemType: item.itemType as RecentlyViewedItem['itemType'],
@@ -87,12 +91,29 @@ export function addToRecentlyViewed(item: {
   }
 }
 
+const typeToPath: Record<RecentlyViewedItem['itemType'], string> = {
+  kindergarten: 'darzeliai',
+  aukle: 'aukles',
+  burelis: 'bureliai',
+  specialist: 'specialistai',
+};
+
+function cityToSlug(city: string): string {
+  return city
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 interface RecentlyViewedProps {
   onItemClick?: (item: RecentlyViewedItem) => void;
 }
 
 export default function RecentlyViewed({ onItemClick }: RecentlyViewedProps) {
   const [items, setItems] = useState<RecentlyViewedItem[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     setItems(getRecentlyViewed());
@@ -126,7 +147,16 @@ export default function RecentlyViewed({ onItemClick }: RecentlyViewedProps) {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => onItemClick?.(item)}
+                onClick={() => {
+                  if (onItemClick) {
+                    onItemClick(item);
+                  } else {
+                    const path = typeToPath[item.itemType] || 'darzeliai';
+                    const slug = item.slug || item.id;
+                    const city = cityToSlug(item.city);
+                    router.push(`/${city}/${path}/${slug}`);
+                  }
+                }}
                 className="flex-shrink-0 w-40 sm:w-48 min-h-[7rem] rounded-xl border border-gray-200 dark:border-gray-700
                   bg-white dark:bg-slate-800 p-3 text-left shadow-sm
                   hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600
