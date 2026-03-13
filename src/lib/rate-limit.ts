@@ -73,6 +73,8 @@ export const RATE_LIMITS = {
   AUTH_REGISTER: { maxRequests: 3, windowSeconds: 900, identifier: 'auth-register' } satisfies RateLimitOptions,
   /** User login: 10 attempts per 15 minutes */
   AUTH_LOGIN: { maxRequests: 10, windowSeconds: 900, identifier: 'auth-login' } satisfies RateLimitOptions,
+  /** Password reset: 3 requests per hour */
+  PASSWORD_RESET: { maxRequests: 3, windowSeconds: 3600, identifier: 'password-reset' } satisfies RateLimitOptions,
 } as const;
 
 const RATE_LIMIT_MESSAGE = 'Per daug užklausų. Bandykite vėliau.';
@@ -80,15 +82,17 @@ const RATE_LIMIT_MESSAGE = 'Per daug užklausų. Bandykite vėliau.';
 /**
  * Check the rate limit for a request.
  * Returns `null` if the request is within limits, or a 429 NextResponse if rate-limited.
+ * When userId is provided, rate limits are applied per user instead of per IP.
  */
 export function checkRateLimit(
   request: NextRequest,
   options: RateLimitOptions,
+  userId?: string,
 ): NextResponse | null {
   ensureCleanup();
 
-  const ip = getClientIp(request);
-  const key = `${options.identifier}:${ip}`;
+  const identifier = userId ?? getClientIp(request);
+  const key = `${options.identifier}:${identifier}`;
   const now = Date.now();
 
   const existing = store.get(key);

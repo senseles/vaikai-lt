@@ -95,14 +95,17 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
         },
         body: JSON.stringify({ itemId, itemType, rating, text: text.trim(), authorName: authorName.trim() }),
       });
-      if (!res.ok) throw new Error('Nepavyko išsaugoti');
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || 'Nepavyko išsaugoti');
+      }
       setSuccess(true);
       setRating(0);
       setText('');
       setAuthorName(session?.user?.name || '');
       onSubmitted?.();
-    } catch {
-      setError('Klaida siunčiant atsiliepimą. Bandykite dar kartą.');
+    } catch (err) {
+      setError(err instanceof Error && err.message !== 'Nepavyko išsaugoti' ? err.message : 'Klaida siunčiant atsiliepimą. Bandykite dar kartą.');
     } finally {
       setSubmitting(false);
     }
@@ -110,9 +113,12 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
 
   if (success) {
     return (
-      <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm animate-scale-in flex items-center gap-2">
-        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-        Ačiū už atsiliepimą! Jis bus paskelbtas po peržiūros.
+      <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm animate-scale-in flex items-start gap-2">
+        <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+        <div>
+          <p className="font-medium">Ačiū už atsiliepimą!</p>
+          <p className="mt-0.5 text-green-600 dark:text-green-500">Jūsų atsiliepimas bus paskelbtas po administracijos peržiūros.</p>
+        </div>
       </div>
     );
   }

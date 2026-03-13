@@ -3,7 +3,7 @@ import { verifyAdminToken } from '@/lib/admin-tokens';
 import { VALID_CITY_SLUGS } from '@/lib/cities';
 
 /** Known top-level routes that are NOT city slugs */
-const KNOWN_ROUTES = new Set(['', 'megstamiausieji', 'paieska', 'admin', 'prisijungti', 'registracija', 'privatumo-politika', 'forumas', 'aukles', 'bureliai']);
+const KNOWN_ROUTES = new Set(['', 'megstamiausieji', 'paieska', 'admin', 'prisijungti', 'registracija', 'privatumo-politika', 'forumas', 'aukles', 'bureliai', 'slaptazodis']);
 
 /** Minimal 404 HTML — styled to match the site */
 const NOT_FOUND_HTML = `<!DOCTYPE html>

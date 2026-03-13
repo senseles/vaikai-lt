@@ -494,6 +494,18 @@ export default function AuthPage() {
           </button>
         </form>
 
+        {/* Forgot password link */}
+        {mode === 'login' && (
+          <p className="text-center text-sm mt-3">
+            <Link
+              href="/slaptazodis"
+              className="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light transition-colors"
+            >
+              Pamiršote slaptažodį?
+            </Link>
+          </p>
+        )}
+
         {/* Mode switch hint */}
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-5">
           {mode === 'login' ? (

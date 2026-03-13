@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
+import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
+import { authOptions } from '@/lib/auth';
 import { jsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { notifyNewReview } from '@/lib/notifications';
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     return jsonResponse(reviews);
   } catch {
-    return errorResponse('Vidinė serverio klaida', 500);
+    return errorResponse('Vidine serverio klaida', 500);
   }
 }
 
@@ -37,7 +39,16 @@ export async function POST(request: NextRequest) {
   const csrfResponse = checkCsrf(request);
   if (csrfResponse) return csrfResponse;
 
-  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.REVIEW_POST);
+  // P1.5: Require authenticated session
+  const session = await getServerSession(authOptions);
+  if (!session?.user || !(session.user as { id?: string }).id) {
+    return errorResponse('Prisijunkite, kad galėtumėte rašyti atsiliepimą', 401);
+  }
+
+  const userId = (session.user as { id: string }).id;
+
+  // Rate limiting by userId instead of just IP
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.REVIEW_POST, userId);
   if (rateLimitResponse) return rateLimitResponse;
 
   let body: unknown;
@@ -65,6 +76,14 @@ export async function POST(request: NextRequest) {
   });
   if (!entityExists) {
     return errorResponse('Nurodytas objektas nerastas', 404);
+  }
+
+  // P1.5: Check 1 review per user per entity
+  const existingReview = await prisma.review.findFirst({
+    where: { userId, itemId: itemId as string, itemType: itemType as string },
+  });
+  if (existingReview) {
+    return errorResponse('Jūs jau palikote atsiliepimą šiam objektui', 409);
   }
 
   if (!rawAuthor || typeof rawAuthor !== 'string') {
@@ -102,7 +121,8 @@ export async function POST(request: NextRequest) {
         authorName: cleanAuthor,
         rating: rating as number,
         text: cleanText,
-        isApproved: true,
+        isApproved: false, // P1.1: Reviews require admin approval
+        userId, // P1.2: Link review to authenticated user
       },
     });
 
@@ -115,7 +135,7 @@ export async function POST(request: NextRequest) {
       itemId: review.itemId,
     }).catch(() => { /* notification failure should not block review creation */ });
 
-    return jsonResponse(review, 201);
+    return jsonResponse({ ...review, message: 'Jūsų atsiliepimas bus paskelbtas po peržiūros' }, 201);
   } catch {
     return errorResponse('Nepavyko išsaugoti atsiliepimo', 500);
   }
