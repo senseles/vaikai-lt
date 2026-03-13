@@ -85,7 +85,7 @@ export default function CityPageClient({
     setCompareIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
-      else if (next.size < 3) next.add(id);
+      else if (next.size < 4) next.add(id);
       return next;
     });
   }, []);
@@ -304,17 +304,17 @@ export default function CityPageClient({
             ))}
             {category === 'aukles' && (items as Aukle[]).map((item, i) => (
               <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
-                <AukleCard item={item} href={`/${citySlug}/aukles/${item.slug}`} />
+                <AukleCard item={item} href={`/${citySlug}/aukles/${item.slug}`} compareSelected={compareIds.has(item.id)} onCompareToggle={toggleCompare} />
               </ScrollReveal>
             ))}
             {category === 'bureliai' && (items as Burelis[]).map((item, i) => (
               <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
-                <BurelisCard item={item} href={`/${citySlug}/bureliai/${item.slug}`} />
+                <BurelisCard item={item} href={`/${citySlug}/bureliai/${item.slug}`} compareSelected={compareIds.has(item.id)} onCompareToggle={toggleCompare} />
               </ScrollReveal>
             ))}
             {category === 'specialistai' && (items as Specialist[]).map((item, i) => (
               <ScrollReveal key={item.id} delay={Math.min(i % 6, 5) * 60}>
-                <SpecialistCard item={item} href={`/${citySlug}/specialistai/${item.slug}`} />
+                <SpecialistCard item={item} href={`/${citySlug}/specialistai/${item.slug}`} compareSelected={compareIds.has(item.id)} onCompareToggle={toggleCompare} />
               </ScrollReveal>
             ))}
           </div>
@@ -353,7 +353,8 @@ export default function CityPageClient({
       {/* Compare Table */}
       {showCompare && (
         <CompareTable
-          items={kindergartens.filter((k) => compareIds.has(k.id))}
+          items={(category === 'darzeliai' ? kindergartens : category === 'aukles' ? aukles : category === 'bureliai' ? bureliai : specialists).filter((k) => compareIds.has(k.id)) as unknown as { id: string; name: string; city: string; baseRating: number; baseReviewCount: number; [key: string]: unknown }[]}
+          itemType={category === 'darzeliai' ? 'kindergarten' : category === 'aukles' ? 'aukle' : category === 'bureliai' ? 'burelis' : 'specialist'}
           onClose={() => setShowCompare(false)}
         />
       )}

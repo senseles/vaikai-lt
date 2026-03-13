@@ -38,14 +38,28 @@ export async function GET(request: NextRequest) {
     ];
   }
 
-  const [reviews, totalCount] = await Promise.all([
+  // Sort parameter
+  const sortParam = searchParams.get('sort') ?? 'date_desc';
+  const orderBy: Record<string, string> = {};
+  switch (sortParam) {
+    case 'date_asc': orderBy.createdAt = 'asc'; break;
+    case 'rating_desc': orderBy.rating = 'desc'; break;
+    case 'rating_asc': orderBy.rating = 'asc'; break;
+    default: orderBy.createdAt = 'desc';
+  }
+
+  const [reviews, totalCount, pendingCount, approvedCount, totalAll] = await Promise.all([
     prisma.review.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy,
       skip,
       take: limit,
+      include: { replies: { take: 1, orderBy: { createdAt: 'desc' } } },
     }),
     prisma.review.count({ where }),
+    prisma.review.count({ where: { isApproved: false } }),
+    prisma.review.count({ where: { isApproved: true } }),
+    prisma.review.count(),
   ]);
 
   // Resolve entity names for each review (batched to avoid N+1)
@@ -85,12 +99,15 @@ export async function GET(request: NextRequest) {
   const enrichedReviews = reviews.map((r) => ({
     ...r,
     itemName: nameMap.get(r.itemId) ?? undefined,
+    reply: r.replies && r.replies.length > 0 ? r.replies[0] : null,
+    replies: undefined,
   }));
 
   return json({
     reviews: enrichedReviews,
     total: totalCount,
     pagination: { page, limit, total: totalCount, totalPages: Math.ceil(totalCount / limit) },
+    counts: { pending: pendingCount, approved: approvedCount, all: totalAll },
   });
 }
 

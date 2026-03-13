@@ -15,6 +15,7 @@ export interface Kindergarten {
   hours?: string | null;
   features: string;
   description?: string | null;
+  imageUrl?: string | null;
   note?: string | null;
   baseRating: number;
   baseReviewCount: number;
@@ -37,6 +38,7 @@ export interface Aukle {
   hourlyRate?: string | null;
   languages?: string | null;
   description?: string | null;
+  imageUrl?: string | null;
   availability?: string | null;
   baseRating: number;
   baseReviewCount: number;
@@ -61,6 +63,7 @@ export interface Burelis {
   phone?: string | null;
   website?: string | null;
   description?: string | null;
+  imageUrl?: string | null;
   baseRating: number;
   baseReviewCount: number;
   isUserAdded: boolean;
@@ -82,6 +85,7 @@ export interface Specialist {
   website?: string | null;
   languages?: string | null;
   description?: string | null;
+  imageUrl?: string | null;
   baseRating: number;
   baseReviewCount: number;
   isUserAdded: boolean;
@@ -99,6 +103,25 @@ export interface Review {
   isApproved: boolean;
   createdAt: string;
   userId?: string | null;
+  replies?: ReviewReply[];
+}
+
+export interface ReviewReply {
+  id: string;
+  reviewId: string;
+  text: string;
+  authorName: string;
+  createdAt: string;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: string;
+  message: string;
+  link?: string | null;
+  isRead: boolean;
+  createdAt: string;
 }
 
 export type ItemType = 'kindergarten' | 'aukle' | 'burelis' | 'specialist';

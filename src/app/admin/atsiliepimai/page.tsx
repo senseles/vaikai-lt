@@ -12,6 +12,7 @@ interface Review {
   text: string;
   isApproved: boolean;
   createdAt: string;
+  reply?: { id: string; text: string; authorName: string; createdAt: string } | null;
 }
 
 type TabFilter = 'pending' | 'approved' | 'all';
@@ -41,6 +42,13 @@ export default function AdminAtsiliepimai() {
   const [filterRating, setFilterRating] = useState('');
   const [processing, setProcessing] = useState<Set<string>>(new Set());
   const [counts, setCounts] = useState({ pending: 0, approved: 0, all: 0 });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [sortBy, setSortBy] = useState('date_desc');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [replySubmitting, setReplySubmitting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -50,43 +58,32 @@ export default function AdminAtsiliepimai() {
       else if (tab === 'approved') params.set('approved', 'true');
       if (filterType) params.set('itemType', filterType);
       if (filterRating) params.set('rating', filterRating);
+      if (searchQuery) params.set('search', searchQuery);
+      params.set('page', String(currentPage));
+      params.set('limit', '20');
+      if (sortBy) params.set('sort', sortBy);
 
       const res = await fetch(`/api/admin/reviews?${params}`);
       if (res.ok) {
         const data = await res.json();
         setReviews(Array.isArray(data) ? data : (data.reviews ?? []));
+        if (data.pagination) {
+          setTotalPages(data.pagination.totalPages || 1);
+        }
+        if (data.counts) {
+          setCounts(data.counts);
+        }
       }
     } finally {
       setLoading(false);
     }
-  }, [tab, filterType, filterRating]);
-
-  // Load counts for tabs — use the total field from API response
-  const loadCounts = useCallback(async () => {
-    try {
-      const [pendingRes, approvedRes, allRes] = await Promise.all([
-        fetch('/api/admin/reviews?pending=true'),
-        fetch('/api/admin/reviews?approved=true'),
-        fetch('/api/admin/reviews'),
-      ]);
-      const [pendingData, approvedData, allData] = await Promise.all([
-        pendingRes.ok ? pendingRes.json() : { total: 0 },
-        approvedRes.ok ? approvedRes.json() : { total: 0 },
-        allRes.ok ? allRes.json() : { total: 0 },
-      ]);
-      setCounts({
-        pending: pendingData.total ?? (Array.isArray(pendingData) ? pendingData : pendingData.reviews ?? []).length,
-        approved: approvedData.total ?? (Array.isArray(approvedData) ? approvedData : approvedData.reviews ?? []).length,
-        all: allData.total ?? (Array.isArray(allData) ? allData : allData.reviews ?? []).length,
-      });
-    } catch {
-      // Silently fail, counts are not critical
-    }
-  }, []);
+  }, [tab, filterType, filterRating, searchQuery, currentPage, sortBy]);
 
   useEffect(() => { load(); }, [load]);
-  useEffect(() => { loadCounts(); }, [loadCounts]);
   useEffect(() => { setSelectedIds(new Set()); }, [reviews]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => { setCurrentPage(1); }, [tab, filterType, filterRating, searchQuery, sortBy]);
 
   // Auto-dismiss success messages
   useEffect(() => {
@@ -112,7 +109,6 @@ export default function AdminAtsiliepimai() {
       if (!res.ok) throw new Error();
       setActionSuccess('Atsiliepimas patvirtintas');
       load();
-      loadCounts();
     } catch {
       setActionError('Nepavyko patvirtinti atsiliepimo');
     } finally {
@@ -136,7 +132,6 @@ export default function AdminAtsiliepimai() {
       if (!res.ok) throw new Error();
       setActionSuccess('Atsiliepimas atmestas');
       load();
-      loadCounts();
     } catch {
       setActionError('Nepavyko atmesti atsiliepimo');
     } finally {
@@ -157,7 +152,6 @@ export default function AdminAtsiliepimai() {
       if (!res.ok) throw new Error();
       setActionSuccess('Atsiliepimas ištrintas');
       load();
-      loadCounts();
     } catch {
       setActionError('Nepavyko ištrinti atsiliepimo');
     } finally {
@@ -183,7 +177,6 @@ export default function AdminAtsiliepimai() {
       setActionSuccess(`${selectedIds.size} atsiliepimų patvirtinta`);
       setSelectedIds(new Set());
       load();
-      loadCounts();
     } catch {
       setActionError('Nepavyko atlikti masinio patvirtinimo');
     }
@@ -202,7 +195,6 @@ export default function AdminAtsiliepimai() {
       setActionSuccess(`${selectedIds.size} atsiliepimų atmesta`);
       setSelectedIds(new Set());
       load();
-      loadCounts();
     } catch {
       setActionError('Nepavyko atlikti masinio atmetimo');
     }
@@ -223,6 +215,31 @@ export default function AdminAtsiliepimai() {
       else next.add(id);
       return next;
     });
+  };
+
+  const submitReply = async (reviewId: string) => {
+    if (!replyText.trim()) return;
+    setReplySubmitting(true);
+    clearMessages();
+    try {
+      const res = await fetch(`/api/admin/reviews/${reviewId}/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: replyText }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Nepavyko išsaugoti atsakymo');
+      }
+      setActionSuccess('Atsakymas išsaugotas');
+      setReplyingTo(null);
+      setReplyText('');
+      load();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Nepavyko išsaugoti atsakymo');
+    } finally {
+      setReplySubmitting(false);
+    }
   };
 
   const allSelected = reviews.length > 0 && reviews.every((r) => selectedIds.has(r.id));
@@ -296,8 +313,15 @@ export default function AdminAtsiliepimai() {
         ))}
       </div>
 
-      {/* Filters */}
+      {/* Search and Filters */}
       <div className="flex flex-wrap gap-2 mb-4">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Ieškoti pagal autorių ar tekstą..."
+          className="border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#2d6a4f] focus:border-transparent outline-none min-h-[40px] min-w-[220px]"
+        />
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
@@ -321,9 +345,19 @@ export default function AdminAtsiliepimai() {
           <option value="4">4 žvaigždutės</option>
           <option value="5">5 žvaigždutės</option>
         </select>
-        {(filterType || filterRating) && (
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#2d6a4f] focus:border-transparent outline-none min-h-[40px]"
+        >
+          <option value="date_desc">Naujausi pirmi</option>
+          <option value="date_asc">Seniausi pirmi</option>
+          <option value="rating_desc">Aukščiausias įvertinimas</option>
+          <option value="rating_asc">Žemiausias įvertinimas</option>
+        </select>
+        {(filterType || filterRating || searchQuery) && (
           <button
-            onClick={() => { setFilterType(''); setFilterRating(''); }}
+            onClick={() => { setFilterType(''); setFilterRating(''); setSearchQuery(''); }}
             className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors px-2 min-h-[40px]"
           >
             Išvalyti filtrus
@@ -464,6 +498,16 @@ export default function AdminAtsiliepimai() {
                               </button>
                             )}
                             <button
+                              onClick={() => {
+                                if (replyingTo === r.id) { setReplyingTo(null); setReplyText(''); }
+                                else { setReplyingTo(r.id); setReplyText(''); }
+                              }}
+                              disabled={isProcessing}
+                              className="px-3 py-1.5 text-xs bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 disabled:opacity-50 font-medium transition-colors whitespace-nowrap min-h-[32px]"
+                            >
+                              Atsakyti
+                            </button>
+                            <button
                               onClick={() => deleteReview(r.id)}
                               disabled={isProcessing}
                               className="px-3 py-1.5 text-xs bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/40 disabled:opacity-50 font-medium transition-colors whitespace-nowrap min-h-[32px]"
@@ -472,6 +516,53 @@ export default function AdminAtsiliepimai() {
                             </button>
                           </div>
                         </div>
+
+                        {/* Existing reply */}
+                        {r.reply && (
+                          <div className="mt-3 ml-4 p-3 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-lg">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-semibold text-blue-700 dark:text-blue-400">{r.reply.authorName}</span>
+                              <time className="text-xs text-blue-400 dark:text-blue-500">
+                                {new Date(r.reply.createdAt).toLocaleDateString('lt-LT', {
+                                  year: 'numeric', month: 'long', day: 'numeric',
+                                })}
+                              </time>
+                            </div>
+                            <p className="text-sm text-blue-800 dark:text-blue-300">{r.reply.text}</p>
+                          </div>
+                        )}
+
+                        {/* Inline reply form */}
+                        {replyingTo === r.id && (
+                          <div className="mt-3 ml-4 p-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-lg">
+                            <textarea
+                              value={replyText}
+                              onChange={(e) => setReplyText(e.target.value)}
+                              placeholder="Rašykite atsakymą..."
+                              rows={3}
+                              maxLength={2000}
+                              className="w-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#2d6a4f] focus:border-transparent outline-none resize-none"
+                            />
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="text-xs text-gray-400 dark:text-gray-500">{replyText.length}/2000</span>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => { setReplyingTo(null); setReplyText(''); }}
+                                  className="px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 font-medium transition-colors min-h-[32px]"
+                                >
+                                  Atšaukti
+                                </button>
+                                <button
+                                  onClick={() => submitReply(r.id)}
+                                  disabled={replySubmitting || !replyText.trim()}
+                                  className="px-3 py-1.5 text-xs bg-[#2d6a4f] text-white rounded-lg hover:bg-[#40916c] disabled:opacity-50 font-medium transition-colors min-h-[32px]"
+                                >
+                                  {replySubmitting ? 'Siunčiama...' : 'Siųsti atsakymą'}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -479,6 +570,29 @@ export default function AdminAtsiliepimai() {
               );
             })}
           </div>
+
+          {/* Pagination controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 mt-6">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+                className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed font-medium text-gray-700 dark:text-gray-300 transition-colors min-h-[40px]"
+              >
+                Ankstesnis
+              </button>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {currentPage} iš {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+                className="px-4 py-2 text-sm bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed font-medium text-gray-700 dark:text-gray-300 transition-colors min-h-[40px]"
+              >
+                Kitas
+              </button>
+            </div>
+          )}
         </>
       )}
 

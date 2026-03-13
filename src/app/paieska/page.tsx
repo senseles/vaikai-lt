@@ -3,6 +3,7 @@ import { unstable_cache } from 'next/cache';
 import { Suspense } from 'react';
 import prisma from '@/lib/prisma';
 
+
 import SearchResultsClient from './SearchResultsClient';
 import SearchLoading from './loading';
 
@@ -106,10 +107,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <Suspense fallback={<SearchLoading />}>
           <SearchResultsClient
             query={query}
-            kindergartens={serialize(kindergartens) as never[]}
-            aukles={serialize(aukles) as never[]}
-            bureliai={serialize(bureliai) as never[]}
-            specialists={serialize(specialists) as never[]}
+            kindergartens={serialize(kindergartens)}
+            aukles={serialize(aukles)}
+            bureliai={serialize(bureliai)}
+            specialists={serialize(specialists)}
           />
         </Suspense>
       )}

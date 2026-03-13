@@ -110,6 +110,21 @@ function ReviewItem({ review }: { readonly review: Review }) {
       <StarRating rating={review.rating} size="sm" />
       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{review.text}</p>
 
+      {/* Admin reply */}
+      {review.replies && review.replies.length > 0 && (
+        <div className="mt-3 ml-4 pl-3 border-l-2 border-primary/30">
+          {review.replies.map((reply) => (
+            <div key={reply.id} className="mb-2 last:mb-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-xs font-semibold text-primary dark:text-primary-light">{reply.authorName}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500">{new Date(reply.createdAt).toLocaleDateString('lt-LT')}</span>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{reply.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Report section */}
       <div className="mt-2 flex items-center gap-2">
         {reportState === 'idle' && (

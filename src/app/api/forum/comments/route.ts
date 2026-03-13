@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { jsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { checkCsrf, checkHoneypot, checkSubmitTiming, stripHtml } from '@/lib/security';
+import { createNotification } from '@/lib/create-notification';
 
 /** Check nesting depth of a comment by walking up the parent chain */
 async function getCommentDepth(parentId: string): Promise<number> {
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
   }
   const post = await prisma.forumPost.findUnique({
     where: { id: postId },
-    select: { id: true, isLocked: true },
+    select: { id: true, isLocked: true, authorId: true, slug: true, title: true },
   });
   if (!post) {
     return errorResponse('Įrašas nerastas', 404);
@@ -121,6 +122,16 @@ export async function POST(request: NextRequest) {
         authorName: cleanAuthor,
       },
     });
+
+    // Notify the post author about the new comment
+    if (post.authorId && post.authorId !== (parsed.authorId as string | undefined)) {
+      createNotification({
+        userId: post.authorId,
+        type: 'forum_reply',
+        message: `${cleanAuthor} atsakė į jūsų įrašą "${post.title}"`,
+        link: `/forumas/${post.slug}`,
+      });
+    }
 
     return jsonResponse(comment, 201);
   } catch {

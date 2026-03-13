@@ -1,26 +1,59 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useState } from 'react';
-import type { Kindergarten } from '@/types';
 import StarRating from './StarRating';
+import type { ItemType } from '@/types';
+
+interface CompareItem {
+  id: string;
+  name: string;
+  city: string;
+  baseRating: number;
+  baseReviewCount: number;
+  [key: string]: unknown;
+}
 
 interface CompareTableProps {
-  readonly items: Kindergarten[];
+  readonly items: CompareItem[];
+  readonly itemType: ItemType;
   readonly onClose: () => void;
 }
 
-const fields: { key: keyof Kindergarten | 'rating'; label: string }[] = [
-  { key: 'type', label: 'Tipas' },
-  { key: 'address', label: 'Adresas' },
-  { key: 'phone', label: 'Telefonas' },
-  { key: 'language', label: 'Kalba' },
-  { key: 'hours', label: 'Darbo laikas' },
-  { key: 'ageFrom', label: 'Amžius nuo' },
-  { key: 'groups', label: 'Grupės' },
-  { key: 'rating', label: 'Įvertinimas' },
-];
+const fieldsByType: Record<ItemType, { key: string; label: string }[]> = {
+  kindergarten: [
+    { key: 'type', label: 'Tipas' },
+    { key: 'address', label: 'Adresas' },
+    { key: 'phone', label: 'Telefonas' },
+    { key: 'language', label: 'Kalba' },
+    { key: 'hours', label: 'Darbo laikas' },
+    { key: 'ageFrom', label: 'Amžius nuo' },
+    { key: 'groups', label: 'Grupės' },
+  ],
+  aukle: [
+    { key: 'phone', label: 'Telefonas' },
+    { key: 'hourlyRate', label: 'Kaina' },
+    { key: 'experience', label: 'Patirtis' },
+    { key: 'ageRange', label: 'Amžiaus grupė' },
+    { key: 'languages', label: 'Kalbos' },
+    { key: 'availability', label: 'Prieinamumas' },
+  ],
+  burelis: [
+    { key: 'category', label: 'Kategorija' },
+    { key: 'price', label: 'Kaina' },
+    { key: 'schedule', label: 'Tvarkaraštis' },
+    { key: 'ageRange', label: 'Amžiaus grupė' },
+    { key: 'phone', label: 'Telefonas' },
+  ],
+  specialist: [
+    { key: 'specialty', label: 'Specializacija' },
+    { key: 'clinic', label: 'Klinika' },
+    { key: 'price', label: 'Kaina' },
+    { key: 'phone', label: 'Telefonas' },
+    { key: 'languages', label: 'Kalbos' },
+  ],
+};
 
-export default function CompareTable({ items, onClose }: CompareTableProps) {
+export default function CompareTable({ items, itemType, onClose }: CompareTableProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const [dragY, setDragY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -59,6 +92,7 @@ export default function CompareTable({ items, onClose }: CompareTableProps) {
 
   if (items.length < 2) return null;
 
+  const fields = fieldsByType[itemType] || fieldsByType.kindergarten;
   const bestRatingIdx = items.reduce((best, item, i) =>
     item.baseRating > items[best].baseRating ? i : best, 0);
 
@@ -77,7 +111,6 @@ export default function CompareTable({ items, onClose }: CompareTableProps) {
           transition: isDragging ? 'none' : undefined,
         }}
       >
-        {/* Mobile drag handle */}
         <div className="sm:hidden flex justify-center pb-3 -mt-1" aria-hidden="true">
           <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-slate-600" />
         </div>
@@ -118,30 +151,24 @@ export default function CompareTable({ items, onClose }: CompareTableProps) {
             {fields.map(({ key, label }) => (
               <tr key={key} className="border-t border-gray-100 dark:border-slate-700">
                 <td className="py-2.5 pr-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">{label}</td>
-                {items.map((item, i) => (
-                  <td key={item.id} className={`py-2.5 px-2 text-gray-900 dark:text-gray-200 ${
-                    key === 'rating' && i === bestRatingIdx && item.baseRating > 0 ? 'bg-green-50 dark:bg-green-900/10 rounded' : ''
-                  }`}>
-                    {key === 'rating' ? (
-                      <div className="flex items-center gap-1.5">
-                        <StarRating rating={item.baseRating} size="sm" />
-                        <span className="text-xs text-gray-500 dark:text-gray-400">{item.baseRating.toFixed(1)}</span>
-                      </div>
-                    ) : key === 'type' ? (
-                      <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${
-                        item.type === 'valstybinis'
-                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                          : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                      }`}>
-                        {item.type === 'valstybinis' ? 'Valstybinis' : 'Privatus'}
-                      </span>
-                    ) : (
-                      String(item[key] ?? '—')
-                    )}
+                {items.map((item) => (
+                  <td key={item.id} className="py-2.5 px-2 text-gray-900 dark:text-gray-200">
+                    {String(item[key] ?? '—')}
                   </td>
                 ))}
               </tr>
             ))}
+            <tr className="border-t border-gray-100 dark:border-slate-700">
+              <td className="py-2.5 pr-4 text-gray-500 dark:text-gray-400">Įvertinimas</td>
+              {items.map((item, i) => (
+                <td key={item.id} className={`py-2.5 px-2 ${i === bestRatingIdx && item.baseRating > 0 ? 'bg-green-50 dark:bg-green-900/10 rounded' : ''}`}>
+                  <div className="flex items-center gap-1.5">
+                    <StarRating rating={item.baseRating} size="sm" />
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{item.baseRating.toFixed(1)}</span>
+                  </div>
+                </td>
+              ))}
+            </tr>
           </tbody>
         </table>
         </div>

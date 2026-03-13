@@ -11,11 +11,13 @@ interface SpecialistCardProps {
   readonly item: Specialist;
   readonly onSelect?: (item: Specialist) => void;
   readonly href?: string;
+  readonly compareSelected?: boolean;
+  readonly onCompareToggle?: (id: string) => void;
 }
 
 const cardClasses = "bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 active:shadow-sm transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden group";
 
-export default memo(function SpecialistCard({ item, onSelect, href }: SpecialistCardProps) {
+export default memo(function SpecialistCard({ item, onSelect, href, compareSelected = false, onCompareToggle }: SpecialistCardProps) {
   const content = (
     <>
       <PlaceholderImage category="specialistai" name={item.name} />
@@ -44,6 +46,20 @@ export default memo(function SpecialistCard({ item, onSelect, href }: Specialist
           </div>
           {item.phone && <span className="text-sm text-gray-600 dark:text-gray-400 truncate min-w-0">{item.phone}</span>}
         </div>
+
+        {onCompareToggle && (
+          <div className="flex items-center justify-end mt-2">
+            <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400" onClick={(e) => e.stopPropagation()}>
+              <input
+                type="checkbox"
+                checked={compareSelected}
+                onChange={() => onCompareToggle(item.id)}
+                className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+              />
+              Palyginti
+            </label>
+          </div>
+        )}
       </div>
     </>
   );

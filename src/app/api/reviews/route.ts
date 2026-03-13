@@ -9,6 +9,16 @@ import { checkCsrf, stripHtml } from '@/lib/security';
 
 const VALID_ITEM_TYPES = ['kindergarten', 'aukle', 'burelis', 'specialist'] as const;
 
+function getEntityModel(type: string) {
+  switch (type) {
+    case 'kindergarten': return prisma.kindergarten;
+    case 'aukle': return prisma.aukle;
+    case 'burelis': return prisma.burelis;
+    case 'specialist': return prisma.specialist;
+    default: return null;
+  }
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const itemId = searchParams.get('itemId');
@@ -26,6 +36,7 @@ export async function GET(request: NextRequest) {
     const reviews = await prisma.review.findMany({
       where: { itemId, itemType, isApproved: true },
       orderBy: { createdAt: 'desc' },
+      include: { replies: { orderBy: { createdAt: 'asc' } } },
     });
 
     return jsonResponse(reviews);
@@ -68,9 +79,10 @@ export async function POST(request: NextRequest) {
   }
 
   // Verify the referenced entity exists
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const entityModel = (prisma as any)[itemType as string];
-  const entityExists = await entityModel.findUnique({
+  const entityModel = getEntityModel(itemType as string);
+  if (!entityModel) return errorResponse('Netinkamas tipas', 400);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma union types not compatible with each other
+  const entityExists = await (entityModel as any).findUnique({
     where: { id: itemId as string },
     select: { id: true },
   });

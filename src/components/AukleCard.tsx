@@ -11,11 +11,13 @@ interface AukleCardProps {
   readonly item: Aukle;
   readonly onSelect?: (item: Aukle) => void;
   readonly href?: string;
+  readonly compareSelected?: boolean;
+  readonly onCompareToggle?: (id: string) => void;
 }
 
 const cardClasses = "bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 active:shadow-sm transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden group";
 
-export default memo(function AukleCard({ item, onSelect, href }: AukleCardProps) {
+export default memo(function AukleCard({ item, onSelect, href, compareSelected = false, onCompareToggle }: AukleCardProps) {
   const content = (
     <>
       <PlaceholderImage category="aukles" name={item.name} />
@@ -48,6 +50,20 @@ export default memo(function AukleCard({ item, onSelect, href }: AukleCardProps)
             {item.phone && <span className="truncate min-w-0">{item.phone}</span>}
           </div>
         </div>
+
+        {onCompareToggle && (
+          <div className="flex items-center justify-end mt-2">
+            <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400" onClick={(e) => e.stopPropagation()}>
+              <input
+                type="checkbox"
+                checked={compareSelected}
+                onChange={() => onCompareToggle(item.id)}
+                className="rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+              />
+              Palyginti
+            </label>
+          </div>
+        )}
       </div>
     </>
   );
