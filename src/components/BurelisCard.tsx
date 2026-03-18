@@ -6,6 +6,7 @@ import type { Burelis } from '@/types';
 import StarRating from './StarRating';
 import FavoriteButton from './FavoriteButton';
 import PlaceholderImage from './PlaceholderImage';
+import VerificationBadge from './VerificationBadge';
 
 interface BurelisCardProps {
   readonly item: Burelis;
@@ -24,7 +25,10 @@ export default memo(function BurelisCard({ item, onSelect, href, compareSelected
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 dark:text-white truncate">{item.name}</h3>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <h3 className="font-semibold text-gray-900 dark:text-white truncate">{item.name}</h3>
+              <VerificationBadge status={item.verificationStatus ?? ''} verifiedAt={item.verifiedAt} />
+            </div>
             <p className="text-sm text-gray-500 dark:text-gray-400">{item.city}</p>
           </div>
           <FavoriteButton itemId={item.id} itemType="burelis" />

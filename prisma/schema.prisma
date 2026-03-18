@@ -9,6 +9,19 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum VerificationStatus {
+  UNVERIFIED
+  VERIFIED
+  REJECTED
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FLAGGED
+}
+
 model User {
   id            String      @id @default(cuid())
   email         String      @unique
@@ -81,14 +94,19 @@ model Kindergarten {
   note            String?
   baseRating      Float    @default(0)
   baseReviewCount Int      @default(0)
-  isUserAdded     Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isUserAdded          Boolean            @default(false)
+  verificationStatus   VerificationStatus @default(UNVERIFIED)
+  verifiedAt           DateTime?
+  verifiedBy           String?
+  rejectionReason      String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 
   @@index([city])
   @@index([city, baseRating])
   @@index([name])
   @@index([createdAt])
+  @@index([verificationStatus])
 }
 
 model Aukle {
@@ -109,15 +127,20 @@ model Aukle {
   availability    String?
   baseRating      Float    @default(0)
   baseReviewCount Int      @default(0)
-  isServicePortal Boolean  @default(false)
-  isUserAdded     Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isServicePortal      Boolean            @default(false)
+  isUserAdded          Boolean            @default(false)
+  verificationStatus   VerificationStatus @default(UNVERIFIED)
+  verifiedAt           DateTime?
+  verifiedBy           String?
+  rejectionReason      String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 
   @@index([city])
   @@index([city, baseRating])
   @@index([name])
   @@index([createdAt])
+  @@index([verificationStatus])
 }
 
 model Burelis {
@@ -138,14 +161,19 @@ model Burelis {
   imageUrl        String?
   baseRating      Float    @default(0)
   baseReviewCount Int      @default(0)
-  isUserAdded     Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isUserAdded          Boolean            @default(false)
+  verificationStatus   VerificationStatus @default(UNVERIFIED)
+  verifiedAt           DateTime?
+  verifiedBy           String?
+  rejectionReason      String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 
   @@index([city])
   @@index([city, baseRating])
   @@index([name])
   @@index([createdAt])
+  @@index([verificationStatus])
 }
 
 model Specialist {
@@ -165,14 +193,19 @@ model Specialist {
   imageUrl        String?
   baseRating      Float    @default(0)
   baseReviewCount Int      @default(0)
-  isUserAdded     Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isUserAdded          Boolean            @default(false)
+  verificationStatus   VerificationStatus @default(UNVERIFIED)
+  verifiedAt           DateTime?
+  verifiedBy           String?
+  rejectionReason      String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 
   @@index([city])
   @@index([city, baseRating])
   @@index([name])
   @@index([createdAt])
+  @@index([verificationStatus])
 }
 
 model Review {
@@ -182,11 +215,14 @@ model Review {
   authorName String
   rating     Int      @default(5)
   text       String
-  isApproved Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id])
+  isApproved       Boolean          @default(false)
+  moderationStatus ModerationStatus @default(PENDING)
+  moderatedAt      DateTime?
+  moderatedBy      String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @default(now()) @updatedAt
+  userId           String?
+  user             User?            @relation(fields: [userId], references: [id])
   replies    ReviewReply[]
 
   @@unique([userId, itemId, itemType])

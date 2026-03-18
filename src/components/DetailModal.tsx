@@ -10,6 +10,7 @@ import SimilarEntities from './SimilarEntities';
 import { addToRecentlyViewed } from './RecentlyViewed';
 import { toSlug } from '@/lib/utils';
 import ErrorBoundary from './ErrorBoundary';
+import VerificationBadge from './VerificationBadge';
 
 type DetailItem = Kindergarten | Aukle | Burelis | Specialist;
 
@@ -200,7 +201,16 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
           </svg>
         </button>
 
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white pr-8 break-words">{item.name}</h2>
+        <div className="flex items-center gap-2 flex-wrap pr-8">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white break-words">{item.name}</h2>
+          {'verificationStatus' in item && (
+            <VerificationBadge
+              status={(item as { verificationStatus?: string }).verificationStatus ?? ''}
+              verifiedAt={'verifiedAt' in item ? (item as { verifiedAt?: string | null }).verifiedAt : null}
+              size="md"
+            />
+          )}
+        </div>
         <Link
           href={`/${toSlug(item.city)}`}
           onClick={onClose}

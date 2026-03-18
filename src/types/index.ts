@@ -20,6 +20,8 @@ export interface Kindergarten {
   baseRating: number;
   baseReviewCount: number;
   isUserAdded: boolean;
+  verificationStatus?: string;
+  verifiedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -44,6 +46,8 @@ export interface Aukle {
   baseReviewCount: number;
   isServicePortal: boolean;
   isUserAdded: boolean;
+  verificationStatus?: string;
+  verifiedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -67,6 +71,8 @@ export interface Burelis {
   baseRating: number;
   baseReviewCount: number;
   isUserAdded: boolean;
+  verificationStatus?: string;
+  verifiedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -89,6 +95,8 @@ export interface Specialist {
   baseRating: number;
   baseReviewCount: number;
   isUserAdded: boolean;
+  verificationStatus?: string;
+  verifiedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
