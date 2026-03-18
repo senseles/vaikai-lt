@@ -15,7 +15,9 @@ export type AuditAction =
   | 'USER_UNBLOCK'
   | 'FORUM_LOCK'
   | 'FORUM_DELETE'
-  | 'REPORT_REVIEW';
+  | 'REPORT_REVIEW'
+  | 'SUBMISSION_APPROVE'
+  | 'SUBMISSION_REJECT';
 
 interface AuditLogParams {
   action: AuditAction;

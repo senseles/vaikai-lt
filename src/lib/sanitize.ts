@@ -61,3 +61,27 @@ export const registrationSchema = z.object({
   password: z.string().min(8, 'Slaptažodis turi būti bent 8 simbolių'),
   name: sanitized.pipe(z.string().max(100)).optional(),
 });
+
+export const submissionSchema = z.object({
+  entityType: z.enum(['KINDERGARTEN', 'AUKLE', 'BURELIS', 'SPECIALIST'], {
+    message: 'Pasirinkite tipą',
+  }),
+  name: sanitized.pipe(z.string().min(2, 'Pavadinimas per trumpas').max(200, 'Pavadinimas per ilgas')),
+  city: sanitized.pipe(z.string().min(2, 'Miestas privalomas').max(100)),
+  address: sanitized.pipe(z.string().max(300)).optional(),
+  phone: sanitized.pipe(z.string().max(30)).optional(),
+  email: z.string().email('Neteisingas el. pašto formatas').optional().or(z.literal('')),
+  website: sanitized.pipe(z.string().max(300)).optional(),
+  description: sanitized.pipe(z.string().max(5000, 'Aprašymas per ilgas')).optional(),
+  submitterName: sanitized.pipe(z.string().min(2, 'Vardas privalomas').max(100)),
+  submitterEmail: z.string().email('Neteisingas el. pašto formatas').optional().or(z.literal('')),
+  submitterPhone: sanitized.pipe(z.string().max(30)).optional(),
+  // Extra fields per entity type (stored in data JSON)
+  hours: sanitized.pipe(z.string().max(200)).optional(),
+  experience: sanitized.pipe(z.string().max(500)).optional(),
+  ageRange: sanitized.pipe(z.string().max(100)).optional(),
+  category: sanitized.pipe(z.string().max(100)).optional(),
+  specialty: sanitized.pipe(z.string().max(200)).optional(),
+  clinic: sanitized.pipe(z.string().max(200)).optional(),
+  price: sanitized.pipe(z.string().max(100)).optional(),
+});

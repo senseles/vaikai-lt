@@ -3,9 +3,9 @@ import { unstable_cache } from 'next/cache';
 import { Suspense } from 'react';
 import prisma from '@/lib/prisma';
 
-
 import SearchResultsClient from './SearchResultsClient';
 import SearchLoading from './loading';
+import SuggestButton from '@/components/SuggestButton';
 
 interface SearchPageProps {
   readonly searchParams: { q?: string };
@@ -102,7 +102,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <p className="text-gray-500 dark:text-gray-400 mb-8">Rasta: {totalResults}</p>
 
       {totalResults === 0 ? (
-        <p className="text-center text-gray-400 dark:text-gray-500 py-12">Nieko nerasta pagal &bdquo;{query}&ldquo;. Pabandykite kitą paieškos frazę.</p>
+        <div>
+          <p className="text-center text-gray-400 dark:text-gray-500 py-12">Nieko nerasta pagal &bdquo;{query}&ldquo;. Pabandykite kitą paieškos frazę.</p>
+          <SuggestButton searchQuery={query} resultCount={0} />
+        </div>
       ) : (
         <Suspense fallback={<SearchLoading />}>
           <SearchResultsClient

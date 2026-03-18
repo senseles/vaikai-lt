@@ -8,6 +8,7 @@ import BurelisCard from '@/components/BurelisCard';
 import SpecialistCard from '@/components/SpecialistCard';
 import SearchBar from '@/components/SearchBar';
 import ScrollReveal from '@/components/ScrollReveal';
+import SuggestButton from '@/components/SuggestButton';
 import { toSlug } from '@/lib/utils';
 
 interface SearchResultsClientProps {
@@ -18,14 +19,14 @@ interface SearchResultsClientProps {
   readonly specialists: Specialist[];
 }
 
+const totalOriginal = (props: SearchResultsClientProps) =>
+  props.kindergartens.length + props.aukles.length + props.bureliai.length + props.specialists.length;
+
 type CategoryFilter = 'all' | 'kindergarten' | 'aukle' | 'burelis' | 'specialist';
 
-export default function SearchResultsClient({
-  kindergartens,
-  aukles,
-  bureliai,
-  specialists,
-}: SearchResultsClientProps) {
+export default function SearchResultsClient(props: SearchResultsClientProps) {
+  const { kindergartens, aukles, bureliai, specialists, query } = props;
+  const origTotal = totalOriginal(props);
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [minRating, setMinRating] = useState(0);
   const [cityFilter, setCityFilter] = useState('');
@@ -174,6 +175,8 @@ export default function SearchResultsClient({
               </div>
             </section>
           )}
+
+          <SuggestButton searchQuery={query} resultCount={origTotal} variant="inline" />
         </>
       )}
     </>
