@@ -61,7 +61,7 @@ interface SearchBarProps {
 
 const RECENT_SEARCHES_KEY = 'vaikai_recent_searches';
 const MAX_RECENT = 5;
-const POPULAR_SEARCHES = ['Darželis Vilnius', 'Auklė Kaunas', 'Būreliai vaikams', 'Logopedas', 'Montessori'];
+const POPULAR_SEARCHES = ['Vilnius', 'Kaunas', 'Montessori', 'Logopedas', 'Klaipėda'];
 
 function getRecentSearches(): string[] {
   if (typeof window === 'undefined') return [];

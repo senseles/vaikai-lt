@@ -12,28 +12,39 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Search across all entity types — match name, city, or type-specific fields
+    // Split query into words and AND them together for multi-word search
+    const words = q.split(/\s+/).filter(w => w.length > 0);
+    if (words.length === 0) {
+      return NextResponse.json({ suggestions: [] });
+    }
+
+    const wordConditions = (fields: string[], ws: string[]) => ({
+      AND: ws.map(w => ({
+        OR: fields.map(f => ({ [f]: { contains: w, mode: 'insensitive' as const } })),
+      })),
+    });
+
     const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
       prisma.kindergarten.findMany({
-        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { address: { contains: q, mode: 'insensitive' as const } }] },
+        where: wordConditions(['name', 'city', 'address'], words),
         select: { name: true, city: true, slug: true, baseRating: true },
         take: 3,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.aukle.findMany({
-        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }] },
+        where: wordConditions(['name', 'city'], words),
         select: { name: true, city: true, slug: true, baseRating: true },
         take: 2,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.burelis.findMany({
-        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { category: { contains: q, mode: 'insensitive' as const } }] },
+        where: wordConditions(['name', 'city', 'category'], words),
         select: { name: true, city: true, slug: true, category: true, baseRating: true },
         take: 2,
         orderBy: { baseRating: 'desc' },
       }),
       prisma.specialist.findMany({
-        where: { OR: [{ name: { contains: q, mode: 'insensitive' as const } }, { city: { contains: q, mode: 'insensitive' as const } }, { specialty: { contains: q, mode: 'insensitive' as const } }] },
+        where: wordConditions(['name', 'city', 'specialty'], words),
         select: { name: true, city: true, slug: true, specialty: true, baseRating: true },
         take: 2,
         orderBy: { baseRating: 'desc' },

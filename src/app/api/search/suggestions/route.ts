@@ -32,24 +32,48 @@ interface RawResult {
   base_rating: number;
 }
 
+const CATEGORY_KEYWORDS: Record<string, string> = {
+  'darželiai': 'kindergarten', 'darželis': 'kindergarten', 'darzeliai': 'kindergarten', 'darzelis': 'kindergarten',
+  'auklė': 'aukle', 'auklės': 'aukle', 'aukle': 'aukle', 'aukles': 'aukle',
+  'būreliai': 'burelis', 'būrelis': 'burelis', 'bureliai': 'burelis', 'burelis': 'burelis',
+  'specialistai': 'specialist', 'specialistas': 'specialist',
+};
+
+function parseSearchWords(q: string): { searchWords: string[]; categoryFilter: string | null } {
+  const allWords = q.split(/\s+/).filter(w => w.length > 0);
+  let categoryFilter: string | null = null;
+  const searchWords: string[] = [];
+  for (const w of allWords) {
+    const cat = CATEGORY_KEYWORDS[w.toLocaleLowerCase('lt')];
+    if (cat && !categoryFilter) {
+      categoryFilter = cat;
+    } else {
+      searchWords.push(w);
+    }
+  }
+  return { searchWords: searchWords.length > 0 ? searchWords : allWords, categoryFilter };
+}
+
 async function searchWithUnaccent(
   table: string,
   fields: string[],
-  q: string,
+  words: string[],
   limit: number
 ): Promise<RawResult[]> {
-  const pattern = `%${q}%`;
-  const orClauses = fields
-    .map((f) => `unaccent(${f}) ILIKE unaccent($1)`)
-    .join(' OR ');
-  
-  const sql = `SELECT id, name, city, slug, "baseRating" as base_rating 
-    FROM "${table}" 
-    WHERE ${orClauses}
-    ORDER BY "baseRating" DESC 
+  const patterns = words.map(w => `%${w}%`);
+  const andClauses = patterns.map((_, i) => {
+    const paramIdx = i + 1;
+    const orParts = fields.map(f => `unaccent(${f}) ILIKE unaccent($${paramIdx})`);
+    return `(${orParts.join(' OR ')})`;
+  });
+
+  const sql = `SELECT id, name, city, slug, "baseRating" as base_rating
+    FROM "${table}"
+    WHERE ${andClauses.join(' AND ')}
+    ORDER BY "baseRating" DESC
     LIMIT ${limit}`;
-  
-  return prisma.$queryRawUnsafe(sql, pattern) as Promise<RawResult[]>;
+
+  return prisma.$queryRawUnsafe(sql, ...patterns) as Promise<RawResult[]>;
 }
 
 export async function GET(request: NextRequest) {
@@ -68,11 +92,20 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const { searchWords, categoryFilter } = parseSearchWords(sanitized);
+    if (searchWords.every(w => w.length < 2) && !categoryFilter) {
+      return NextResponse.json({ suggestions: [] });
+    }
+
     const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
-      searchWithUnaccent('Kindergarten', ['name', 'city', 'address'], sanitized, 4),
-      searchWithUnaccent('Aukle', ['name', 'city'], sanitized, 3),
-      searchWithUnaccent('Burelis', ['name', 'city', 'category'], sanitized, 3),
-      searchWithUnaccent('Specialist', ['name', 'city', 'specialty'], sanitized, 3),
+      !categoryFilter || categoryFilter === 'kindergarten'
+        ? searchWithUnaccent('Kindergarten', ['name', 'city', 'address'], searchWords, 4) : Promise.resolve([]),
+      !categoryFilter || categoryFilter === 'aukle'
+        ? searchWithUnaccent('Aukle', ['name', 'city'], searchWords, 3) : Promise.resolve([]),
+      !categoryFilter || categoryFilter === 'burelis'
+        ? searchWithUnaccent('Burelis', ['name', 'city', 'category'], searchWords, 3) : Promise.resolve([]),
+      !categoryFilter || categoryFilter === 'specialist'
+        ? searchWithUnaccent('Specialist', ['name', 'city', 'specialty'], searchWords, 3) : Promise.resolve([]),
     ]);
 
     const suggestions = [
