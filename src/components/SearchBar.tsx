@@ -79,6 +79,7 @@ function saveRecentSearch(q: string) {
 export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [fallbackMessage, setFallbackMessage] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showRecent, setShowRecent] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(-1);
@@ -102,6 +103,7 @@ export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
 
     if (query.trim().length < 2) {
       setSuggestions([]);
+      setFallbackMessage(null);
       setShowSuggestions(false);
       setIsLoading(false);
       if (query.trim().length > 0) setShowRecent(false);
@@ -121,6 +123,7 @@ export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
         if (res.ok) {
           const data = await res.json();
           setSuggestions(data.suggestions || []);
+          setFallbackMessage(data.fallbackMessage || null);
           setShowSuggestions(true);
           setSelectedIdx(-1);
         }
@@ -300,7 +303,7 @@ export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
           className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl shadow-xl overflow-hidden animate-fade-in max-h-[70vh] overflow-y-auto"
           role="listbox"
         >
-          {suggestions.length === 0 && !isLoading && (
+          {suggestions.length === 0 && !isLoading && !fallbackMessage && (
             <>
               <li className="px-4 py-4 text-sm text-gray-400 dark:text-gray-500 text-center">
                 <svg className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,6 +324,18 @@ export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
                 </Link>
               </li>
             </>
+          )}
+
+          {/* Fallback message when showing alternative results */}
+          {fallbackMessage && suggestions.length > 0 && (
+            <li className="px-4 py-2.5 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-100 dark:border-amber-800/30">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {fallbackMessage}
+              </div>
+            </li>
           )}
 
           {suggestions.map((s, i) => (

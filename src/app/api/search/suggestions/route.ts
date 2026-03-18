@@ -99,12 +99,69 @@ export async function GET(request: NextRequest) {
         ? searchEntity('Specialist', SUGGESTION_FIELDS.specialist, searchWords, synonymPatterns, 3, neighborhoodSearch) : Promise.resolve([]),
     ]);
 
-    const suggestions = [
+    let allResults = [
       ...kindergartens.map(i => ({ ...i, type: 'darzeliai' as const, itemType: 'kindergarten' as const })),
       ...aukles.map(i => ({ ...i, type: 'aukles' as const, itemType: 'aukle' as const })),
       ...bureliai.map(i => ({ ...i, type: 'bureliai' as const, itemType: 'burelis' as const })),
       ...specialists.map(i => ({ ...i, type: 'specialistai' as const, itemType: 'specialist' as const })),
-    ].slice(0, 8).map(s => {
+    ];
+
+    let fallbackMessage: string | null = null;
+
+    // Fallback: if 0 results and a neighborhood or city was detected, show top-rated from that city
+    if (allResults.length === 0) {
+      // Determine the city to fall back to
+      let fallbackCity: string | null = null;
+      if (neighborhoodSearch) {
+        // Detect which city the neighborhood belongs to — check Vilnius first, then Kaunas
+        const vilniusNeighborhoods = new Set([
+          'Antakalnis', 'Baltupiai', 'Bajorai', 'Balsiai', 'Centras', 'Senamiestis',
+          'Fabijoniškės', 'Grigiškės', 'Justiniškės', 'Karoliniškės', 'Lazdynai',
+          'Naujamiestis', 'Naujininkai', 'Paneriai', 'Pašilaičiai', 'Pavilnys',
+          'Pilaitė', 'Rasos', 'Šeškinė', 'Šnipiškės', 'Užupis', 'Verkiai',
+          'Vilkpėdė', 'Viršuliškės', 'Žirmūnai', 'Žvėrynas',
+        ]);
+        const kaunasNeighborhoods = new Set([
+          'Aleksotas', 'Dainava', 'Eiguliai', 'Žaliakalnis', 'Šančiai', 'Šilainiai',
+          'Petrašiūnai', 'Vilijampolė', 'Kalniečiai', 'Panemunė', 'Romainiai', 'Garliava',
+        ]);
+        if (vilniusNeighborhoods.has(neighborhoodSearch)) fallbackCity = 'Vilnius';
+        else if (kaunasNeighborhoods.has(neighborhoodSearch)) fallbackCity = 'Kaunas';
+        fallbackMessage = `${neighborhoodSearch} rajone nieko nerasta. Rodomi kiti ${fallbackCity || 'miesto'} rezultatai:`;
+      } else {
+        // Check if any search word is a city name
+        for (const w of searchWords) {
+          for (const c of CITIES) {
+            if (c.name.toLocaleLowerCase('lt') === w.toLocaleLowerCase('lt')) {
+              fallbackCity = c.name;
+              break;
+            }
+          }
+          if (fallbackCity) break;
+        }
+        if (fallbackCity) {
+          fallbackMessage = `Tikslių rezultatų nerasta. Rodomi populiariausi ${fallbackCity} darželiai:`;
+        }
+      }
+
+      if (fallbackCity) {
+        const fallbackResults: RawResult[] = await prisma.$queryRawUnsafe(
+          `SELECT id, name, city, slug, "baseRating" as base_rating
+           FROM "Kindergarten"
+           WHERE city = $1
+           ORDER BY "baseRating" DESC
+           LIMIT 6`,
+          fallbackCity,
+        );
+        allResults = fallbackResults.map(i => ({
+          ...i,
+          type: 'darzeliai' as const,
+          itemType: 'kindergarten' as const,
+        }));
+      }
+    }
+
+    const suggestions = allResults.slice(0, 8).map(s => {
       const citySlug = getCitySlug(s.city);
       const categoryPath = categoryMap[s.itemType] || 'darzeliai';
       const url = citySlug
@@ -113,9 +170,10 @@ export async function GET(request: NextRequest) {
       return { id: s.id, name: s.name, city: s.city, slug: s.slug, type: s.type, rating: s.base_rating, url };
     });
 
-    return NextResponse.json({ suggestions }, {
-      headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' },
-    });
+    return NextResponse.json(
+      { suggestions, ...(fallbackMessage ? { fallbackMessage } : {}) },
+      { headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' } },
+    );
   } catch {
     return NextResponse.json({ suggestions: [] }, { status: 500 });
   }
