@@ -73,17 +73,17 @@ export async function middleware(request: NextRequest) {
   const csp = [
     "default-src 'self'",
     // Scripts: self only, no eval, no inline (Next.js uses nonces internally)
-    "script-src 'self' 'unsafe-inline'",
-    // Styles: self + inline needed for Tailwind CSS and component styles
-    "style-src 'self' 'unsafe-inline'",
+    "script-src 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com",
+    // Styles: self + inline needed for Tailwind CSS and component styles + hCaptcha
+    "style-src 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com",
     // Images: self, data: URIs, and HTTPS sources (e.g., map tiles)
     "img-src 'self' data: https:",
     // Fonts: self and data: URIs
     "font-src 'self' data:",
-    // Connect: self for API calls + OAuth providers
-    "connect-src 'self' https://accounts.google.com https://www.facebook.com",
-    // Frames: Google Maps + OAuth
-    "frame-src https://www.google.com https://maps.google.com https://accounts.google.com https://www.facebook.com",
+    // Connect: self for API calls + OAuth providers + hCaptcha
+    "connect-src 'self' https://accounts.google.com https://www.facebook.com https://hcaptcha.com https://*.hcaptcha.com",
+    // Frames: Google Maps + OAuth + hCaptcha
+    "frame-src https://www.google.com https://maps.google.com https://accounts.google.com https://www.facebook.com https://hcaptcha.com https://*.hcaptcha.com",
     // Objects: none (block Flash, Java, etc.)
     "object-src 'none'",
     // Base URI: self only (prevent <base> tag hijacking)

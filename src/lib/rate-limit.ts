@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
 interface RateLimitEntry {
   count: number;
@@ -7,9 +8,8 @@ interface RateLimitEntry {
 }
 
 /**
- * In-memory store: key (ip + identifier) -> request count & window expiry.
- * NOTE: This does NOT work across multiple serverless instances or after cold starts.
- * For production with >1 instance, replace with Redis/Upstash.
+ * In-memory store: used as fast-path for high-frequency checks (GET, votes).
+ * DB-backed sliding window is used for important actions (submissions, reviews, auth).
  */
 const store = new Map<string, RateLimitEntry>();
 
@@ -30,7 +30,6 @@ function ensureCleanup() {
     });
     keysToDelete.forEach((key) => store.delete(key));
   }, CLEANUP_INTERVAL_MS);
-  // Allow the Node.js process to exit even if the timer is still running
   if (cleanupTimer && typeof cleanupTimer === 'object' && 'unref' in cleanupTimer) {
     cleanupTimer.unref();
   }
@@ -38,15 +37,12 @@ function ensureCleanup() {
 
 /**
  * Extract the client IP address from the request.
- * Uses x-forwarded-for header (set by reverse proxies / Vercel) or falls back to a default.
  */
-function getClientIp(request: NextRequest): string {
+export function getClientIp(request: NextRequest): string {
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) {
-    // x-forwarded-for can contain multiple IPs: "client, proxy1, proxy2"
     return forwarded.split(',')[0].trim();
   }
-  // Next.js doesn't expose raw socket IP easily; use a fallback
   return request.headers.get('x-real-ip') ?? '127.0.0.1';
 }
 
@@ -81,14 +77,17 @@ export const RATE_LIMITS = {
   PASSWORD_RESET: { maxRequests: 3, windowSeconds: 3600, identifier: 'password-reset' } satisfies RateLimitOptions,
   /** Newsletter subscribe: 5 requests per 15 minutes */
   NEWSLETTER: { maxRequests: 5, windowSeconds: 900, identifier: 'newsletter' } satisfies RateLimitOptions,
+  /** Submission: 3 per hour */
+  SUBMISSION: { maxRequests: 3, windowSeconds: 3600, identifier: 'submission' } satisfies RateLimitOptions,
+  /** Report: 10 per hour */
+  REPORT: { maxRequests: 10, windowSeconds: 3600, identifier: 'report' } satisfies RateLimitOptions,
 } as const;
 
 const RATE_LIMIT_MESSAGE = 'Per daug užklausų. Bandykite vėliau.';
 
 /**
- * Check the rate limit for a request.
- * Returns `null` if the request is within limits, or a 429 NextResponse if rate-limited.
- * When userId is provided, rate limits are applied per user instead of per IP.
+ * In-memory rate limit check (original behavior).
+ * Fast but doesn't persist across serverless instances.
  */
 export function checkRateLimit(
   request: NextRequest,
@@ -104,7 +103,6 @@ export function checkRateLimit(
   const existing = store.get(key);
 
   if (!existing || now >= existing.resetAt) {
-    // First request in a new window
     store.set(key, {
       count: 1,
       resetAt: now + options.windowSeconds * 1000,
@@ -112,7 +110,6 @@ export function checkRateLimit(
     return null;
   }
 
-  // Within the current window
   existing.count += 1;
 
   if (existing.count > options.maxRequests) {
@@ -127,4 +124,75 @@ export function checkRateLimit(
   }
 
   return null;
+}
+
+/**
+ * DB-backed sliding window rate limit check.
+ * Persists across serverless instances. Use for important actions
+ * (submissions, reviews, auth) where in-memory is insufficient.
+ *
+ * Returns null if allowed, or a 429 NextResponse if rate-limited.
+ */
+export async function checkRateLimitDb(
+  request: NextRequest,
+  options: RateLimitOptions,
+  userId?: string,
+): Promise<NextResponse | null> {
+  const identifier = userId ?? getClientIp(request);
+  const action = options.identifier;
+  const windowStart = new Date(Date.now() - options.windowSeconds * 1000);
+
+  try {
+    // Upsert: find existing record or create new one
+    const existing = await prisma.rateLimit.findUnique({
+      where: { identifier_action: { identifier, action } },
+    });
+
+    if (!existing || existing.windowStart < windowStart) {
+      // Window expired or no record — reset counter
+      await prisma.rateLimit.upsert({
+        where: { identifier_action: { identifier, action } },
+        update: { count: 1, windowStart: new Date() },
+        create: { identifier, action, count: 1, windowStart: new Date() },
+      });
+      return null;
+    }
+
+    // Within window — increment
+    if (existing.count >= options.maxRequests) {
+      const windowEnd = new Date(existing.windowStart.getTime() + options.windowSeconds * 1000);
+      const retryAfterSeconds = Math.max(1, Math.ceil((windowEnd.getTime() - Date.now()) / 1000));
+      return NextResponse.json(
+        { error: RATE_LIMIT_MESSAGE },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(retryAfterSeconds) },
+        },
+      );
+    }
+
+    await prisma.rateLimit.update({
+      where: { identifier_action: { identifier, action } },
+      data: { count: { increment: 1 } },
+    });
+
+    return null;
+  } catch (err) {
+    // If DB fails, fall back to in-memory
+    console.error('DB rate limit check failed, falling back to in-memory:', err);
+    return checkRateLimit(request, options, userId);
+  }
+}
+
+/**
+ * Periodically clean up expired rate limit entries from the DB.
+ * Call this from a cron or on a schedule.
+ */
+export async function cleanupExpiredRateLimits(): Promise<number> {
+  // Delete entries older than the longest window (1 hour)
+  const cutoff = new Date(Date.now() - 3600 * 1000);
+  const result = await prisma.rateLimit.deleteMany({
+    where: { windowStart: { lt: cutoff } },
+  });
+  return result.count;
 }

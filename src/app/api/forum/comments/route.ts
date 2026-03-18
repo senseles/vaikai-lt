@@ -4,7 +4,8 @@ import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { jsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
-import { checkCsrf, checkHoneypot, checkSubmitTiming, stripHtml } from '@/lib/security';
+import { checkCsrf, checkHoneypot, checkSubmitTiming } from '@/lib/security';
+import { sanitizeString } from '@/lib/sanitize';
 import { createNotification } from '@/lib/create-notification';
 import { filterBannedContent } from '@/lib/banned-words';
 
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
   if (!rawContent || typeof rawContent !== 'string') {
     return errorResponse('Komentaro turinys yra privalomas', 400);
   }
-  const cleanContent = stripHtml(rawContent.trim());
+  const cleanContent = sanitizeString(rawContent.trim());
   if (cleanContent.length < 2) {
     return errorResponse('Komentaras turi būti bent 2 simbolių', 400);
   }
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest) {
   if (!rawAuthor || typeof rawAuthor !== 'string') {
     return errorResponse('Autoriaus vardas yra privalomas', 400);
   }
-  const cleanAuthor = stripHtml(rawAuthor.trim());
+  const cleanAuthor = sanitizeString(rawAuthor.trim());
   if (cleanAuthor.length < 2) {
     return errorResponse('Autoriaus vardas turi būti bent 2 simbolių', 400);
   }

@@ -343,3 +343,30 @@ model ForumReport {
   @@index([status, createdAt])
   @@index([targetId, type])
 }
+
+model RateLimit {
+  id          String   @id @default(cuid())
+  identifier  String   // IP or session/user ID
+  action      String   // "review-post", "forum-post", etc.
+  count       Int      @default(1)
+  windowStart DateTime @default(now())
+
+  @@unique([identifier, action])
+  @@index([windowStart])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String   // REVIEW_APPROVE, REVIEW_REJECT, etc.
+  targetType String   // review, kindergarten, user, etc.
+  targetId   String
+  adminId    String   @default("admin")
+  oldValue   String?  @db.Text
+  newValue   String?  @db.Text
+  details    String?  @db.Text
+  createdAt  DateTime @default(now())
+
+  @@index([action])
+  @@index([createdAt])
+  @@index([targetType, targetId])
+}

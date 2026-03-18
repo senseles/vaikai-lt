@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { href: '/admin/atsiliepimai', label: 'Atsiliepimai', icon: '★' },
   { href: '/admin/vartotojai', label: 'Vartotojai', icon: '👤' },
   { href: '/admin/forumas', label: 'Forumas', icon: '◬' },
+  { href: '/admin/audit', label: 'Auditas', icon: '📋' },
   { href: '/admin/nustatymai', label: 'Nustatymai', icon: '⚙' },
 ];
 

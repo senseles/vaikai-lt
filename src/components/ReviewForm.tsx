@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import type { ItemType } from '@/types';
 import StarRating from './StarRating';
+import HoneypotField from './HoneypotField';
+import CaptchaWidget from './CaptchaWidget';
 
 interface ReviewFormProps {
   readonly itemId: string;
@@ -20,6 +22,9 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [honeypot, setHoneypot] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const formLoadedAt = useRef(Date.now());
 
   // Pre-fill author name from session
   useEffect(() => {
@@ -83,6 +88,7 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
     if (!text.trim()) { setError('Parašykite atsiliepimą'); return; }
     if (text.trim().length < 10) { setError('Atsiliepimas turi būti bent 10 simbolių'); return; }
     if (!authorName.trim()) { setError('Įveskite vardą'); return; }
+    if (!captchaToken) { setError('Prašome patvirtinti, kad nesate robotas'); return; }
 
     setSubmitting(true);
     setError('');
@@ -93,7 +99,16 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
         },
-        body: JSON.stringify({ itemId, itemType, rating, text: text.trim(), authorName: authorName.trim() }),
+        body: JSON.stringify({
+          itemId,
+          itemType,
+          rating,
+          text: text.trim(),
+          authorName: authorName.trim(),
+          captchaToken,
+          _hp_website: honeypot,
+          _form_loaded_at: formLoadedAt.current,
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -103,6 +118,8 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
       setRating(0);
       setText('');
       setAuthorName(session?.user?.name || '');
+      setCaptchaToken('');
+      formLoadedAt.current = Date.now();
       onSubmitted?.();
     } catch (err) {
       setError(err instanceof Error && err.message !== 'Nepavyko išsaugoti' ? err.message : 'Klaida siunčiant atsiliepimą. Bandykite dar kartą.');
@@ -124,8 +141,10 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+    <form onSubmit={handleSubmit} className="mt-4 space-y-3 relative">
       <h4 className="font-semibold text-gray-900 dark:text-white">Palikti atsiliepimą</h4>
+
+      <HoneypotField value={honeypot} onChange={setHoneypot} />
 
       <div>
         <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">Įvertinimas</label>
@@ -160,6 +179,11 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
           <p className={`text-xs mt-1 ${text.length >= 2000 ? 'text-red-500 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`}>{text.length}/2000</p>
         )}
       </div>
+
+      <CaptchaWidget
+        onVerify={setCaptchaToken}
+        onExpire={() => setCaptchaToken('')}
+      />
 
       {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { logAuditEvent } from '@/lib/audit';
 
 type Params = { params: { id: string } };
 
@@ -22,7 +23,20 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       );
     }
 
+    // Fetch current state for audit log
+    const current = await prisma.review.findUnique({ where: { id }, select: { isApproved: true } });
+
     const updated = await prisma.review.update({ where: { id }, data });
+
+    // Audit log
+    logAuditEvent({
+      action: data.isApproved ? 'REVIEW_APPROVE' : 'REVIEW_REJECT',
+      targetType: 'review',
+      targetId: id,
+      oldValue: current ? String(current.isApproved) : null,
+      newValue: String(data.isApproved),
+    });
+
     return NextResponse.json({ success: true, data: updated });
   } catch (err) {
     console.error(`Admin patch review/${id} error:`, err);
@@ -44,6 +58,13 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
 
   try {
     await prisma.review.delete({ where: { id } });
+
+    logAuditEvent({
+      action: 'REVIEW_DELETE',
+      targetType: 'review',
+      targetId: id,
+    });
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error(`Admin delete review/${id} error:`, err);

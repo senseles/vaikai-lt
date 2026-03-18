@@ -5,7 +5,9 @@ import { authOptions } from '@/lib/auth';
 import { jsonResponse, errorResponse } from '@/lib/api-utils';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { notifyNewReview } from '@/lib/notifications';
-import { checkCsrf, stripHtml } from '@/lib/security';
+import { checkCsrf, checkHoneypot, checkSubmitTiming } from '@/lib/security';
+import { sanitizeString } from '@/lib/sanitize';
+import { verifyCaptcha } from '@/lib/captcha';
 
 const VALID_ITEM_TYPES = ['kindergarten', 'aukle', 'burelis', 'specialist'] as const;
 
@@ -69,7 +71,23 @@ export async function POST(request: NextRequest) {
     return errorResponse('Invalid JSON body', 400);
   }
 
-  const { itemId, itemType, authorName: rawAuthor, rating, text: rawText } = body as Record<string, unknown>;
+  const parsed = body as Record<string, unknown>;
+
+  // Honeypot check — bots fill hidden fields
+  const honeypotResponse = checkHoneypot(parsed);
+  if (honeypotResponse) return honeypotResponse;
+
+  // Timing check — reject submissions faster than 3 seconds
+  const timingResponse = checkSubmitTiming(parsed, 3);
+  if (timingResponse) return timingResponse;
+
+  // hCaptcha verification
+  const captchaValid = await verifyCaptcha(parsed.captchaToken as string | undefined);
+  if (!captchaValid) {
+    return errorResponse('CAPTCHA patikrinimas nepavyko', 400);
+  }
+
+  const { itemId, itemType, authorName: rawAuthor, rating, text: rawText } = parsed;
 
   if (!itemId || typeof itemId !== 'string') {
     return errorResponse('itemId is required and must be a string', 400);
@@ -108,9 +126,9 @@ export async function POST(request: NextRequest) {
     return errorResponse('text is required', 400);
   }
 
-  // Sanitize BEFORE validation — prevents empty-content reviews from XSS payloads
-  const cleanAuthor = stripHtml(rawAuthor.trim());
-  const cleanText = stripHtml(rawText.trim());
+  // Sanitize BEFORE validation — DOMPurify strips all HTML
+  const cleanAuthor = sanitizeString(rawAuthor);
+  const cleanText = sanitizeString(rawText);
 
   if (cleanAuthor.length === 0) {
     return errorResponse('authorName is required', 400);
@@ -133,8 +151,8 @@ export async function POST(request: NextRequest) {
         authorName: cleanAuthor,
         rating: rating as number,
         text: cleanText,
-        isApproved: false, // P1.1: Reviews require admin approval
-        userId, // P1.2: Link review to authenticated user
+        isApproved: false,
+        userId,
       },
     });
 
@@ -145,7 +163,7 @@ export async function POST(request: NextRequest) {
       text: review.text,
       itemType: review.itemType,
       itemId: review.itemId,
-    }).catch(() => { /* notification failure should not block review creation */ });
+    }).catch(() => {});
 
     return jsonResponse({ ...review, message: 'Jūsų atsiliepimas bus paskelbtas po peržiūros' }, 201);
   } catch {

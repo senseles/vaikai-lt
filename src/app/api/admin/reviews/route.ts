@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getPagination } from '@/lib/api-utils';
+import { logAuditEvent } from '@/lib/audit';
 
 function json<T>(data: T, status = 200) {
   return NextResponse.json(data, { status });
@@ -139,6 +140,16 @@ export async function PATCH(request: NextRequest) {
       where: { id: { in: ids } },
       data: { isApproved },
     });
+
+    // Audit log for bulk action
+    for (const targetId of ids) {
+      logAuditEvent({
+        action: isApproved ? 'REVIEW_APPROVE' : 'REVIEW_REJECT',
+        targetType: 'review',
+        targetId,
+        details: `Bulk ${action}`,
+      });
+    }
 
     return json({ success: true, updated: result.count });
   } catch (err) {

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
-import { checkCsrf } from '@/lib/security';
+import { checkCsrf, checkHoneypot } from '@/lib/security';
+import { sanitizeString } from '@/lib/sanitize';
 import { hashPassword } from '@/lib/password';
 
 export async function POST(request: NextRequest) {
@@ -13,6 +14,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
+
+    // Honeypot check
+    const honeypotResponse = checkHoneypot(body as Record<string, unknown>);
+    if (honeypotResponse) return honeypotResponse;
+
     const { email, password, name } = body as { email?: string; password?: string; name?: string };
 
     if (!email || !password) {
@@ -36,7 +42,7 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.create({
       data: {
         email,
-        name: name?.trim() || null,
+        name: name ? sanitizeString(name) || null : null,
         passwordHash,
       },
     });
