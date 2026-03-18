@@ -7,6 +7,7 @@ import SearchResultsClient from './SearchResultsClient';
 import SearchLoading from './loading';
 import SuggestButton from '@/components/SuggestButton';
 import SearchBar from '@/components/SearchBar';
+import { parseSearchQuery, FULL_SEARCH_FIELDS, buildWhereClause } from '@/lib/search-utils';
 
 interface SearchPageProps {
   readonly searchParams: { q?: string };
@@ -14,7 +15,7 @@ interface SearchPageProps {
 
 export async function generateMetadata({ searchParams }: SearchPageProps) {
   const q = searchParams.q ?? '';
-  const title = q ? `„${q}“ — Paieška | Vaikai.lt` : 'Paieška | Vaikai.lt';
+  const title = q ? `„${q}" — Paieška | Vaikai.lt` : 'Paieška | Vaikai.lt';
   const description = 'Ieškokite darželių, auklių, būrelių ir specialistų visoje Lietuvoje.';
   return {
     title,
@@ -36,6 +37,16 @@ export async function generateMetadata({ searchParams }: SearchPageProps) {
   };
 }
 
+const QUICK_SUGGESTIONS = [
+  { label: 'Vilnius', href: '/vilnius' },
+  { label: 'Kaunas', href: '/kaunas' },
+  { label: 'Klaipėda', href: '/klaipeda' },
+  { label: 'Darželiai', href: '/paieska?q=darželiai' },
+  { label: 'Auklės', href: '/paieska?q=auklės' },
+  { label: 'Būreliai', href: '/paieska?q=būreliai' },
+  { label: 'Specialistai', href: '/paieska?q=specialistai' },
+];
+
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const query = (searchParams.q ?? '').trim();
 
@@ -45,75 +56,62 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Paieška</h1>
         <p className="text-gray-500 dark:text-gray-400 mb-8">Ieškokite darželių, auklių, būrelių ar specialistų visoje Lietuvoje.</p>
         <SearchBar autoFocus />
+        <div className="mt-8 flex flex-wrap justify-center gap-2">
+          {QUICK_SUGGESTIONS.map(s => (
+            <Link
+              key={s.label}
+              href={s.href}
+              className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm hover:bg-primary/10 hover:text-primary transition-colors"
+            >
+              {s.label}
+            </Link>
+          ))}
+        </div>
       </div>
     );
   }
 
-  // Category keyword mapping: if a word matches a category, filter by entity type
-  const CATEGORY_KEYWORDS: Record<string, string> = {
-    'darželiai': 'kindergarten', 'darželis': 'kindergarten', 'darzeliai': 'kindergarten', 'darzelis': 'kindergarten',
-    'auklė': 'aukle', 'auklės': 'aukle', 'aukle': 'aukle', 'aukles': 'aukle',
-    'būreliai': 'burelis', 'būrelis': 'burelis', 'bureliai': 'burelis', 'burelis': 'burelis',
-    'specialistai': 'specialist', 'specialistas': 'specialist',
-  };
+  const { searchWords: wordsToSearch, categoryFilter, synonymPatterns } = parseSearchQuery(query);
 
-  const allWords = query.replace(/[%_]/g, '').split(/\s+/).filter(w => w.length > 0);
-  let categoryFilter: string | null = null;
-  const searchWords: string[] = [];
-  for (const w of allWords) {
-    const cat = CATEGORY_KEYWORDS[w.toLocaleLowerCase('lt')];
-    if (cat && !categoryFilter) {
-      categoryFilter = cat;
-    } else {
-      // Normalize Lithuanian city declensions
-      const CITY_DECLENSIONS: Record<string, string> = {
-        'vilniuje': 'Vilnius', 'vilniaus': 'Vilnius', 'vilnių': 'Vilnius',
-        'kaune': 'Kaunas', 'kauno': 'Kaunas',
-        'klaipėdoje': 'Klaipėda', 'klaipedoje': 'Klaipėda', 'klaipėdos': 'Klaipėda',
-        'šiauliuose': 'Šiauliai', 'siauliuose': 'Šiauliai',
-        'panevėžyje': 'Panevėžys', 'panevezyje': 'Panevėžys',
-        'alytuje': 'Alytus', 'marijampolėje': 'Marijampolė',
-      };
-      const lower = w.toLocaleLowerCase('lt');
-      searchWords.push(CITY_DECLENSIONS[lower] || w);
-    }
-  }
-  // If all words were category keywords, use original words for search
-  const wordsToSearch = searchWords.length > 0 ? searchWords : allWords;
-
-  function buildWhereClause(fields: string[], wordCount: number): string {
-    const andClauses = Array.from({ length: wordCount }, (_, i) => {
-      const paramIdx = i + 1;
-      const orParts = fields.map(f => `unaccent(${f}) ILIKE unaccent($${paramIdx})`);
-      return `(${orParts.join(' OR ')})`;
-    });
-    return andClauses.join(' AND ');
+  function buildClause(fields: string[], wordCount: number): { clause: string; extraParams: string[] } {
+    return buildWhereClause(fields, wordCount, synonymPatterns);
   }
 
   const patterns = wordsToSearch.map(w => `%${w}%`);
 
   const getSearchResults = unstable_cache(
     async (...params: string[]) => {
+      const wordCount = params.length - synonymPatterns.length;
       const shouldSearchKg = !categoryFilter || categoryFilter === 'kindergarten';
       const shouldSearchAu = !categoryFilter || categoryFilter === 'aukle';
       const shouldSearchBu = !categoryFilter || categoryFilter === 'burelis';
       const shouldSearchSp = !categoryFilter || categoryFilter === 'specialist';
 
+      const kgFields = FULL_SEARCH_FIELDS.kindergarten;
+      const auFields = FULL_SEARCH_FIELDS.aukle;
+      const buFields = FULL_SEARCH_FIELDS.burelis;
+      const spFields = FULL_SEARCH_FIELDS.specialist;
+
+      const kgClause = buildClause(kgFields, wordCount);
+      const auClause = buildClause(auFields, wordCount);
+      const buClause = buildClause(buFields, wordCount);
+      const spClause = buildClause(spFields, wordCount);
+
       const [kg, au, bu, sp] = await Promise.all([
         shouldSearchKg ? prisma.$queryRawUnsafe(
-          `SELECT id, name, slug, city, address, type, phone, website, language, hours, "ageFrom", groups, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Kindergarten" WHERE ${buildWhereClause(['name', 'city', 'COALESCE(description,\'\')'], params.length)} ORDER BY "baseRating" DESC LIMIT 20`,
+          `SELECT id, name, slug, city, address, type, phone, website, language, hours, "ageFrom", groups, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Kindergarten" WHERE ${kgClause.clause} ORDER BY "baseRating" DESC LIMIT 20`,
           ...params
         ) : [],
         shouldSearchAu ? prisma.$queryRawUnsafe(
-          `SELECT id, name, slug, city, phone, email, "hourlyRate", languages, experience, "ageRange", availability, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Aukle" WHERE ${buildWhereClause(['name', 'city', 'COALESCE(description,\'\')'], params.length)} ORDER BY "baseRating" DESC LIMIT 20`,
+          `SELECT id, name, slug, city, phone, email, "hourlyRate", languages, experience, "ageRange", availability, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Aukle" WHERE ${auClause.clause} ORDER BY "baseRating" DESC LIMIT 20`,
           ...params
         ) : [],
         shouldSearchBu ? prisma.$queryRawUnsafe(
-          `SELECT id, name, slug, city, category, "ageRange", price, schedule, phone, website, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Burelis" WHERE ${buildWhereClause(['name', 'city', 'COALESCE(description,\'\')', 'COALESCE(category,\'\')'], params.length)} ORDER BY "baseRating" DESC LIMIT 20`,
+          `SELECT id, name, slug, city, category, "ageRange", price, schedule, phone, website, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Burelis" WHERE ${buClause.clause} ORDER BY "baseRating" DESC LIMIT 20`,
           ...params
         ) : [],
         shouldSearchSp ? prisma.$queryRawUnsafe(
-          `SELECT id, name, slug, city, specialty, clinic, phone, price, website, languages, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Specialist" WHERE ${buildWhereClause(['name', 'city', 'COALESCE(description,\'\')', 'COALESCE(specialty,\'\')'], params.length)} ORDER BY "baseRating" DESC LIMIT 20`,
+          `SELECT id, name, slug, city, specialty, clinic, phone, price, website, languages, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Specialist" WHERE ${spClause.clause} ORDER BY "baseRating" DESC LIMIT 20`,
           ...params
         ) : [],
       ]) as [unknown[], unknown[], unknown[], unknown[]];
@@ -123,7 +121,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     { revalidate: 120 }
   );
 
-  const { kg: kindergartens, au: aukles, bu: bureliai, sp: specialists } = await getSearchResults(...patterns);
+  const allParams = [...patterns, ...synonymPatterns];
+  const { kg: kindergartens, au: aukles, bu: bureliai, sp: specialists } = await getSearchResults(...allParams);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const serialize = (items: any[]) =>
@@ -149,8 +148,25 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <p className="text-gray-500 dark:text-gray-400 mb-8">Rasta: {totalResults}</p>
 
       {totalResults === 0 ? (
-        <div>
-          <p className="text-center text-gray-400 dark:text-gray-500 py-12">Nieko nerasta pagal &bdquo;{query}&ldquo;. Pabandykite kitą paieškos frazę.</p>
+        <div className="text-center py-12">
+          <div className="text-5xl mb-4">🔍</div>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">
+            Nieko nerasta pagal &bdquo;{query}&ldquo;.
+          </p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm mb-6">
+            Pabandykite kitą paieškos frazę arba naršykite pagal kategoriją:
+          </p>
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {QUICK_SUGGESTIONS.map(s => (
+              <Link
+                key={s.label}
+                href={s.href}
+                className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-primary/10 hover:text-primary transition-colors"
+              >
+                {s.label}
+              </Link>
+            ))}
+          </div>
           <SuggestButton searchQuery={query} resultCount={0} />
         </div>
       ) : (

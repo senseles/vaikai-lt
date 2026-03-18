@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { CITIES } from '@/lib/cities';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import {
+  parseSearchQuery,
+  SUGGESTION_FIELDS,
+  buildWhereClause,
+} from '@/lib/search-utils';
 
 const cityNameToSlug: Record<string, string> = {};
 for (const c of CITIES) {
@@ -32,67 +37,24 @@ interface RawResult {
   base_rating: number;
 }
 
-const CATEGORY_KEYWORDS: Record<string, string> = {
-  'darželiai': 'kindergarten', 'darželis': 'kindergarten', 'darzeliai': 'kindergarten', 'darzelis': 'kindergarten',
-  'auklė': 'aukle', 'auklės': 'aukle', 'aukle': 'aukle', 'aukles': 'aukle',
-  'būreliai': 'burelis', 'būrelis': 'burelis', 'bureliai': 'burelis', 'burelis': 'burelis',
-  'specialistai': 'specialist', 'specialistas': 'specialist',
-};
-
-// Lithuanian city name declensions → base form (nominative)
-const CITY_DECLENSIONS: Record<string, string> = {
-  'vilniuje': 'Vilnius', 'vilniaus': 'Vilnius', 'vilnių': 'Vilnius', 'vilniui': 'Vilnius',
-  'kaune': 'Kaunas', 'kauno': 'Kaunas', 'kaunui': 'Kaunas',
-  'klaipėdoje': 'Klaipėda', 'klaipedoje': 'Klaipėda', 'klaipėdos': 'Klaipėda', 'klaipedos': 'Klaipėda',
-  'šiauliuose': 'Šiauliai', 'siauliuose': 'Šiauliai', 'šiaulių': 'Šiauliai', 'siauliu': 'Šiauliai',
-  'panevėžyje': 'Panevėžys', 'panevėžio': 'Panevėžys', 'panevezyje': 'Panevėžys', 'panevezio': 'Panevėžys',
-  'alytuje': 'Alytus', 'alytaus': 'Alytus',
-  'marijampolėje': 'Marijampolė', 'marijampoleje': 'Marijampolė', 'marijampolės': 'Marijampolė',
-  'utenoje': 'Utena', 'utenos': 'Utena',
-  'telšiuose': 'Telšiai', 'telsiuose': 'Telšiai', 'telšių': 'Telšiai',
-  'tauragėje': 'Tauragė', 'taurageje': 'Tauragė', 'tauragės': 'Tauragė',
-};
-
-function normalizeCityWord(w: string): string {
-  const lower = w.toLocaleLowerCase('lt');
-  return CITY_DECLENSIONS[lower] || w;
-}
-
-function parseSearchWords(q: string): { searchWords: string[]; categoryFilter: string | null } {
-  const allWords = q.split(/\s+/).filter(w => w.length > 0);
-  let categoryFilter: string | null = null;
-  const searchWords: string[] = [];
-  for (const w of allWords) {
-    const cat = CATEGORY_KEYWORDS[w.toLocaleLowerCase('lt')];
-    if (cat && !categoryFilter) {
-      categoryFilter = cat;
-    } else {
-      searchWords.push(normalizeCityWord(w));
-    }
-  }
-  return { searchWords: searchWords.length > 0 ? searchWords : allWords, categoryFilter };
-}
-
-async function searchWithUnaccent(
+async function searchEntity(
   table: string,
   fields: string[],
   words: string[],
+  synonymPatterns: string[],
   limit: number
 ): Promise<RawResult[]> {
   const patterns = words.map(w => `%${w}%`);
-  const andClauses = patterns.map((_, i) => {
-    const paramIdx = i + 1;
-    const orParts = fields.map(f => `unaccent(${f}) ILIKE unaccent($${paramIdx})`);
-    return `(${orParts.join(' OR ')})`;
-  });
+  const { clause, extraParams } = buildWhereClause(fields, words.length, synonymPatterns);
+  const allParams = [...patterns, ...extraParams];
 
   const sql = `SELECT id, name, city, slug, "baseRating" as base_rating
     FROM "${table}"
-    WHERE ${andClauses.join(' AND ')}
+    WHERE ${clause}
     ORDER BY "baseRating" DESC
     LIMIT ${limit}`;
 
-  return prisma.$queryRawUnsafe(sql, ...patterns) as Promise<RawResult[]>;
+  return prisma.$queryRawUnsafe(sql, ...allParams) as Promise<RawResult[]>;
 }
 
 export async function GET(request: NextRequest) {
@@ -105,26 +67,26 @@ export async function GET(request: NextRequest) {
   }
 
   // Sanitize: only allow alphanumeric, spaces, Lithuanian chars, basic punctuation
-  const sanitized = q.replace(/[^a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ0-9\s\-.,]/g, '').slice(0, 100);
+  const sanitized = q.replace(/[^a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ0-9\s\-.,:/]/g, '').slice(0, 100);
   if (sanitized.length < 2) {
     return NextResponse.json({ suggestions: [] });
   }
 
   try {
-    const { searchWords, categoryFilter } = parseSearchWords(sanitized);
+    const { searchWords, categoryFilter, synonymPatterns } = parseSearchQuery(sanitized);
     if (searchWords.every(w => w.length < 2) && !categoryFilter) {
       return NextResponse.json({ suggestions: [] });
     }
 
     const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
       !categoryFilter || categoryFilter === 'kindergarten'
-        ? searchWithUnaccent('Kindergarten', ['name', 'city', 'address'], searchWords, 4) : Promise.resolve([]),
+        ? searchEntity('Kindergarten', SUGGESTION_FIELDS.kindergarten, searchWords, synonymPatterns, 4) : Promise.resolve([]),
       !categoryFilter || categoryFilter === 'aukle'
-        ? searchWithUnaccent('Aukle', ['name', 'city'], searchWords, 3) : Promise.resolve([]),
+        ? searchEntity('Aukle', SUGGESTION_FIELDS.aukle, searchWords, synonymPatterns, 3) : Promise.resolve([]),
       !categoryFilter || categoryFilter === 'burelis'
-        ? searchWithUnaccent('Burelis', ['name', 'city', 'category'], searchWords, 3) : Promise.resolve([]),
+        ? searchEntity('Burelis', SUGGESTION_FIELDS.burelis, searchWords, synonymPatterns, 3) : Promise.resolve([]),
       !categoryFilter || categoryFilter === 'specialist'
-        ? searchWithUnaccent('Specialist', ['name', 'city', 'specialty'], searchWords, 3) : Promise.resolve([]),
+        ? searchEntity('Specialist', SUGGESTION_FIELDS.specialist, searchWords, synonymPatterns, 3) : Promise.resolve([]),
     ]);
 
     const suggestions = [
