@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { searchWords, categoryFilter, synonymPatterns } = parseSearchQuery(q);
+    const { searchWords, categoryFilter, synonymPatterns, neighborhoodSearch } = parseSearchQuery(q);
     if (searchWords.length === 0) {
       return NextResponse.json({ suggestions: [] });
     }
@@ -21,28 +21,28 @@ export async function GET(request: NextRequest) {
     const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
       !categoryFilter || categoryFilter === 'kindergarten'
         ? prisma.kindergarten.findMany({
-            where: buildPrismaWhere(['name', 'city', 'area', 'address', 'description', 'type', 'language', 'hours'], searchWords, synonymPatterns),
+            where: buildPrismaWhere(['name', 'city', 'area', 'address', 'description', 'type', 'language', 'hours'], searchWords, synonymPatterns, neighborhoodSearch),
             select: { name: true, city: true, slug: true, baseRating: true },
             take: 3,
             orderBy: { baseRating: 'desc' },
           }) : Promise.resolve([]),
       !categoryFilter || categoryFilter === 'aukle'
         ? prisma.aukle.findMany({
-            where: buildPrismaWhere(['name', 'city', 'area', 'description', 'availability', 'languages'], searchWords, synonymPatterns),
+            where: buildPrismaWhere(['name', 'city', 'area', 'description', 'availability', 'languages'], searchWords, synonymPatterns, neighborhoodSearch),
             select: { name: true, city: true, slug: true, baseRating: true },
             take: 2,
             orderBy: { baseRating: 'desc' },
           }) : Promise.resolve([]),
       !categoryFilter || categoryFilter === 'burelis'
         ? prisma.burelis.findMany({
-            where: buildPrismaWhere(['name', 'city', 'area', 'description', 'category', 'schedule'], searchWords, synonymPatterns),
+            where: buildPrismaWhere(['name', 'city', 'area', 'description', 'category', 'schedule'], searchWords, synonymPatterns, neighborhoodSearch),
             select: { name: true, city: true, slug: true, category: true, baseRating: true },
             take: 2,
             orderBy: { baseRating: 'desc' },
           }) : Promise.resolve([]),
       !categoryFilter || categoryFilter === 'specialist'
         ? prisma.specialist.findMany({
-            where: buildPrismaWhere(['name', 'city', 'area', 'description', 'specialty', 'clinic', 'languages'], searchWords, synonymPatterns),
+            where: buildPrismaWhere(['name', 'city', 'area', 'description', 'specialty', 'clinic', 'languages'], searchWords, synonymPatterns, neighborhoodSearch),
             select: { name: true, city: true, slug: true, specialty: true, baseRating: true },
             take: 2,
             orderBy: { baseRating: 'desc' },

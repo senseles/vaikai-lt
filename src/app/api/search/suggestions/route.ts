@@ -42,15 +42,25 @@ async function searchEntity(
   fields: string[],
   words: string[],
   synonymPatterns: string[],
-  limit: number
+  limit: number,
+  neighborhoodSearch: string | null = null,
 ): Promise<RawResult[]> {
   const patterns = words.map(w => `%${w}%`);
   const { clause, extraParams } = buildWhereClause(fields, words.length, synonymPatterns);
   const allParams = [...patterns, ...extraParams];
 
+  // When searching for a neighborhood, also match area exactly OR address containing it
+  let neighborhoodClause = '';
+  if (neighborhoodSearch) {
+    const nIdx = allParams.length + 1;
+    const nIdx2 = allParams.length + 2;
+    neighborhoodClause = ` OR (unaccent(COALESCE(area,'')) ILIKE unaccent($${nIdx}) OR unaccent(COALESCE(address,'')) ILIKE unaccent($${nIdx2}))`;
+    allParams.push(neighborhoodSearch, `%${neighborhoodSearch}%`);
+  }
+
   const sql = `SELECT id, name, city, slug, "baseRating" as base_rating
     FROM "${table}"
-    WHERE ${clause}
+    WHERE (${clause})${neighborhoodClause}
     ORDER BY "baseRating" DESC
     LIMIT ${limit}`;
 
@@ -73,20 +83,20 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { searchWords, categoryFilter, synonymPatterns } = parseSearchQuery(sanitized);
+    const { searchWords, categoryFilter, synonymPatterns, neighborhoodSearch } = parseSearchQuery(sanitized);
     if (searchWords.every(w => w.length < 2) && !categoryFilter) {
       return NextResponse.json({ suggestions: [] });
     }
 
     const [kindergartens, aukles, bureliai, specialists] = await Promise.all([
       !categoryFilter || categoryFilter === 'kindergarten'
-        ? searchEntity('Kindergarten', SUGGESTION_FIELDS.kindergarten, searchWords, synonymPatterns, 4) : Promise.resolve([]),
+        ? searchEntity('Kindergarten', SUGGESTION_FIELDS.kindergarten, searchWords, synonymPatterns, 4, neighborhoodSearch) : Promise.resolve([]),
       !categoryFilter || categoryFilter === 'aukle'
-        ? searchEntity('Aukle', SUGGESTION_FIELDS.aukle, searchWords, synonymPatterns, 3) : Promise.resolve([]),
+        ? searchEntity('Aukle', SUGGESTION_FIELDS.aukle, searchWords, synonymPatterns, 3, neighborhoodSearch) : Promise.resolve([]),
       !categoryFilter || categoryFilter === 'burelis'
-        ? searchEntity('Burelis', SUGGESTION_FIELDS.burelis, searchWords, synonymPatterns, 3) : Promise.resolve([]),
+        ? searchEntity('Burelis', SUGGESTION_FIELDS.burelis, searchWords, synonymPatterns, 3, neighborhoodSearch) : Promise.resolve([]),
       !categoryFilter || categoryFilter === 'specialist'
-        ? searchEntity('Specialist', SUGGESTION_FIELDS.specialist, searchWords, synonymPatterns, 3) : Promise.resolve([]),
+        ? searchEntity('Specialist', SUGGESTION_FIELDS.specialist, searchWords, synonymPatterns, 3, neighborhoodSearch) : Promise.resolve([]),
     ]);
 
     const suggestions = [

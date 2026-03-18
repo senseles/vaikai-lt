@@ -24,25 +24,88 @@ export const CITY_DECLENSIONS: Record<string, string> = {
   'tauragėje': 'Tauragė', 'taurageje': 'Tauragė', 'tauragės': 'Tauragė',
 };
 
-// Vilnius neighborhood declensions → nominative
+// Neighborhood declensions → nominative (Vilnius + Kaunas + other cities)
 export const NEIGHBORHOOD_DECLENSIONS: Record<string, string> = {
-  'pavilnyje': 'Pavilnys', 'pavilnio': 'Pavilnys',
-  'žirmūnuose': 'Žirmūnai', 'zirmunuose': 'Žirmūnai', 'žirmūnų': 'Žirmūnai', 'zirmunu': 'Žirmūnai',
-  'antakalnyje': 'Antakalnis', 'antakalnio': 'Antakalnis',
-  'šeškinėje': 'Šeškinė', 'seskineje': 'Šeškinė', 'šeškinės': 'Šeškinė',
-  'justiniškėse': 'Justiniškės', 'justiniskese': 'Justiniškės',
-  'pilaitėje': 'Pilaitė', 'pilaiteje': 'Pilaitė', 'pilaitės': 'Pilaitė',
-  'pašilaičiuose': 'Pašilaičiai', 'pasilaiciuose': 'Pašilaičiai',
-  'fabijoniškėse': 'Fabijoniškės', 'fabijoniskese': 'Fabijoniškės',
-  'naujininkuose': 'Naujininkai', 'naujininkų': 'Naujininkai',
-  'viršuliškėse': 'Viršuliškės', 'virsuliskese': 'Viršuliškės',
+  // ── Vilnius neighborhoods ──
+  // Antakalnis
+  'antakalnyje': 'Antakalnis', 'antakalnio': 'Antakalnis', 'antakalni': 'Antakalnis',
+  // Baltupiai
+  'baltupių': 'Baltupiai', 'baltupiuose': 'Baltupiai', 'baltupiu': 'Baltupiai',
+  // Bajorai
+  'bajoruose': 'Bajorai', 'bajorų': 'Bajorai', 'bajoru': 'Bajorai',
+  // Balsiai
+  'balsiuose': 'Balsiai', 'balsių': 'Balsiai',
+  // Centras / Senamiestis
   'centre': 'Centras', 'centro': 'Centras',
-  'karoliniškėse': 'Karoliniškės', 'karoliniskese': 'Karoliniškės',
-  'lazdynuose': 'Lazdynai', 'lazdynų': 'Lazdynai',
-  'verkiuose': 'Verkiai', 'verkių': 'Verkiai',
-  'baltupių': 'Baltupiai', 'baltupiuose': 'Baltupiai',
-  'grigiškėse': 'Grigiškės', 'grigiskese': 'Grigiškės',
+  'senamiestyje': 'Senamiestis', 'senamiesčio': 'Senamiestis', 'senamiescio': 'Senamiestis',
+  // Fabijoniškės
+  'fabijoniškėse': 'Fabijoniškės', 'fabijoniskese': 'Fabijoniškės', 'fabijoniškių': 'Fabijoniškės', 'fabijoniskiu': 'Fabijoniškės',
+  // Grigiškės
+  'grigiškėse': 'Grigiškės', 'grigiskese': 'Grigiškės', 'grigiškių': 'Grigiškės', 'grigiskiu': 'Grigiškės',
+  // Justiniškės
+  'justiniškėse': 'Justiniškės', 'justiniskese': 'Justiniškės', 'justiniškių': 'Justiniškės', 'justiniskiu': 'Justiniškės',
+  // Karoliniškės
+  'karoliniškėse': 'Karoliniškės', 'karoliniskese': 'Karoliniškės', 'karoliniškių': 'Karoliniškės', 'karoliniskiu': 'Karoliniškės',
+  // Lazdynai
+  'lazdynuose': 'Lazdynai', 'lazdynų': 'Lazdynai', 'lazdynu': 'Lazdynai',
+  // Naujamiestis
+  'naujamiestyje': 'Naujamiestis', 'naujamiesčio': 'Naujamiestis', 'naujamescio': 'Naujamiestis',
+  // Naujininkai
+  'naujininkuose': 'Naujininkai', 'naujininkų': 'Naujininkai', 'naujininku': 'Naujininkai',
+  // Paneriai
+  'paneriuose': 'Paneriai', 'panerių': 'Paneriai', 'paneriu': 'Paneriai',
+  // Pašilaičiai
+  'pašilaičiuose': 'Pašilaičiai', 'pasilaiciuose': 'Pašilaičiai', 'pašilaičių': 'Pašilaičiai', 'pasilaiciau': 'Pašilaičiai',
+  // Pavilnys
+  'pavilnyje': 'Pavilnys', 'pavilnio': 'Pavilnys',
+  // Pilaitė
+  'pilaitėje': 'Pilaitė', 'pilaiteje': 'Pilaitė', 'pilaitės': 'Pilaitė', 'pilaites': 'Pilaitė',
+  // Rasos
+  'rasose': 'Rasos', 'rasų': 'Rasos', 'rasu': 'Rasos',
+  // Šeškinė
+  'šeškinėje': 'Šeškinė', 'seskineje': 'Šeškinė', 'šeškinės': 'Šeškinė', 'seskines': 'Šeškinė',
+  // Šnipiškės
+  'šnipiškėse': 'Šnipiškės', 'snipiskese': 'Šnipiškės', 'šnipiškių': 'Šnipiškės', 'snipiskiu': 'Šnipiškės',
+  // Užupis
+  'užupyje': 'Užupis', 'uzupyje': 'Užupis', 'užupio': 'Užupis', 'uzupio': 'Užupis',
+  // Verkiai
+  'verkiuose': 'Verkiai', 'verkių': 'Verkiai', 'verkiu': 'Verkiai',
+  // Vilkpėdė
+  'vilkpėdėje': 'Vilkpėdė', 'vilkpedeje': 'Vilkpėdė', 'vilkpėdės': 'Vilkpėdė', 'vilkpedes': 'Vilkpėdė',
+  // Viršuliškės
+  'viršuliškėse': 'Viršuliškės', 'virsuliskese': 'Viršuliškės', 'viršuliškių': 'Viršuliškės', 'virsuliskiu': 'Viršuliškės',
+  // Žirmūnai
+  'žirmūnuose': 'Žirmūnai', 'zirmunuose': 'Žirmūnai', 'žirmūnų': 'Žirmūnai', 'zirmunu': 'Žirmūnai',
+  // Žvėrynas
+  'žvėryne': 'Žvėrynas', 'zveryne': 'Žvėrynas', 'žvėryno': 'Žvėrynas', 'zveryno': 'Žvėrynas',
+
+  // ── Kaunas neighborhoods ──
+  'aleksote': 'Aleksotas', 'aleksoto': 'Aleksotas',
+  'dainavoje': 'Dainava', 'dainavos': 'Dainava',
+  'eigulių': 'Eiguliai', 'eiguliuose': 'Eiguliai', 'eiguliu': 'Eiguliai',
+  'žaliakalnyje': 'Žaliakalnis', 'zaliakalnyje': 'Žaliakalnis', 'žaliakalnio': 'Žaliakalnis', 'zaliakalnio': 'Žaliakalnis',
+  'šančiuose': 'Šančiai', 'sanciuose': 'Šančiai', 'šančių': 'Šančiai', 'sanciu': 'Šančiai',
+  'šilainiuose': 'Šilainiai', 'silainuose': 'Šilainiai', 'šilainių': 'Šilainiai', 'silainiu': 'Šilainiai',
+  'petrašiūnuose': 'Petrašiūnai', 'petrasiunuose': 'Petrašiūnai', 'petrašiūnų': 'Petrašiūnai',
+  'vilijampolėje': 'Vilijampolė', 'vilijampoleje': 'Vilijampolė', 'vilijampolės': 'Vilijampolė',
+  'kalniečiuose': 'Kalniečiai', 'kalnieciuose': 'Kalniečiai', 'kalniečių': 'Kalniečiai',
+  'panemunėje': 'Panemunė', 'panemuneje': 'Panemunė', 'panemunės': 'Panemunė',
+  'romainiuose': 'Romainiai', 'romainių': 'Romainiai',
+  'garliavoje': 'Garliava', 'garliavos': 'Garliava',
 };
+
+// Set of all known neighborhood nominative forms (for detecting neighborhood searches)
+export const KNOWN_NEIGHBORHOODS = new Set([
+  // Vilnius
+  'Antakalnis', 'Baltupiai', 'Bajorai', 'Balsiai', 'Centras', 'Senamiestis',
+  'Fabijoniškės', 'Grigiškės', 'Justiniškės', 'Karoliniškės', 'Lazdynai',
+  'Naujamiestis', 'Naujininkai', 'Paneriai', 'Pašilaičiai', 'Pavilnys',
+  'Pilaitė', 'Rasos', 'Šeškinė', 'Šnipiškės', 'Užupis', 'Verkiai',
+  'Vilkpėdė', 'Viršuliškės', 'Žirmūnai', 'Žvėrynas',
+  // Kaunas
+  'Aleksotas', 'Dainava', 'Eiguliai', 'Žaliakalnis', 'Šančiai', 'Šilainiai',
+  'Petrašiūnai', 'Vilijampolė', 'Kalniečiai', 'Panemunė', 'Romainiai', 'Garliava',
+]);
 
 // Synonym/keyword mapping: search term → { field patterns to search, extra search words }
 interface SynonymMapping {
@@ -85,17 +148,20 @@ export function normalizeWord(w: string): string {
 }
 
 /**
- * Parse search query into normalized words + category filter + synonym patterns
+ * Parse search query into normalized words + category filter + synonym patterns.
+ * Also detects neighborhood searches to enable area+address matching.
  */
 export function parseSearchQuery(q: string): {
   searchWords: string[];
   categoryFilter: string | null;
   synonymPatterns: string[];
+  neighborhoodSearch: string | null; // nominative form of detected neighborhood
 } {
   const allWords = q.replace(/[%_]/g, '').split(/\s+/).filter(w => w.length > 0);
   let categoryFilter: string | null = null;
   const searchWords: string[] = [];
   const synonymPatterns: string[] = [];
+  let neighborhoodSearch: string | null = null;
 
   // Check multi-word synonyms first
   const lowerQ = q.toLocaleLowerCase('lt');
@@ -111,7 +177,13 @@ export function parseSearchQuery(q: string): {
     if (cat && !categoryFilter) {
       categoryFilter = cat;
     } else {
-      searchWords.push(normalizeWord(w));
+      const normalized = normalizeWord(w);
+      searchWords.push(normalized);
+
+      // Detect if this word resolves to a known neighborhood
+      if (KNOWN_NEIGHBORHOODS.has(normalized)) {
+        neighborhoodSearch = normalized;
+      }
     }
 
     // Single-word synonyms
@@ -128,6 +200,7 @@ export function parseSearchQuery(q: string): {
     searchWords: searchWords.length > 0 ? searchWords : allWords,
     categoryFilter,
     synonymPatterns: uniquePatterns,
+    neighborhoodSearch,
   };
 }
 
@@ -178,13 +251,15 @@ export function buildWhereClause(
 /**
  * Build Prisma where conditions for the /api/search route (uses Prisma ORM).
  * Returns { AND: [...] } style conditions.
+ * When neighborhoodSearch is set, results matching area or address are OR'd in.
  */
 export function buildPrismaWhere(
   fields: string[],
   words: string[],
   synonymPatterns: string[] = [],
+  neighborhoodSearch: string | null = null,
 ) {
-  return {
+  const wordConditions = {
     AND: words.map(w => ({
       OR: [
         // Standard field matching
@@ -197,4 +272,17 @@ export function buildPrismaWhere(
       ],
     })),
   };
+
+  // If neighborhood search detected, also match by area or address
+  if (neighborhoodSearch) {
+    return {
+      OR: [
+        wordConditions,
+        { area: { equals: neighborhoodSearch, mode: 'insensitive' as const } },
+        { address: { contains: neighborhoodSearch, mode: 'insensitive' as const } },
+      ],
+    };
+  }
+
+  return wordConditions;
 }

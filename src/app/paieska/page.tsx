@@ -71,7 +71,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     );
   }
 
-  const { searchWords: wordsToSearch, categoryFilter, synonymPatterns } = parseSearchQuery(query);
+  const { searchWords: wordsToSearch, categoryFilter, synonymPatterns, neighborhoodSearch } = parseSearchQuery(query);
 
   function buildClause(fields: string[], wordCount: number): { clause: string; extraParams: string[] } {
     return buildWhereClause(fields, wordCount, synonymPatterns);
@@ -97,22 +97,33 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       const buClause = buildClause(buFields, wordCount);
       const spClause = buildClause(spFields, wordCount);
 
+      // For neighborhood searches, add OR clause matching area/address
+      const nbParam = neighborhoodSearch || '';
+      const hasNb = !!neighborhoodSearch;
+      const nbIdx = params.length + 1;
+      const nbIdx2 = params.length + 2;
+      const nbClause = hasNb
+        ? ` OR (unaccent(COALESCE(area,'')) ILIKE unaccent($${nbIdx}) OR unaccent(COALESCE(address,'')) ILIKE unaccent($${nbIdx2}))`
+        : '';
+      const nbParams = hasNb ? [nbParam, `%${nbParam}%`] : [];
+      const allSqlParams = [...params, ...nbParams];
+
       const [kg, au, bu, sp] = await Promise.all([
         shouldSearchKg ? prisma.$queryRawUnsafe(
-          `SELECT id, name, slug, city, address, type, phone, website, language, hours, "ageFrom", groups, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Kindergarten" WHERE ${kgClause.clause} ORDER BY "baseRating" DESC LIMIT 20`,
-          ...params
+          `SELECT id, name, slug, city, address, type, phone, website, language, hours, "ageFrom", groups, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Kindergarten" WHERE (${kgClause.clause})${nbClause} ORDER BY "baseRating" DESC LIMIT 20`,
+          ...allSqlParams
         ) : [],
         shouldSearchAu ? prisma.$queryRawUnsafe(
-          `SELECT id, name, slug, city, phone, email, "hourlyRate", languages, experience, "ageRange", availability, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Aukle" WHERE ${auClause.clause} ORDER BY "baseRating" DESC LIMIT 20`,
-          ...params
+          `SELECT id, name, slug, city, phone, email, "hourlyRate", languages, experience, "ageRange", availability, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Aukle" WHERE (${auClause.clause})${nbClause} ORDER BY "baseRating" DESC LIMIT 20`,
+          ...allSqlParams
         ) : [],
         shouldSearchBu ? prisma.$queryRawUnsafe(
-          `SELECT id, name, slug, city, category, "ageRange", price, schedule, phone, website, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Burelis" WHERE ${buClause.clause} ORDER BY "baseRating" DESC LIMIT 20`,
-          ...params
+          `SELECT id, name, slug, city, category, "ageRange", price, schedule, phone, website, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Burelis" WHERE (${buClause.clause})${nbClause} ORDER BY "baseRating" DESC LIMIT 20`,
+          ...allSqlParams
         ) : [],
         shouldSearchSp ? prisma.$queryRawUnsafe(
-          `SELECT id, name, slug, city, specialty, clinic, phone, price, website, languages, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Specialist" WHERE ${spClause.clause} ORDER BY "baseRating" DESC LIMIT 20`,
-          ...params
+          `SELECT id, name, slug, city, specialty, clinic, phone, price, website, languages, description, "baseRating", "baseReviewCount", "createdAt", "updatedAt" FROM "Specialist" WHERE (${spClause.clause})${nbClause} ORDER BY "baseRating" DESC LIMIT 20`,
+          ...allSqlParams
         ) : [],
       ]) as [unknown[], unknown[], unknown[], unknown[]];
       return { kg, au, bu, sp };
