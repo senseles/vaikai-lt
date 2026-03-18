@@ -85,11 +85,18 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
     document.body.style.overflow = 'hidden';
     const closeBtn = modalRef.current?.querySelector<HTMLButtonElement>('[data-modal-close]');
     closeBtn?.focus();
+
+    // Push history state so browser Back closes modal instead of navigating away
+    history.pushState({ modal: true }, '');
+    const handlePopState = () => onClose();
+    window.addEventListener('popstate', handlePopState);
+
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('popstate', handlePopState);
       document.body.style.overflow = '';
     };
-  }, [item, itemType, handleKeyDown]);
+  }, [item, itemType, handleKeyDown, onClose]);
 
   if (!item) return null;
 
@@ -201,6 +208,21 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
           </svg>
         </button>
 
+        {/* Breadcrumbs */}
+        <nav aria-label="Navigacijos kelias" className="mb-2 pr-12">
+          <ol className="flex items-center flex-wrap gap-1 text-xs text-gray-400 dark:text-gray-500">
+            <li><Link href="/" onClick={onClose} className="hover:text-primary transition-colors">Pradžia</Link></li>
+            <li className="flex items-center gap-1">
+              <span aria-hidden="true">/</span>
+              <Link href={`/${toSlug(item.city)}`} onClick={onClose} className="hover:text-primary transition-colors">{item.city}</Link>
+            </li>
+            <li className="flex items-center gap-1">
+              <span aria-hidden="true">/</span>
+              <span className="text-gray-600 dark:text-gray-300 truncate max-w-[200px]">{item.name}</span>
+            </li>
+          </ol>
+        </nav>
+
         <div className="flex items-center gap-2 flex-wrap pr-8">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white break-words">{item.name}</h2>
           {'verificationStatus' in item && (
@@ -211,13 +233,6 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
             />
           )}
         </div>
-        <Link
-          href={`/${toSlug(item.city)}`}
-          onClick={onClose}
-          className="inline-block text-sm text-gray-500 dark:text-gray-400 mt-0.5 hover:text-primary dark:hover:text-primary-light transition-colors"
-        >
-          {item.city} &rarr;
-        </Link>
 
         {item.baseRating > 0 && (
           <div className="flex items-center gap-2 mt-2">

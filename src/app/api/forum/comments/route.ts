@@ -8,6 +8,7 @@ import { checkCsrf, checkHoneypot, checkSubmitTiming } from '@/lib/security';
 import { sanitizeString } from '@/lib/sanitize';
 import { createNotification } from '@/lib/create-notification';
 import { filterBannedContent } from '@/lib/banned-words';
+import { verifyCaptcha } from '@/lib/captcha';
 
 /** Check nesting depth of a comment by walking up the parent chain */
 async function getCommentDepth(parentId: string): Promise<number> {
@@ -32,14 +33,12 @@ export async function POST(request: NextRequest) {
   const csrfResponse = checkCsrf(request);
   if (csrfResponse) return csrfResponse;
 
-  // Require authenticated session
+  // Auth is optional — anonymous users can comment with CAPTCHA
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return errorResponse('Prisijunkite, kad galėtumėte komentuoti', 401);
-  }
+  const userId = session?.user?.id ?? null;
 
-  // Rate limiting: 10 comments per 5 minutes (per user)
-  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.FORUM_COMMENT, session.user.id);
+  // Rate limiting: 10 comments per 5 minutes
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.FORUM_COMMENT, userId ?? undefined);
   if (rateLimitResponse) return rateLimitResponse;
 
   let body: unknown;
@@ -58,6 +57,12 @@ export async function POST(request: NextRequest) {
   // Timing check — reject submissions faster than 3 seconds
   const timingResponse = checkSubmitTiming(parsed, 3);
   if (timingResponse) return timingResponse;
+
+  // hCaptcha verification
+  const captchaValid = await verifyCaptcha(parsed.captchaToken as string | undefined);
+  if (!captchaValid) {
+    return errorResponse('CAPTCHA patikrinimas nepavyko', 400);
+  }
 
   const { postId, content: rawContent, authorName: rawAuthor, parentId } = parsed;
 
@@ -139,12 +144,12 @@ export async function POST(request: NextRequest) {
         parentId: validParentId,
         content: cleanContent,
         authorName: cleanAuthor,
-        authorId: session.user.id,
+        authorId: userId ?? undefined,
       },
     });
 
     // Notify the post author about the new comment
-    if (post.authorId && post.authorId !== (parsed.authorId as string | undefined)) {
+    if (post.authorId && post.authorId !== userId) {
       createNotification({
         userId: post.authorId,
         type: 'forum_reply',

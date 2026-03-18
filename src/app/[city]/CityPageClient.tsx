@@ -15,6 +15,8 @@ import EmptyState from '@/components/EmptyState';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import Pagination from '@/components/Pagination';
 import ScrollReveal from '@/components/ScrollReveal';
+import SuggestButton from '@/components/SuggestButton';
+import ScrollToTop from '@/components/ScrollToTop';
 const CompareTable = dynamic(() => import('@/components/CompareTable'), {
   loading: () => <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"><div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>,
 });
@@ -171,8 +173,8 @@ export default function CityPageClient({
 
   return (
     <>
-      {/* Category Tabs */}
-      <nav className="flex gap-1.5 overflow-x-auto pb-2 mb-6 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0" role="tablist">
+      {/* Category Tabs — sticky on mobile */}
+      <nav className="flex gap-1.5 overflow-x-auto pb-2 mb-6 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 sticky top-16 z-30 bg-white dark:bg-slate-900 pt-2 sm:static sm:pt-0 sm:bg-transparent dark:sm:bg-transparent" role="tablist">
         {categoryTabs.map((tab) => (
           <button
             key={tab.id}
@@ -284,11 +286,14 @@ export default function CityPageClient({
         </p>
       )}
       {items.length === 0 ? (
-        <EmptyState
-          icon="filter"
-          title="Nerasta rezultatų"
-          description="Šiame mieste su pasirinktais filtrais rezultatų nerasta. Pabandykite pakeisti filtrus."
-        />
+        <>
+          <EmptyState
+            icon="filter"
+            title="Nerasta rezultatų"
+            description="Šiame mieste su pasirinktais filtrais rezultatų nerasta. Pabandykite pakeisti filtrus."
+          />
+          <SuggestButton searchQuery={searchQuery} city={citySlug} resultCount={0} />
+        </>
       ) : (
         <ErrorBoundary fallback={<EmptyState icon="filter" title="Klaida" description="Nepavyko atvaizduoti rezultatų. Pabandykite perkrauti puslapį." />}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -318,6 +323,7 @@ export default function CityPageClient({
               </ScrollReveal>
             ))}
           </div>
+          <SuggestButton searchQuery={searchQuery} city={citySlug} resultCount={items.length} variant="inline" />
         </ErrorBoundary>
       )}
 
@@ -359,6 +365,7 @@ export default function CityPageClient({
         />
       )}
 
+      <ScrollToTop />
     </>
   );
 }

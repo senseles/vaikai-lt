@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, FormEvent } from 'react';
+import { useState, useEffect, useCallback, useRef, FormEvent } from 'react';
+import HoneypotField from './HoneypotField';
+import CaptchaWidget from './CaptchaWidget';
 
 // ===== Session ID =====
 function getSessionId(): string {
@@ -399,6 +401,9 @@ function CommentForm({ postId, parentId, onSubmit, compact }: CommentFormProps) 
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [honeypot, setHoneypot] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const formLoadedAt = useRef(Date.now());
 
   // Restore saved author name
   useEffect(() => {
@@ -418,18 +423,28 @@ function CommentForm({ postId, parentId, onSubmit, compact }: CommentFormProps) 
       setError('Komentaras turi būti bent 2 simbolių');
       return;
     }
+    if (!captchaToken) {
+      setError('Prašome patvirtinti, kad nesate robotas');
+      return;
+    }
 
     setSubmitting(true);
 
     try {
       const res = await fetch('/api/forum/comments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
         body: JSON.stringify({
           postId,
           parentId: parentId || undefined,
           authorName: authorName.trim(),
           content: content.trim(),
+          captchaToken,
+          _hp_website: honeypot,
+          _form_loaded_at: formLoadedAt.current,
         }),
       });
 
@@ -443,6 +458,8 @@ function CommentForm({ postId, parentId, onSubmit, compact }: CommentFormProps) 
       // Save author name for reuse
       localStorage.setItem('forum_author_name', authorName.trim());
       setContent('');
+      setCaptchaToken('');
+      formLoadedAt.current = Date.now();
       onSubmit?.();
     } catch {
       setError('Tinklo klaida. Bandykite dar kartą.');
@@ -454,7 +471,8 @@ function CommentForm({ postId, parentId, onSubmit, compact }: CommentFormProps) 
   if (compact) {
     // Compact reply form — stacks vertically on mobile, full-width
     return (
-      <form onSubmit={handleSubmit} className="space-y-2">
+      <form onSubmit={handleSubmit} className="space-y-2 relative">
+        <HoneypotField value={honeypot} onChange={setHoneypot} />
         <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
@@ -473,13 +491,15 @@ function CommentForm({ postId, parentId, onSubmit, compact }: CommentFormProps) 
             className="w-full flex-1 px-3 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 resize-none placeholder:text-slate-400"
           />
         </div>
+        <CaptchaWidget onVerify={setCaptchaToken} onExpire={() => setCaptchaToken('')} />
         {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
         <div className="flex justify-end">
           <button
             type="submit"
             disabled={submitting}
-            className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium px-4 py-2.5 rounded-lg text-sm transition-colors min-h-[44px]"
+            className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium px-4 py-2.5 rounded-lg text-sm transition-colors min-h-[44px] inline-flex items-center gap-2"
           >
+            {submitting && <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>}
             {submitting ? 'Siunčiama...' : 'Atsakyti'}
           </button>
         </div>
@@ -491,8 +511,9 @@ function CommentForm({ postId, parentId, onSubmit, compact }: CommentFormProps) 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 space-y-3"
+      className="bg-white dark:bg-slate-800 p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 space-y-3 relative"
     >
+      <HoneypotField value={honeypot} onChange={setHoneypot} />
       <h3 className="font-semibold text-slate-800 dark:text-white text-base">
         Pridėti komentarą
       </h3>
@@ -512,13 +533,15 @@ function CommentForm({ postId, parentId, onSubmit, compact }: CommentFormProps) 
         rows={4}
         className="w-full px-3 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 resize-y placeholder:text-slate-400"
       />
+      <CaptchaWidget onVerify={setCaptchaToken} onExpire={() => setCaptchaToken('')} />
       {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
       <div className="flex justify-end">
         <button
           type="submit"
           disabled={submitting}
-          className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium px-5 py-2.5 rounded-lg text-sm transition-colors min-h-[44px]"
+          className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium px-5 py-2.5 rounded-lg text-sm transition-colors min-h-[44px] inline-flex items-center gap-2"
         >
+          {submitting && <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>}
           {submitting ? 'Siunčiama...' : 'Komentuoti'}
         </button>
       </div>

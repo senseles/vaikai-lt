@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Suggestion {
   id: string;
@@ -58,17 +59,41 @@ interface SearchBarProps {
   readonly compact?: boolean;
 }
 
+const RECENT_SEARCHES_KEY = 'vaikai_recent_searches';
+const MAX_RECENT = 5;
+const POPULAR_SEARCHES = ['Darželis Vilnius', 'Auklė Kaunas', 'Būreliai vaikams', 'Logopedas', 'Montessori'];
+
+function getRecentSearches(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || '[]');
+  } catch { return []; }
+}
+
+function saveRecentSearch(q: string) {
+  const recent = getRecentSearches().filter(s => s !== q);
+  recent.unshift(q);
+  localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(recent.slice(0, MAX_RECENT)));
+}
+
 export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showRecent, setShowRecent] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(-1);
   const [isLoading, setIsLoading] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const router = useRouter();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const abortRef = useRef<AbortController | null>(null);
+
+  // Load recent searches on mount
+  useEffect(() => {
+    setRecentSearches(getRecentSearches());
+  }, []);
 
   // Fetch suggestions with debounce (300ms)
   useEffect(() => {
@@ -79,8 +104,10 @@ export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
       setSuggestions([]);
       setShowSuggestions(false);
       setIsLoading(false);
+      if (query.trim().length > 0) setShowRecent(false);
       return;
     }
+    setShowRecent(false);
 
     setIsLoading(true);
     const controller = new AbortController();
@@ -117,6 +144,7 @@ export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
     const handleClick = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         setShowSuggestions(false);
+        setShowRecent(false);
       }
     };
     document.addEventListener("mousedown", handleClick);
@@ -132,12 +160,18 @@ export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
 
   const navigateToSuggestion = useCallback((suggestion: Suggestion) => {
     setShowSuggestions(false);
+    setShowRecent(false);
+    saveRecentSearch(suggestion.name);
+    setRecentSearches(getRecentSearches());
     setQuery("");
     router.push(suggestion.url);
   }, [router]);
 
   const navigateToSearch = useCallback((q: string) => {
     setShowSuggestions(false);
+    setShowRecent(false);
+    saveRecentSearch(q);
+    setRecentSearches(getRecentSearches());
     router.push(`/paieska?q=${encodeURIComponent(q)}`);
   }, [router]);
 
@@ -202,7 +236,11 @@ export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => {
-              if (suggestions.length > 0) setShowSuggestions(true);
+              if (query.trim().length >= 2 && suggestions.length > 0) {
+                setShowSuggestions(true);
+              } else if (query.trim().length < 2) {
+                setShowRecent(true);
+              }
             }}
             onKeyDown={handleKeyDown}
             placeholder="Ieškoti darželio, auklės, būrelio..."
@@ -215,6 +253,19 @@ export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
             aria-haspopup="listbox"
             aria-activedescendant={selectedIdx >= 0 ? `suggestion-${selectedIdx}` : undefined}
           />
+          {/* Clear button */}
+          {query && (
+            <button
+              type="button"
+              onClick={() => { setQuery(""); setSuggestions([]); setShowSuggestions(false); inputRef.current?.focus(); }}
+              className={`absolute top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors ${compact ? 'right-12' : 'right-14'}`}
+              aria-label="Išvalyti"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
           {/* Loading spinner or search icon */}
           <button
             type="submit"
@@ -250,12 +301,26 @@ export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
           role="listbox"
         >
           {suggestions.length === 0 && !isLoading && (
-            <li className="px-4 py-4 text-sm text-gray-400 dark:text-gray-500 text-center">
-              <svg className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              Nieko nerasta pagal &bdquo;{query}&ldquo;
-            </li>
+            <>
+              <li className="px-4 py-4 text-sm text-gray-400 dark:text-gray-500 text-center">
+                <svg className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Nieko nerasta pagal &bdquo;{query}&ldquo;
+              </li>
+              <li className="border-t border-gray-100 dark:border-slate-700">
+                <Link
+                  href={`/pasiulyti?name=${encodeURIComponent(query.trim())}`}
+                  className="flex items-center gap-2 px-4 py-3 text-sm text-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors"
+                  onClick={() => setShowSuggestions(false)}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Nerandi? Pasiūlyk pridėti &rarr;
+                </Link>
+              </li>
+            </>
           )}
 
           {suggestions.map((s, i) => (
@@ -336,6 +401,46 @@ export default function SearchBar({ autoFocus, compact }: SearchBarProps = {}) {
             </li>
           )}
         </ul>
+      )}
+
+      {/* Recent / Popular searches when empty and focused */}
+      {showRecent && !showSuggestions && query.trim().length < 2 && (
+        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl shadow-xl overflow-hidden animate-fade-in">
+          {recentSearches.length > 0 && (
+            <div>
+              <p className="px-4 pt-3 pb-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Paskutinės paieškos</p>
+              {recentSearches.map((s) => (
+                <button
+                  key={s}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-left"
+                  onClick={() => { setQuery(s); setShowRecent(false); navigateToSearch(s); }}
+                >
+                  <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+          <div>
+            <p className="px-4 pt-3 pb-1 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+              {recentSearches.length > 0 ? 'Populiarios paieškos' : 'Populiariausios paieškos'}
+            </p>
+            {POPULAR_SEARCHES.map((s) => (
+              <button
+                key={s}
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-left"
+                onClick={() => { setQuery(s); setShowRecent(false); navigateToSearch(s); }}
+              >
+                <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

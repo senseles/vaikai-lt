@@ -8,6 +8,7 @@ import { checkCsrf, checkHoneypot, checkSubmitTiming } from '@/lib/security';
 import { sanitizeString } from '@/lib/sanitize';
 import { filterBannedContent } from '@/lib/banned-words';
 import { slugify } from '@/lib/lithuanian';
+import { verifyCaptcha } from '@/lib/captcha';
 
 export async function GET(request: NextRequest) {
   const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.PUBLIC_GET);
@@ -126,14 +127,12 @@ export async function POST(request: NextRequest) {
   const csrfResponse = checkCsrf(request);
   if (csrfResponse) return csrfResponse;
 
-  // Require authenticated session
+  // Auth is optional — anonymous users can post with CAPTCHA
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return errorResponse('Prisijunkite, kad galėtumėte kurti įrašus forume', 401);
-  }
+  const userId = session?.user?.id ?? null;
 
-  // Rate limiting: 3 posts per 5 minutes (per user)
-  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.FORUM_POST, session.user.id);
+  // Rate limiting: 3 posts per 5 minutes
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.FORUM_POST, userId ?? undefined);
   if (rateLimitResponse) return rateLimitResponse;
 
   let body: unknown;
@@ -152,6 +151,12 @@ export async function POST(request: NextRequest) {
   // Timing check — reject submissions faster than 3 seconds
   const timingResponse = checkSubmitTiming(parsed, 3);
   if (timingResponse) return timingResponse;
+
+  // hCaptcha verification
+  const captchaValid = await verifyCaptcha(parsed.captchaToken as string | undefined);
+  if (!captchaValid) {
+    return errorResponse('CAPTCHA patikrinimas nepavyko', 400);
+  }
 
   const { title: rawTitle, content: rawContent, authorName: rawAuthor, categorySlug, city } = parsed;
 
@@ -244,7 +249,7 @@ export async function POST(request: NextRequest) {
         slug,
         content: cleanContent,
         authorName: cleanAuthor,
-        authorId: session.user.id,
+        authorId: userId ?? undefined,
         categoryId: category.id,
         city: cleanCity,
       },

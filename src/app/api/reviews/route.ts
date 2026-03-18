@@ -52,16 +52,12 @@ export async function POST(request: NextRequest) {
   const csrfResponse = checkCsrf(request);
   if (csrfResponse) return csrfResponse;
 
-  // P1.5: Require authenticated session
+  // Auth is optional — anonymous users can submit with CAPTCHA
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return errorResponse('Prisijunkite, kad galėtumėte rašyti atsiliepimą', 401);
-  }
+  const userId = session?.user?.id ?? null;
 
-  const userId = session.user.id;
-
-  // Rate limiting by userId instead of just IP
-  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.REVIEW_POST, userId);
+  // Rate limiting by userId or IP
+  const rateLimitResponse = checkRateLimit(request, RATE_LIMITS.REVIEW_POST, userId ?? undefined);
   if (rateLimitResponse) return rateLimitResponse;
 
   let body: unknown;
@@ -108,12 +104,14 @@ export async function POST(request: NextRequest) {
     return errorResponse('Nurodytas objektas nerastas', 404);
   }
 
-  // P1.5: Check 1 review per user per entity
-  const existingReview = await prisma.review.findFirst({
-    where: { userId, itemId: itemId as string, itemType: itemType as string },
-  });
-  if (existingReview) {
-    return errorResponse('Jūs jau palikote atsiliepimą šiam objektui', 409);
+  // Check 1 review per user per entity (only for logged-in users)
+  if (userId) {
+    const existingReview = await prisma.review.findFirst({
+      where: { userId, itemId: itemId as string, itemType: itemType as string },
+    });
+    if (existingReview) {
+      return errorResponse('Jūs jau palikote atsiliepimą šiam objektui', 409);
+    }
   }
 
   if (!rawAuthor || typeof rawAuthor !== 'string') {
@@ -152,7 +150,7 @@ export async function POST(request: NextRequest) {
         rating: rating as number,
         text: cleanText,
         isApproved: false,
-        userId,
+        userId: userId ?? undefined,
       },
     });
 

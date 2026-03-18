@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
-import Link from 'next/link';
 import type { ItemType } from '@/types';
 import StarRating from './StarRating';
 import HoneypotField from './HoneypotField';
@@ -15,7 +14,7 @@ interface ReviewFormProps {
 }
 
 export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewFormProps) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [rating, setRating] = useState(0);
   const [text, setText] = useState('');
   const [authorName, setAuthorName] = useState('');
@@ -39,48 +38,6 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
     const timer = setTimeout(() => setSuccess(false), 5000);
     return () => clearTimeout(timer);
   }, [success]);
-
-  // Loading state
-  if (status === 'loading') {
-    return (
-      <div className="mt-4 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
-        <div className="animate-pulse flex items-center gap-3">
-          <div className="w-5 h-5 bg-gray-200 dark:bg-slate-700 rounded" />
-          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-48" />
-        </div>
-      </div>
-    );
-  }
-
-  // Not logged in — show login prompt
-  if (!session) {
-    return (
-      <div className="mt-4 p-5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-        <div className="flex items-start gap-3">
-          <svg className="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m0 0v2m0-2h2m-2 0H10m-4.757 3.757A9.97 9.97 0 0112 21a9.97 9.97 0 016.757-2.243M15 9A3 3 0 119 9a3 3 0 016 0z" />
-          </svg>
-          <div>
-            <p className="font-medium text-amber-800 dark:text-amber-300 mb-1">
-              Prisijunkite, kad galėtumėte rašyti atsiliepimą
-            </p>
-            <p className="text-sm text-amber-700 dark:text-amber-400 mb-3">
-              Norėdami palikti atsiliepimą, turite būti prisijungę prie savo paskyros.
-            </p>
-            <Link
-              href="/prisijungti"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-              </svg>
-              Prisijungti
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,12 +74,13 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
       setSuccess(true);
       setRating(0);
       setText('');
-      setAuthorName(session?.user?.name || '');
+      setAuthorName(session?.user?.name ?? '');
       setCaptchaToken('');
       formLoadedAt.current = Date.now();
       onSubmitted?.();
     } catch (err) {
-      setError(err instanceof Error && err.message !== 'Nepavyko išsaugoti' ? err.message : 'Klaida siunčiant atsiliepimą. Bandykite dar kartą.');
+      const msg = err instanceof Error ? err.message : '';
+      setError(msg && msg !== 'Nepavyko išsaugoti' ? msg : 'Įvyko klaida siunčiant atsiliepimą. Prašome bandyti dar kartą.');
     } finally {
       setSubmitting(false);
     }
@@ -185,13 +143,18 @@ export default function ReviewForm({ itemId, itemType, onSubmitted }: ReviewForm
         onExpire={() => setCaptchaToken('')}
       />
 
-      {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+          <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+        </div>
+      )}
 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full bg-primary text-white rounded-lg py-3 min-h-[48px] text-base font-medium hover:bg-primary-dark disabled:opacity-50 transition-colors"
+        className="w-full bg-primary text-white rounded-lg py-3 min-h-[48px] text-base font-medium hover:bg-primary-dark disabled:opacity-50 transition-colors inline-flex items-center justify-center gap-2"
       >
+        {submitting && <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>}
         {submitting ? 'Siunčiama...' : 'Siųsti atsiliepimą'}
       </button>
     </form>

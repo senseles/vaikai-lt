@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, useRef, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import HoneypotField from '@/components/HoneypotField';
+import CaptchaWidget from '@/components/CaptchaWidget';
 
 interface Category {
   id: string;
@@ -24,6 +26,9 @@ export default function NewPostPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState('');
+  const [honeypot, setHoneypot] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const formLoadedAt = useRef(Date.now());
 
   // Load categories
   useEffect(() => {
@@ -77,18 +82,29 @@ export default function NewPostPage() {
 
     if (!validate()) return;
 
+    if (!captchaToken) {
+      setServerError('Prašome patvirtinti, kad nesate robotas');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
       const res = await fetch('/api/forum/posts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
         body: JSON.stringify({
           categorySlug,
           title: title.trim(),
           content: content.trim(),
           authorName: authorName.trim(),
           city: city.trim() || undefined,
+          captchaToken,
+          _hp_website: honeypot,
+          _form_loaded_at: formLoadedAt.current,
         }),
       });
 
@@ -120,7 +136,8 @@ export default function NewPostPage() {
         Pasidalinkite klausimu, patirtimi ar rekomendacija su kitais tėveliais.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6 relative">
+        <HoneypotField value={honeypot} onChange={setHoneypot} />
         {/* Category */}
         <div>
           <label htmlFor="category" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
@@ -227,10 +244,24 @@ export default function NewPostPage() {
           />
         </div>
 
+        <CaptchaWidget onVerify={setCaptchaToken} onExpire={() => setCaptchaToken('')} />
+
         {/* Server error */}
         {serverError && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
-            <p className="text-red-600 dark:text-red-400 text-sm">{serverError}</p>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-start gap-3">
+            <svg className="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <div>
+              <p className="text-red-600 dark:text-red-400 text-sm">{serverError}</p>
+              <button
+                type="button"
+                onClick={() => setServerError('')}
+                className="text-red-500 dark:text-red-400 text-xs font-medium mt-1 hover:underline"
+              >
+                Bandyti dar kartą
+              </button>
+            </div>
           </div>
         )}
 
@@ -245,8 +276,9 @@ export default function NewPostPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="bg-[#2d6a4f] hover:bg-[#40916c] active:bg-[#1b4332] disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors min-h-[48px] sm:min-h-[44px] flex-1 sm:flex-none"
+            className="bg-[#2d6a4f] hover:bg-[#40916c] active:bg-[#1b4332] disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors min-h-[48px] sm:min-h-[44px] flex-1 sm:flex-none inline-flex items-center justify-center gap-2"
           >
+            {submitting && <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>}
             {submitting ? 'Kuriama...' : 'Sukurti įrašą'}
           </button>
         </div>
