@@ -4,6 +4,7 @@ import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { checkCsrf, checkHoneypot } from '@/lib/security';
 import { sanitizeString } from '@/lib/sanitize';
 import { hashPassword } from '@/lib/password';
+import { verifyCaptcha } from '@/lib/captcha';
 
 export async function POST(request: NextRequest) {
   const csrfResponse = checkCsrf(request);
@@ -19,7 +20,13 @@ export async function POST(request: NextRequest) {
     const honeypotResponse = checkHoneypot(body as Record<string, unknown>);
     if (honeypotResponse) return honeypotResponse;
 
-    const { email, password, name } = body as { email?: string; password?: string; name?: string };
+    const { email, password, name, captchaToken } = body as { email?: string; password?: string; name?: string; captchaToken?: string };
+
+    // Verify CAPTCHA
+    const captchaValid = await verifyCaptcha(captchaToken);
+    if (!captchaValid) {
+      return NextResponse.json({ success: false, error: 'CAPTCHA patikrinimas nepavyko' }, { status: 400 });
+    }
 
     if (!email || !password) {
       return NextResponse.json({ success: false, error: 'El. paštas ir slaptažodis privalomi' }, { status: 400 });

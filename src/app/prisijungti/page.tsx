@@ -4,6 +4,8 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
+import CaptchaWidget from '@/components/CaptchaWidget';
+import HoneypotField from '@/components/HoneypotField';
 
 type Mode = 'login' | 'register';
 
@@ -59,6 +61,8 @@ export default function AuthPage() {
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -120,13 +124,26 @@ export default function AuthPage() {
 
     if (!validateAll()) return;
 
+    // Honeypot: if filled, show fake success (bot trap)
+    if (honeypot) {
+      setSuccess(true);
+      return;
+    }
+
+    // CAPTCHA check
+    if (!captchaToken) {
+      setError('Prašome patvirtinti, kad nesate robotas');
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (mode === 'register') {
         // Register via existing API first, then sign in with NextAuth
-        const body: Record<string, string> = { email: email.trim(), password };
+        const body: Record<string, string> = { email: email.trim(), password, captchaToken };
         if (name.trim()) body.name = name.trim();
+        if (honeypot) body._hp_website = honeypot;
 
         const res = await fetch('/api/auth/register', {
           method: 'POST',
@@ -179,6 +196,7 @@ export default function AuthPage() {
     setFieldErrors({});
     setTouched({});
     setSuccess(false);
+    setCaptchaToken('');
   }, []);
 
   const inputBaseClass = "w-full px-4 py-3 min-h-[48px] rounded-lg border bg-white dark:bg-slate-700 text-gray-900 dark:text-white text-base transition-all duration-200";
@@ -463,6 +481,15 @@ export default function AuthPage() {
               </div>
             )}
           </div>
+
+          {/* Honeypot (hidden from humans) */}
+          <HoneypotField value={honeypot} onChange={setHoneypot} />
+
+          {/* CAPTCHA */}
+          <CaptchaWidget
+            onVerify={setCaptchaToken}
+            onExpire={() => setCaptchaToken('')}
+          />
 
           {/* Global error message */}
           {error && (
