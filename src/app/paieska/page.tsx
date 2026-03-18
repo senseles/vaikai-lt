@@ -65,7 +65,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     if (cat && !categoryFilter) {
       categoryFilter = cat;
     } else {
-      searchWords.push(w);
+      // Normalize Lithuanian city declensions
+      const CITY_DECLENSIONS: Record<string, string> = {
+        'vilniuje': 'Vilnius', 'vilniaus': 'Vilnius', 'vilnių': 'Vilnius',
+        'kaune': 'Kaunas', 'kauno': 'Kaunas',
+        'klaipėdoje': 'Klaipėda', 'klaipedoje': 'Klaipėda', 'klaipėdos': 'Klaipėda',
+        'šiauliuose': 'Šiauliai', 'siauliuose': 'Šiauliai',
+        'panevėžyje': 'Panevėžys', 'panevezyje': 'Panevėžys',
+        'alytuje': 'Alytus', 'marijampolėje': 'Marijampolė',
+      };
+      const lower = w.toLocaleLowerCase('lt');
+      searchWords.push(CITY_DECLENSIONS[lower] || w);
     }
   }
   // If all words were category keywords, use original words for search

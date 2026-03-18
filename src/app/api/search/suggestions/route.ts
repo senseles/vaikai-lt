@@ -39,6 +39,25 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
   'specialistai': 'specialist', 'specialistas': 'specialist',
 };
 
+// Lithuanian city name declensions → base form (nominative)
+const CITY_DECLENSIONS: Record<string, string> = {
+  'vilniuje': 'Vilnius', 'vilniaus': 'Vilnius', 'vilnių': 'Vilnius', 'vilniui': 'Vilnius',
+  'kaune': 'Kaunas', 'kauno': 'Kaunas', 'kaunui': 'Kaunas',
+  'klaipėdoje': 'Klaipėda', 'klaipedoje': 'Klaipėda', 'klaipėdos': 'Klaipėda', 'klaipedos': 'Klaipėda',
+  'šiauliuose': 'Šiauliai', 'siauliuose': 'Šiauliai', 'šiaulių': 'Šiauliai', 'siauliu': 'Šiauliai',
+  'panevėžyje': 'Panevėžys', 'panevėžio': 'Panevėžys', 'panevezyje': 'Panevėžys', 'panevezio': 'Panevėžys',
+  'alytuje': 'Alytus', 'alytaus': 'Alytus',
+  'marijampolėje': 'Marijampolė', 'marijampoleje': 'Marijampolė', 'marijampolės': 'Marijampolė',
+  'utenoje': 'Utena', 'utenos': 'Utena',
+  'telšiuose': 'Telšiai', 'telsiuose': 'Telšiai', 'telšių': 'Telšiai',
+  'tauragėje': 'Tauragė', 'taurageje': 'Tauragė', 'tauragės': 'Tauragė',
+};
+
+function normalizeCityWord(w: string): string {
+  const lower = w.toLocaleLowerCase('lt');
+  return CITY_DECLENSIONS[lower] || w;
+}
+
 function parseSearchWords(q: string): { searchWords: string[]; categoryFilter: string | null } {
   const allWords = q.split(/\s+/).filter(w => w.length > 0);
   let categoryFilter: string | null = null;
@@ -48,7 +67,7 @@ function parseSearchWords(q: string): { searchWords: string[]; categoryFilter: s
     if (cat && !categoryFilter) {
       categoryFilter = cat;
     } else {
-      searchWords.push(w);
+      searchWords.push(normalizeCityWord(w));
     }
   }
   return { searchWords: searchWords.length > 0 ? searchWords : allWords, categoryFilter };
