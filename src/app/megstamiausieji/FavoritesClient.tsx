@@ -15,16 +15,6 @@ interface FavoriteEntry {
   itemType: ItemType;
 }
 
-function getFavoritesFromStorage(): FavoriteEntry[] {
-  try {
-    const raw = localStorage.getItem('vaikai-favorites');
-    if (!raw) return [];
-    return JSON.parse(raw) as FavoriteEntry[];
-  } catch {
-    return [];
-  }
-}
-
 export default function FavoritesClient() {
   const [loading, setLoading] = useState(true);
   const [kindergartens, setKindergartens] = useState<Kindergarten[]>([]);
@@ -36,60 +26,63 @@ export default function FavoritesClient() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const favorites = getFavoritesFromStorage();
-    if (favorites.length === 0) {
-      setLoading(false);
-      return;
-    }
 
-    const fetchByType = async (type: string, ids: string[]) => {
-      if (ids.length === 0) return [];
-      const params = new URLSearchParams();
-      ids.forEach((id) => params.append('ids', id));
-      const apiPath = type === 'kindergarten' ? 'kindergartens' : type === 'aukle' ? 'aukles' : type === 'burelis' ? 'bureliai' : 'specialists';
+    const loadFavorites = async () => {
       try {
-        const res = await fetch(`/api/${apiPath}?${params.toString()}`, {
-          signal: controller.signal,
-        });
-        if (!res.ok) return [];
+        const res = await fetch('/api/favorites', { signal: controller.signal });
+        if (!res.ok) {
+          setLoading(false);
+          return;
+        }
         const data = await res.json();
-        return data.data ?? data ?? [];
+        const favorites: FavoriteEntry[] = data.favorites ?? [];
+        if (favorites.length === 0) {
+          setLoading(false);
+          return;
+        }
+
+        const grouped: Record<string, string[]> = {};
+        for (const f of favorites) {
+          (grouped[f.itemType] ??= []).push(f.itemId);
+        }
+
+        const fetchByType = async (type: string, ids: string[]) => {
+          if (ids.length === 0) return [];
+          const params = new URLSearchParams();
+          ids.forEach((id) => params.append('ids', id));
+          const apiPath = type === 'kindergarten' ? 'kindergartens' : type === 'aukle' ? 'aukles' : type === 'burelis' ? 'bureliai' : 'specialists';
+          try {
+            const r = await fetch(`/api/${apiPath}?${params.toString()}`, {
+              signal: controller.signal,
+            });
+            if (!r.ok) return [];
+            const d = await r.json();
+            return d.data ?? d ?? [];
+          } catch {
+            return [];
+          }
+        };
+
+        const [k, a, b, s] = await Promise.all([
+          fetchByType('kindergarten', grouped['kindergarten'] ?? []),
+          fetchByType('aukle', grouped['aukle'] ?? []),
+          fetchByType('burelis', grouped['burelis'] ?? []),
+          fetchByType('specialist', grouped['specialist'] ?? []),
+        ]);
+
+        if (controller.signal.aborted) return;
+        setKindergartens(k);
+        setAukles(a);
+        setBureliai(b);
+        setSpecialists(s);
       } catch {
-        return [];
+        // aborted or failed
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
 
-    const grouped: Record<string, string[]> = {};
-    for (const f of favorites) {
-      (grouped[f.itemType] ??= []).push(f.itemId);
-    }
-
-    Promise.all([
-      fetchByType('kindergarten', grouped['kindergarten'] ?? []),
-      fetchByType('aukle', grouped['aukle'] ?? []),
-      fetchByType('burelis', grouped['burelis'] ?? []),
-      fetchByType('specialist', grouped['specialist'] ?? []),
-    ]).then(([k, a, b, s]) => {
-      if (controller.signal.aborted) return;
-      setKindergartens(k);
-      setAukles(a);
-      setBureliai(b);
-      setSpecialists(s);
-      setLoading(false);
-
-      // Clean up stale favorites (items deleted from DB)
-      const foundIds = new Set([
-        ...k.map((i: Kindergarten) => i.id),
-        ...a.map((i: Aukle) => i.id),
-        ...b.map((i: Burelis) => i.id),
-        ...s.map((i: Specialist) => i.id),
-      ]);
-      const cleaned = favorites.filter((f) => foundIds.has(f.itemId));
-      if (cleaned.length < favorites.length) {
-        try { localStorage.setItem('vaikai-favorites', JSON.stringify(cleaned)); } catch { /* ignore */ }
-      }
-    });
-
+    loadFavorites();
     return () => controller.abort();
   }, []);
 
