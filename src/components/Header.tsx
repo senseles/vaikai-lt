@@ -66,6 +66,7 @@ export default function Header() {
   const navLinks = [
     { href: "/#miestai", label: t('nav.cities'), prefetch: false as const },
     { href: "/forumas", label: "Forumas", prefetch: true as const },
+    { href: "/pasiulyti", label: "✏️ Pasiūlyti", prefetch: true as const },
     { href: "/megstamiausieji", label: t('nav.favorites'), prefetch: true as const },
     { href: "/#duk", label: t('nav.faq'), prefetch: false as const },
   ];
