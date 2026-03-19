@@ -150,10 +150,20 @@ export default function SubmissionForm({ defaultName, defaultCity, defaultType }
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-xl font-bold text-green-800 dark:text-green-300 mb-2">Pasiūlymas pateiktas!</h2>
-        <p className="text-green-700 dark:text-green-400">
-          Ačiū! Jūsų pasiūlymas bus peržiūrėtas administratoriaus. Įrašas bus pridėtas po patvirtinimo.
+        <h2 className="text-xl font-bold text-green-800 dark:text-green-300 mb-2">✅ Pasiūlymas pateiktas sėkmingai!</h2>
+        <p className="text-green-700 dark:text-green-400 mb-3">
+          Ačiū! Jūsų pasiūlymas gautas ir administratorius gavo pranešimą.
         </p>
+        <div className="text-sm text-green-600 dark:text-green-500 space-y-1">
+          <p>📋 Pasiūlymas bus peržiūrėtas per 1-2 darbo dienas</p>
+          <p>✅ Po patvirtinimo įrašas atsiras svetainėje</p>
+        </div>
+        <button
+          onClick={() => { setSuccess(false); }}
+          className="mt-4 text-sm text-primary hover:underline"
+        >
+          Pateikti dar vieną pasiūlymą →
+        </button>
       </div>
     );
   }

@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: '/admin/aukles', label: 'Auklės', icon: '♀' },
   { href: '/admin/bureliai', label: 'Būreliai', icon: '◈' },
   { href: '/admin/specialistai', label: 'Specialistai', icon: '✚' },
+  { href: '/admin/submissions', label: 'Pasiūlymai', icon: '📝' },
   { href: '/admin/verification', label: 'Verifikavimas', icon: '✓' },
   { href: '/admin/atsiliepimai', label: 'Atsiliepimai', icon: '★' },
   { href: '/admin/vartotojai', label: 'Vartotojai', icon: '👤' },

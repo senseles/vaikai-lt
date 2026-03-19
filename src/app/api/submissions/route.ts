@@ -104,6 +104,39 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Send Telegram notification to admin (non-blocking)
+    const typeLabels: Record<string, string> = {
+      kindergarten: 'Darželis', aukle: 'Auklė', burelis: 'Būrelis', specialist: 'Specialistas',
+    };
+    const typeLabel = typeLabels[entityType] || entityType;
+    const telegramMsg = [
+      `📝 *Naujas pasiūlymas!*`,
+      ``,
+      `Tipas: ${typeLabel}`,
+      `Pavadinimas: ${name}`,
+      `Miestas: ${city}`,
+      address ? `Adresas: ${address}` : '',
+      ``,
+      `Siūlytojas: ${submitterName}`,
+      submitterEmail ? `El. paštas: ${submitterEmail}` : '',
+      ``,
+      `🔗 [Peržiūrėti admin](${process.env.NEXT_PUBLIC_SITE_URL || 'https://vaikai.lt'}/admin/submissions)`,
+    ].filter(Boolean).join('\n');
+
+    const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+    const TELEGRAM_ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID;
+    if (TELEGRAM_BOT_TOKEN && TELEGRAM_ADMIN_CHAT_ID) {
+      fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_ADMIN_CHAT_ID,
+          text: telegramMsg,
+          parse_mode: 'Markdown',
+        }),
+      }).catch((e) => console.error('Telegram notification failed:', e));
+    }
+
     return NextResponse.json({ success: true, id: submission.id }, { status: 201 });
   } catch (err) {
     console.error('Submission creation error:', err);
