@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminToken } from '@/lib/admin-tokens';
 import { VALID_CITY_SLUGS } from '@/lib/cities';
-import { trackRequest } from '@/lib/request-tracker';
+// Note: request tracking moved to server-side (instrumentation + API wrapper)
+// Middleware runs in Edge runtime which doesn't share globalThis with Node.js API routes
 
 /** Known top-level routes that are NOT city slugs */
 const KNOWN_ROUTES = new Set(['', 'megstamiausieji', 'paieska', 'admin', 'prisijungti', 'registracija', 'privatumo-politika', 'forumas', 'aukles', 'bureliai', 'specialistai', 'slaptazodis', 'profilis', 'pasiulyti']);
@@ -28,7 +29,6 @@ a:hover{background:#40916c}
 </html>`;
 
 export async function middleware(request: NextRequest) {
-  const startTime = Date.now();
   const { pathname } = request.nextUrl;
 
   // --- City slug validation ---
@@ -36,11 +36,6 @@ export async function middleware(request: NextRequest) {
   const slug = pathname.slice(1); // remove leading /
   if (slug && !slug.includes('/') && !slug.includes('.') && !slug.startsWith('api') && !slug.startsWith('_next')) {
     if (!KNOWN_ROUTES.has(slug) && !VALID_CITY_SLUGS.has(slug)) {
-      trackRequest({
-        timestamp: startTime, method: request.method, path: pathname,
-        status: 404, responseTime: Date.now() - startTime,
-        userAgent: request.headers.get('user-agent') || '', ip: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '',
-      });
       return new NextResponse(NOT_FOUND_HTML, {
         status: 404,
         headers: { 'Content-Type': 'text/html; charset=utf-8' },
@@ -60,24 +55,12 @@ export async function middleware(request: NextRequest) {
     const token = cookieToken || bearerToken;
 
     if (!token || !(await verifyAdminToken(token))) {
-      trackRequest({
-        timestamp: startTime, method: request.method, path: pathname,
-        status: 401, responseTime: Date.now() - startTime,
-        userAgent: request.headers.get('user-agent') || '', ip: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '',
-      });
       return NextResponse.json(
         { success: false, error: 'Neautorizuota. Prisijunkite.' },
         { status: 401 },
       );
     }
   }
-
-  // --- Request tracking ---
-  trackRequest({
-    timestamp: startTime, method: request.method, path: pathname,
-    status: 200, responseTime: Date.now() - startTime,
-    userAgent: request.headers.get('user-agent') || '', ip: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '',
-  });
 
   // --- Security headers ---
   const response = NextResponse.next();

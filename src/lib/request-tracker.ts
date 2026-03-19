@@ -1,7 +1,11 @@
 /**
- * In-memory circular buffer for request tracking.
- * Shared via globalThis between middleware (Edge) and API routes (Node.js)
- * in production (next start) where they run in the same process.
+ * In-memory request tracking — Node.js runtime only.
+ * Uses a file-based approach to bridge Edge middleware → Node.js:
+ * Middleware writes to a tmp file, monitoring API reads from it.
+ * 
+ * BUT simpler approach: track directly from API routes + use OS-level 
+ * process metrics for system stats. Since all API routes run in Node.js,
+ * globalThis works fine for API-level tracking.
  */
 
 interface RequestEntry {
@@ -26,7 +30,6 @@ interface RequestMetrics {
 const BUFFER_SIZE = 1000;
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
-// Use globalThis to share state across Edge middleware and Node.js API routes
 const globalKey = '__vaikai_request_tracker__' as const;
 
 interface TrackerState {
@@ -58,20 +61,63 @@ export function trackRequest(data: RequestEntry): void {
   state.totalCount++;
 }
 
+/**
+ * Wrapper for API route handlers that automatically tracks requests.
+ * Use in API routes: export const GET = withTracking(async (req) => { ... });
+ */
+export function withTracking(
+  handler: (req: Request) => Promise<Response>
+): (req: Request) => Promise<Response> {
+  return async (req: Request) => {
+    const start = Date.now();
+    const url = new URL(req.url);
+    let response: Response;
+    try {
+      response = await handler(req);
+    } catch (err) {
+      response = new Response('Internal Server Error', { status: 500 });
+      throw err;
+    } finally {
+      trackRequest({
+        timestamp: start,
+        method: req.method,
+        path: url.pathname,
+        status: response!.status,
+        responseTime: Date.now() - start,
+        userAgent: req.headers.get('user-agent') || '',
+        ip: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '',
+      });
+    }
+    return response;
+  };
+}
+
+/**
+ * Track a page-level request (call from server components / generateMetadata).
+ */
+export function trackPageView(path: string, method: string = 'GET', status: number = 200, responseTime: number = 0): void {
+  trackRequest({
+    timestamp: Date.now(),
+    method,
+    path,
+    status,
+    responseTime,
+    userAgent: '',
+    ip: '',
+  });
+}
+
 export function getRecentRequests(limit: number = 50): RequestEntry[] {
   const state = getState();
   const len = state.buffer.length;
   if (len === 0) return [];
 
   const result: RequestEntry[] = [];
-  // Read from newest to oldest
   if (len < BUFFER_SIZE) {
-    // Buffer not full yet — items are in order
     for (let i = len - 1; i >= 0 && result.length < limit; i--) {
       result.push(state.buffer[i]);
     }
   } else {
-    // Circular buffer full — head points to oldest, newest is head-1
     let idx = (state.head - 1 + BUFFER_SIZE) % BUFFER_SIZE;
     for (let i = 0; i < BUFFER_SIZE && result.length < limit; i++) {
       result.push(state.buffer[idx]);
@@ -95,21 +141,12 @@ export function getMetrics(): RequestMetrics {
 
   for (let i = 0; i < len; i++) {
     const entry = state.buffer[i];
-
-    // Status codes
     const code = String(entry.status);
     statusCodes[code] = (statusCodes[code] || 0) + 1;
-
-    // Response time
     totalTime += entry.responseTime;
-
-    // Errors (4xx/5xx)
     if (entry.status >= 400) errorCount++;
-
-    // Requests in last 5 min
     if (entry.timestamp >= fiveMinAgo) recentCount++;
 
-    // Endpoint stats — normalize dynamic paths
     const normalized = normalizePath(entry.path);
     if (!endpointMap[normalized]) {
       endpointMap[normalized] = { count: 0, totalTime: 0 };
@@ -118,7 +155,6 @@ export function getMetrics(): RequestMetrics {
     endpointMap[normalized].totalTime += entry.responseTime;
   }
 
-  // Top endpoints
   const topEndpoints = Object.entries(endpointMap)
     .map(([path, data]) => ({
       path,
@@ -128,7 +164,6 @@ export function getMetrics(): RequestMetrics {
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
-  // Requests per minute (over last 5 min window)
   const minuteWindow = Math.min((now - (state.buffer[0]?.timestamp || now)) / 60000, 5);
   const perMinute = minuteWindow > 0 ? Math.round(recentCount / minuteWindow) : 0;
 
@@ -143,8 +178,9 @@ export function getMetrics(): RequestMetrics {
 }
 
 function normalizePath(path: string): string {
-  // Strip query string
   const base = path.split('?')[0];
-  // Collapse dynamic segments like /api/admin/reviews/clxyz123 → /api/admin/reviews/[id]
-  return base.replace(/\/cl[a-z0-9]{20,}/g, '/[id]');
+  // Collapse dynamic IDs
+  return base
+    .replace(/\/cl[a-z0-9]{20,}/g, '/[id]')
+    .replace(/\/cm[a-z0-9]{20,}/g, '/[id]');
 }
