@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import { getMetrics, getRecentRequests } from '@/lib/request-tracker';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET() {
   try {

@@ -137,8 +137,11 @@ export default function MonitoringPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/monitoring');
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await fetch('/api/admin/monitoring', { credentials: 'include' });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `HTTP ${res.status}`);
+      }
       const json = await res.json();
       setData(json);
       setLastUpdated(new Date());
@@ -172,6 +175,9 @@ export default function MonitoringPage() {
       <div className="text-center py-20">
         <p className="text-red-400 mb-2">Klaida: {error}</p>
         <button onClick={fetchData} className="text-sm text-[#2d6a4f] hover:underline">Bandyti dar kartą</button>
+        {error.includes('401') && (
+          <p className="text-xs text-slate-500 mt-2">Gali reikėti iš naujo prisijungti prie admin</p>
+        )}
       </div>
     );
   }
