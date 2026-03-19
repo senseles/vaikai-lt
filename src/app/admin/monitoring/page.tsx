@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+// ── Types ──────────────────────────────────────────────
+
 interface SystemMetrics {
   cpuUsage: number;
   memoryUsed: number;
@@ -50,6 +52,34 @@ interface MonitoringData {
   recentRequests: RecentRequest[];
 }
 
+interface SnapshotRow {
+  time: string;
+  requests: number;
+  avgResponse: number;
+  cpu: number;
+  memory: number;
+  errors: number;
+  loadAvg: number;
+}
+
+interface DailyAggregate {
+  date: string;
+  totalRequests: number;
+  avgResponse: number;
+  avgCpu: number;
+  peakCpu: number;
+  avgMemory: number;
+  errors: number;
+}
+
+interface HistoryData {
+  period: string;
+  snapshots: SnapshotRow[];
+  daily: DailyAggregate[];
+}
+
+// ── Helpers ──────────────────────────────────────────────
+
 function formatUptime(seconds: number): string {
   const d = Math.floor(seconds / 86400);
   const h = Math.floor((seconds % 86400) / 3600);
@@ -74,32 +104,27 @@ function cpuColor(v: number): string {
   if (v < 80) return 'text-yellow-400';
   return 'text-red-400';
 }
-
 function cpuBg(v: number): string {
   if (v < 50) return 'bg-green-500';
   if (v < 80) return 'bg-yellow-500';
   return 'bg-red-500';
 }
-
 function memBg(v: number): string {
   if (v < 60) return 'bg-green-500';
   if (v < 85) return 'bg-yellow-500';
   return 'bg-red-500';
 }
-
 function msColor(ms: number): string {
   if (ms < 100) return 'text-green-400';
   if (ms < 500) return 'text-yellow-400';
   return 'text-red-400';
 }
-
 function statusColor(s: number): string {
   if (s < 300) return 'bg-green-500/20 text-green-400';
   if (s < 400) return 'bg-blue-500/20 text-blue-400';
   if (s < 500) return 'bg-yellow-500/20 text-yellow-400';
   return 'bg-red-500/20 text-red-400';
 }
-
 function methodColor(m: string): string {
   switch (m) {
     case 'GET': return 'text-green-400';
@@ -109,12 +134,16 @@ function methodColor(m: string): string {
     default: return 'text-slate-400';
   }
 }
-
 function statusBarColor(code: string): string {
   const c = parseInt(code);
   if (c < 300) return 'bg-green-500';
   if (c < 400) return 'bg-blue-500';
   if (c < 500) return 'bg-yellow-500';
+  return 'bg-red-500';
+}
+function responseBarColor(ms: number): string {
+  if (ms < 100) return 'bg-green-500';
+  if (ms < 300) return 'bg-yellow-500';
   return 'bg-red-500';
 }
 
@@ -129,11 +158,208 @@ const DB_LABELS: Record<string, { label: string; icon: string }> = {
   forumPosts: { label: 'Forumo įrašai', icon: '💬' },
 };
 
+type Period = '24h' | '7d' | '30d' | '90d';
+const PERIODS: { value: Period; label: string }[] = [
+  { value: '24h', label: '24 val' },
+  { value: '7d', label: '7 d.' },
+  { value: '30d', label: '30 d.' },
+  { value: '90d', label: '90 d.' },
+];
+
+// ── Chart helper: format time labels ──────────────────
+
+function formatChartLabel(iso: string, period: Period): string {
+  const d = new Date(iso);
+  if (period === '24h') return d.toLocaleTimeString('lt-LT', { hour: '2-digit', minute: '2-digit' });
+  if (period === '7d') return d.toLocaleDateString('lt-LT', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('lt-LT', { month: '2-digit', day: '2-digit' });
+}
+
+// Downsample for chart display (max ~80 bars)
+function downsample<T>(arr: T[], maxBars: number): T[] {
+  if (arr.length <= maxBars) return arr;
+  const step = Math.ceil(arr.length / maxBars);
+  return arr.filter((_, i) => i % step === 0);
+}
+
+// ── Bar Chart Component ──────────────────────────────
+
+function BarChart({
+  data,
+  maxValue,
+  barColor,
+  label,
+  period,
+}: {
+  data: { time: string; value: number }[];
+  maxValue: number;
+  barColor: (v: number) => string;
+  label: string;
+  period: Period;
+}) {
+  const display = downsample(data, 80);
+  const avg = data.length > 0 ? data.reduce((s, d) => s + d.value, 0) / data.length : 0;
+
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{label}</h3>
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          Vid: {Math.round(avg).toLocaleString('lt-LT')}
+        </span>
+      </div>
+      <div className="flex items-end gap-px h-40">
+        {display.map((d, i) => (
+          <div
+            key={i}
+            className={`flex-1 ${barColor(d.value)} rounded-t relative group cursor-pointer transition-opacity hover:opacity-80`}
+            style={{ height: maxValue > 0 ? `${Math.max((d.value / maxValue) * 100, d.value > 0 ? 1.5 : 0)}%` : '0%' }}
+          >
+            <div className="hidden group-hover:block absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10 shadow-lg">
+              {formatChartLabel(d.time, period)}: {d.value.toLocaleString('lt-LT')}
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* X axis labels */}
+      <div className="flex justify-between mt-1">
+        {display.length > 0 && (
+          <>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400">
+              {formatChartLabel(display[0].time, period)}
+            </span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400">
+              {formatChartLabel(display[display.length - 1].time, period)}
+            </span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Dual Bar Chart (CPU + Memory) ─────────────────────
+
+function DualBarChart({
+  data,
+  period,
+}: {
+  data: SnapshotRow[];
+  period: Period;
+}) {
+  const display = downsample(data, 80);
+
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Sistemos resursai</h3>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+            <span className="w-2.5 h-2.5 rounded-sm bg-blue-500 inline-block" /> CPU
+          </span>
+          <span className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+            <span className="w-2.5 h-2.5 rounded-sm bg-purple-500 inline-block" /> Atmintis
+          </span>
+        </div>
+      </div>
+      <div className="flex items-end gap-px h-40">
+        {display.map((d, i) => (
+          <div key={i} className="flex-1 flex items-end gap-[1px] relative group cursor-pointer">
+            {/* CPU bar */}
+            <div
+              className="flex-1 bg-blue-500 rounded-t opacity-70 group-hover:opacity-100 transition-opacity"
+              style={{ height: `${Math.max(d.cpu, 1)}%` }}
+            />
+            {/* Memory bar */}
+            <div
+              className="flex-1 bg-purple-500 rounded-t opacity-70 group-hover:opacity-100 transition-opacity"
+              style={{ height: `${Math.max(d.memory, 1)}%` }}
+            />
+            <div className="hidden group-hover:block absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10 shadow-lg">
+              {formatChartLabel(d.time, period)} — CPU: {d.cpu}% | Atm: {d.memory}%
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between mt-1">
+        {display.length > 0 && (
+          <>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400">
+              {formatChartLabel(display[0].time, period)}
+            </span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400">
+              {formatChartLabel(display[display.length - 1].time, period)}
+            </span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Error Sparkline ──────────────────────────────────
+
+function ErrorSparkline({
+  data,
+  period,
+}: {
+  data: { time: string; value: number; rate: number }[];
+  period: Period;
+}) {
+  const display = downsample(data, 80);
+  const maxVal = Math.max(...display.map((d) => d.value), 1);
+
+  return (
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Klaidos</h3>
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          Iš viso: {data.reduce((s, d) => s + d.value, 0).toLocaleString('lt-LT')}
+        </span>
+      </div>
+      <div className="flex items-end gap-px h-24">
+        {display.map((d, i) => (
+          <div
+            key={i}
+            className={`flex-1 rounded-t relative group cursor-pointer transition-opacity hover:opacity-80 ${
+              d.rate > 5 ? 'bg-red-500' : d.rate > 2 ? 'bg-yellow-500' : 'bg-slate-300 dark:bg-slate-600'
+            }`}
+            style={{ height: maxVal > 0 ? `${Math.max((d.value / maxVal) * 100, d.value > 0 ? 3 : 0)}%` : '0%' }}
+          >
+            <div className="hidden group-hover:block absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10 shadow-lg">
+              {formatChartLabel(d.time, period)}: {d.value} kl. ({d.rate}%)
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between mt-1">
+        {display.length > 0 && (
+          <>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400">
+              {formatChartLabel(display[0].time, period)}
+            </span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400">
+              {formatChartLabel(display[display.length - 1].time, period)}
+            </span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Main Page ──────────────────────────────────────────
+
 export default function MonitoringPage() {
   const [data, setData] = useState<MonitoringData | null>(null);
   const [error, setError] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // History state
+  const [period, setPeriod] = useState<Period>('7d');
+  const [history, setHistory] = useState<HistoryData | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -153,11 +379,29 @@ export default function MonitoringPage() {
     }
   }, []);
 
+  const fetchHistory = useCallback(async (p: Period) => {
+    setHistoryLoading(true);
+    try {
+      const res = await fetch(`/api/admin/monitoring/history?period=${p}`, { credentials: 'include' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      setHistory(json);
+    } catch (e) {
+      console.error('History fetch error:', e);
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchData();
     const interval = setInterval(fetchData, 10000);
     return () => clearInterval(interval);
   }, [fetchData]);
+
+  useEffect(() => {
+    fetchHistory(period);
+  }, [period, fetchHistory]);
 
   if (loading && !data) {
     return (
@@ -186,6 +430,23 @@ export default function MonitoringPage() {
 
   const { system, requests, database, recentRequests } = data;
   const totalStatusCodes = Object.values(requests.statusCodes).reduce((a, b) => a + b, 0);
+
+  // Prepare history chart data
+  const snapshots = history?.snapshots || [];
+  const daily = history?.daily || [];
+
+  const requestChartData = snapshots.map((s) => ({ time: s.time, value: s.requests }));
+  const responseChartData = snapshots.map((s) => ({ time: s.time, value: s.avgResponse }));
+  const errorChartData = snapshots.map((s) => ({ time: s.time, value: s.errors, rate: Math.round(s.requests > 0 ? (s.errors / s.requests) * 100 * 10 : 0) / 10 }));
+
+  const maxRequests = Math.max(...requestChartData.map((d) => d.value), 1);
+  const maxResponse = Math.max(...responseChartData.map((d) => d.value), 1);
+
+  // Summary stats for the period
+  const totalPeriodRequests = snapshots.reduce((s, d) => s + d.requests, 0);
+  const avgPeriodResponse = snapshots.length > 0 ? Math.round(snapshots.reduce((s, d) => s + d.avgResponse, 0) / snapshots.length) : 0;
+  const peakCpu = snapshots.length > 0 ? Math.round(Math.max(...snapshots.map((d) => d.cpu)) * 10) / 10 : 0;
+  const totalErrors = snapshots.reduce((s, d) => s + d.errors, 0);
 
   return (
     <div className="space-y-6">
@@ -312,6 +573,138 @@ export default function MonitoringPage() {
         </div>
       </div>
 
+      {/* ════════════════════════════════════════════════════════════════
+          ISTORIJA — Historical Charts
+         ════════════════════════════════════════════════════════════════ */}
+
+      <div className="border-t border-gray-200 dark:border-slate-700 pt-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Istorija</h2>
+          <div className="flex bg-gray-100 dark:bg-slate-700 rounded-lg p-0.5">
+            {PERIODS.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => setPeriod(p.value)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  period === p.value
+                    ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {historyLoading && !history ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="inline-block w-6 h-6 border-2 border-slate-700 border-t-[#2d6a4f] rounded-full animate-spin" />
+            <span className="ml-2 text-sm text-slate-500">Kraunama istorija...</span>
+          </div>
+        ) : snapshots.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Nėra istorinių duomenų. Snapshot&apos;ai bus automatiškai kuriami kas valandą.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Statistikos suvestinė */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Iš viso užklausų</p>
+                <p className="text-xl font-bold text-gray-900 dark:text-white">{totalPeriodRequests.toLocaleString('lt-LT')}</p>
+              </div>
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Vid. atsakymo laikas</p>
+                <p className={`text-xl font-bold ${msColor(avgPeriodResponse)}`}>{avgPeriodResponse} ms</p>
+              </div>
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Didžiausias CPU pikas</p>
+                <p className={`text-xl font-bold ${cpuColor(peakCpu)}`}>{peakCpu}%</p>
+              </div>
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Klaidų skaičius</p>
+                <p className={`text-xl font-bold ${totalErrors > 100 ? 'text-red-400' : totalErrors > 20 ? 'text-yellow-400' : 'text-green-400'}`}>
+                  {totalErrors.toLocaleString('lt-LT')}
+                </p>
+              </div>
+            </div>
+
+            {/* A) Užklausų grafikas */}
+            <BarChart
+              data={requestChartData}
+              maxValue={maxRequests}
+              barColor={(v) => {
+                const avg = maxRequests * 0.5;
+                return v > avg ? 'bg-yellow-500' : 'bg-green-500';
+              }}
+              label="Užklausų grafikas"
+              period={period}
+            />
+
+            {/* B) Atsakymo laiko grafikas */}
+            <BarChart
+              data={responseChartData}
+              maxValue={maxResponse}
+              barColor={(ms) => responseBarColor(ms)}
+              label="Atsakymo laiko grafikas"
+              period={period}
+            />
+
+            {/* C) Klaidų grafikas */}
+            <ErrorSparkline data={errorChartData} period={period} />
+
+            {/* D) Sistemos resursai */}
+            <DualBarChart data={snapshots} period={period} />
+
+            {/* Daily aggregates table */}
+            {daily.length > 0 && (
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Dienos suvestinė</h3>
+                </div>
+                <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+                  <table className="w-full text-xs">
+                    <thead className="sticky top-0 bg-gray-50 dark:bg-slate-700">
+                      <tr>
+                        <th className="text-left px-3 py-2 font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Data</th>
+                        <th className="text-right px-3 py-2 font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Užklausos</th>
+                        <th className="text-right px-3 py-2 font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Vid. ats.</th>
+                        <th className="text-right px-3 py-2 font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Vid. CPU</th>
+                        <th className="text-right px-3 py-2 font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Pikas CPU</th>
+                        <th className="text-right px-3 py-2 font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Vid. atm.</th>
+                        <th className="text-right px-3 py-2 font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Klaidos</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
+                      {daily.slice().reverse().map((d) => (
+                        <tr key={d.date} className="hover:bg-gray-50 dark:hover:bg-slate-700/30">
+                          <td className="px-3 py-2 font-medium text-gray-900 dark:text-gray-200">{d.date}</td>
+                          <td className="px-3 py-2 text-right text-gray-700 dark:text-gray-300">{d.totalRequests.toLocaleString('lt-LT')}</td>
+                          <td className={`px-3 py-2 text-right font-mono ${msColor(d.avgResponse)}`}>{d.avgResponse} ms</td>
+                          <td className={`px-3 py-2 text-right ${cpuColor(d.avgCpu)}`}>{d.avgCpu}%</td>
+                          <td className={`px-3 py-2 text-right font-bold ${cpuColor(d.peakCpu)}`}>{d.peakCpu}%</td>
+                          <td className="px-3 py-2 text-right text-gray-700 dark:text-gray-300">{d.avgMemory}%</td>
+                          <td className={`px-3 py-2 text-right ${d.errors > 50 ? 'text-red-400 font-bold' : d.errors > 10 ? 'text-yellow-400' : 'text-green-400'}`}>
+                            {d.errors.toLocaleString('lt-LT')}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ════════════════════════════════════════════════════════════════
+          Existing real-time sections
+         ════════════════════════════════════════════════════════════════ */}
+
       {/* Row 3 — Top Endpoints */}
       <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
         <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700">
@@ -350,7 +743,6 @@ export default function MonitoringPage() {
           <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-4">Dar nėra duomenų</p>
         ) : (
           <>
-            {/* Visual bar */}
             <div className="flex h-6 rounded-lg overflow-hidden mb-4">
               {Object.entries(requests.statusCodes)
                 .sort(([a], [b]) => parseInt(a) - parseInt(b))
@@ -363,7 +755,6 @@ export default function MonitoringPage() {
                   />
                 ))}
             </div>
-            {/* Legend */}
             <div className="flex flex-wrap gap-4">
               {Object.entries(requests.statusCodes)
                 .sort(([a], [b]) => parseInt(a) - parseInt(b))

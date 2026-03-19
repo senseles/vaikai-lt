@@ -443,3 +443,32 @@ model AuditLog {
   @@index([createdAt])
   @@index([targetType, targetId])
 }
+
+model MetricSnapshot {
+  id              String   @id @default(cuid())
+  timestamp       DateTime @default(now())
+
+  // Sistema
+  cpuUsage        Float
+  memoryPercent   Float
+  loadAvg         Float
+
+  // Užklausos (sukauptos per valandą)
+  requestCount    Int
+  avgResponseTime Float
+  errorRate       Float
+  errorCount      Int
+
+  // Būsenos kodai JSON: {"200": 1500, "404": 30, "500": 2}
+  statusCodes     Json     @default("{}")
+
+  // Top endpoints JSON: [{"path":"/","count":500,"avgTime":45}]
+  topEndpoints    Json     @default("[]")
+
+  // DB skaičiai momentinio vaizdo metu
+  totalKindergartens Int   @default(0)
+  totalReviews       Int   @default(0)
+  totalUsers         Int   @default(0)
+
+  @@index([timestamp])
+}
