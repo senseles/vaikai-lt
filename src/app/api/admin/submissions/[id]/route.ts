@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { logAuditEvent } from '@/lib/audit';
 import { slugify } from '@/lib/lithuanian';
+import { VALID_CITY_SLUGS } from '@/lib/cities';
 
 export async function GET(
   _request: NextRequest,
@@ -81,6 +82,22 @@ export async function PATCH(
     // Approve: create entity in a transaction
     const data = (editedData || submission.data) as Record<string, string>;
     const entityName = data.name || 'Unnamed';
+    const entityCity = data.city || '';
+
+    // Validate city exists in our system
+    const citySlug = slugify(entityCity);
+    if (!citySlug || !VALID_CITY_SLUGS.has(citySlug)) {
+      // Check if any existing city matches case-insensitively
+      const existingCity = Array.from(VALID_CITY_SLUGS).find(
+        (s) => s === citySlug || s === entityCity.toLowerCase()
+      );
+      if (!existingCity) {
+        return NextResponse.json({
+          error: `Miestas „${entityCity}" nerastas sistemoje. Pataisykite miesto pavadinimą prieš tvirtinant. Galimi miestai: ${Array.from(VALID_CITY_SLUGS).slice(0, 10).join(', ')}...`,
+        }, { status: 400 });
+      }
+    }
+
     const baseSlug = slugify(entityName);
 
     // Ensure unique slug
