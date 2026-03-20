@@ -73,7 +73,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-gray-200 dark:border-slate-700 text-center text-sm text-gray-500 dark:text-gray-400">
-          © {new Date().getFullYear()} Vaikai.lt. Visos teisės saugomos.
+          © {new Date().getFullYear()} ManoVaikai.lt. Visos teisės saugomos.
         </div>
       </div>
     </footer>

@@ -20,17 +20,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const item = await prisma.burelis.findUnique({ where: { slug: params.slug } });
   if (!item || item.city !== cityName) notFound();
 
-  const title = `${item.name} — būrelis ${cityName} | Vaikai.lt`;
+  const title = `${item.name} — būrelis ${cityName} | ManoVaikai.lt`;
   const description = item.description
     ? item.description.slice(0, 160)
     : `${item.name}${item.category ? ` (${item.category})` : ''} — būrelis ${cityName} mieste. Atsiliepimai ir vertinimai.`;
-  const url = `https://vaikai.lt/${params.city}/bureliai/${params.slug}`;
+  const url = `https://manovaikai.lt/${params.city}/bureliai/${params.slug}`;
 
   return {
     title,
     description,
     alternates: { canonical: url, languages: { lt: url, 'x-default': url } },
-    openGraph: { title, description, url, siteName: 'Vaikai.lt', locale: 'lt_LT', type: 'website' },
+    openGraph: { title, description, url, siteName: 'ManoVaikai.lt', locale: 'lt_LT', type: 'website' },
     twitter: { card: 'summary_large_image' as const, title, description },
   };
 }
@@ -68,9 +68,9 @@ export default async function BurelisPage({ params }: PageProps) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Pradžia', item: 'https://vaikai.lt/' },
-      { '@type': 'ListItem', position: 2, name: cityName, item: `https://vaikai.lt/${params.city}` },
-      { '@type': 'ListItem', position: 3, name: 'Būreliai', item: `https://vaikai.lt/${params.city}?category=bureliai` },
+      { '@type': 'ListItem', position: 1, name: 'Pradžia', item: 'https://manovaikai.lt/' },
+      { '@type': 'ListItem', position: 2, name: cityName, item: `https://manovaikai.lt/${params.city}` },
+      { '@type': 'ListItem', position: 3, name: 'Būreliai', item: `https://manovaikai.lt/${params.city}?category=bureliai` },
       { '@type': 'ListItem', position: 4, name: item.name },
     ],
   };

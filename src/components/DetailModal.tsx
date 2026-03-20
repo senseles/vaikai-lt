@@ -286,7 +286,7 @@ export default function DetailModal({ item, itemType, onClose }: DetailModalProp
 function ShareButtons({ itemName }: { readonly itemName: string }) {
   const [copied, setCopied] = useState(false);
 
-  const shareText = `${itemName} | Vaikai.lt`;
+  const shareText = `${itemName} | ManoVaikai.lt`;
 
   const handleCopyLink = async () => {
     try {

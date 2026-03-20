@@ -4,17 +4,17 @@ import { Suspense } from 'react';
 import ForumSubNav from '@/components/ForumSubNav';
 
 export const metadata: Metadata = {
-  title: 'Tėvų forumas — Vaikai.lt',
+  title: 'Tėvų forumas — ManoVaikai.lt',
   description:
     'Tėvų forumas apie darželius, aukles, būrelius, specialistus ir vaikų auginimą. Klauskite, dalinkitės patirtimi ir gaukite patarimų iš kitų tėvelių.',
   alternates: {
     canonical: '/forumas',
   },
   openGraph: {
-    title: 'Tėvų forumas — Vaikai.lt',
+    title: 'Tėvų forumas — ManoVaikai.lt',
     description:
       'Diskusijos apie vaikų ugdymą, darželius, aukles ir daugiau. Prisijunkite prie bendruomenės!',
-    url: 'https://vaikai.lt/forumas',
+    url: 'https://manovaikai.lt/forumas',
     type: 'website',
   },
 };

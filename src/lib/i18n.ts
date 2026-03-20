@@ -100,7 +100,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'footer.newsletter': 'Naujienlaiškis',
     'footer.newsletterPlaceholder': 'Jūsų el. paštas',
     'footer.subscribe': 'Prenumeruoti',
-    'footer.copyright': '© {year} Vaikai.lt. Visos teisės saugomos.',
+    'footer.copyright': '© {year} ManoVaikai.lt. Visos teisės saugomos.',
 
     // Breadcrumbs
     'breadcrumb.home': 'Pradžia',
@@ -211,7 +211,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'footer.newsletter': 'Newsletter',
     'footer.newsletterPlaceholder': 'Your email',
     'footer.subscribe': 'Subscribe',
-    'footer.copyright': '© {year} Vaikai.lt. All rights reserved.',
+    'footer.copyright': '© {year} ManoVaikai.lt. All rights reserved.',
 
     // Breadcrumbs
     'breadcrumb.home': 'Home',

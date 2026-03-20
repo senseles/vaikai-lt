@@ -69,7 +69,7 @@ export default async function Image({ params }: { params: { city: string } }) {
               padding: '0 60px',
             }}
           >
-            Vaikai.lt — Darželiai, auklės, būreliai
+            ManoVaikai.lt — Darželiai, auklės, būreliai
           </div>
         </div>
       </div>

@@ -5,10 +5,10 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/forumas'],
+        allow: '/',
         disallow: ['/api/', '/admin/', '/prisijungti', '/forumas/naujas'],
       },
     ],
-    sitemap: 'https://vaikai.lt/sitemap.xml',
+    sitemap: 'https://manovaikai.lt/sitemap.xml',
   };
 }

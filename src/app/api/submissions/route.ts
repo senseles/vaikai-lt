@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
       `Siūlytojas: ${submitterName}`,
       submitterEmail ? `El. paštas: ${submitterEmail}` : '',
       ``,
-      `🔗 [Peržiūrėti admin](${process.env.NEXT_PUBLIC_SITE_URL || 'https://vaikai.lt'}/admin/submissions)`,
+      `🔗 [Peržiūrėti admin](${process.env.NEXT_PUBLIC_SITE_URL || 'https://manovaikai.lt'}/admin/submissions)`,
     ].filter(Boolean).join('\n');
 
     const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;

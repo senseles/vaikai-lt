@@ -1,0 +1,14 @@
+# ManoVaikai.lt
+> Lithuanian kindergarten, nanny, and childcare directory
+
+ManoVaikai.lt is a comprehensive directory of childcare services in Lithuania including kindergartens (darželiai), nannies (auklės), activity clubs (būreliai), and child specialists.
+
+## API
+- Search: GET /api/search/suggestions?q={query} — returns matching entities
+- Kindergartens: GET /api/kindergartens?city={city}&limit={n}
+
+## Coverage
+- 465+ kindergartens across Lithuania
+- Cities: Vilnius, Kaunas, Klaipėda, Šiauliai, Panevėžys, and more
+- Types: valstybinis (public), privatus (private)
+- Languages: Lithuanian, Polish, Russian, English

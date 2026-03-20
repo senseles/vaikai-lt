@@ -50,8 +50,8 @@ export default function EntityPageShell({ itemId, itemType, itemName, itemCity, 
   };
 
   const handleEmail = () => {
-    const subject = encodeURIComponent(`${itemName} | Vaikai.lt`);
-    const body = encodeURIComponent(`${itemName} | Vaikai.lt\n${window.location.href}`);
+    const subject = encodeURIComponent(`${itemName} | ManoVaikai.lt`);
+    const body = encodeURIComponent(`${itemName} | ManoVaikai.lt\n${window.location.href}`);
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
 

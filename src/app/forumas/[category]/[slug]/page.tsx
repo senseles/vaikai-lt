@@ -91,9 +91,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!post) return {};
 
-  const title = `${post.title} — Tėvų forumas — Vaikai.lt`;
+  const title = `${post.title} — Tėvų forumas — ManoVaikai.lt`;
   const description = post.content.slice(0, 160);
-  const url = `https://vaikai.lt/forumas/${params.category}/${params.slug}`;
+  const url = `https://manovaikai.lt/forumas/${params.category}/${params.slug}`;
 
   return {
     title,
@@ -105,7 +105,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       url,
-      siteName: 'Vaikai.lt',
+      siteName: 'ManoVaikai.lt',
       type: 'article',
       locale: 'lt_LT',
       publishedTime: post.createdAt?.toISOString(),

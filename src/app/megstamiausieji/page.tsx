@@ -3,7 +3,7 @@ import Link from 'next/link';
 import FavoritesClient from './FavoritesClient';
 
 export const metadata: Metadata = {
-  title: 'Mėgstamiausieji | Vaikai.lt',
+  title: 'Mėgstamiausieji | ManoVaikai.lt',
   description: 'Jūsų mėgstamiausi darželiai, auklės, būreliai ir specialistai.',
   robots: { index: false },
 };

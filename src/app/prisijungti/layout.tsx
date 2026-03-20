@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Prisijungti | Vaikai.lt',
-  description: 'Prisijunkite prie Vaikai.lt paskyros.',
+  title: 'Prisijungti | ManoVaikai.lt',
+  description: 'Prisijunkite prie ManoVaikai.lt paskyros.',
   robots: { index: false },
 };
 

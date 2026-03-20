@@ -50,20 +50,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!category) return {};
 
-  const title = `${category.name} — Tėvų forumas — Vaikai.lt`;
+  const title = `${category.name} — Tėvų forumas — ManoVaikai.lt`;
   const description = category.description || `Diskusijos apie ${category.name.toLowerCase()} tėvų forume.`;
 
   return {
     title,
     description,
     alternates: {
-      canonical: `https://vaikai.lt/forumas/${category.slug}`,
+      canonical: `https://manovaikai.lt/forumas/${category.slug}`,
     },
     openGraph: {
       title,
       description,
-      url: `https://vaikai.lt/forumas/${category.slug}`,
-      siteName: 'Vaikai.lt',
+      url: `https://manovaikai.lt/forumas/${category.slug}`,
+      siteName: 'ManoVaikai.lt',
       type: 'website',
       locale: 'lt_LT',
     },

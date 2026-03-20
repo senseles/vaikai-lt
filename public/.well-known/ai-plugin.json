@@ -1,0 +1,11 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "ManoVaikai.lt",
+  "name_for_model": "manovaikai",
+  "description_for_human": "Lithuanian kindergarten, nanny, and childcare directory",
+  "description_for_model": "Search for kindergartens (darželiai), nannies (auklės), activity clubs (būreliai), and child specialists in Lithuanian cities. Returns real user reviews and ratings.",
+  "api": {
+    "type": "openapi",
+    "url": "https://manovaikai.lt/api/openapi.json"
+  }
+}

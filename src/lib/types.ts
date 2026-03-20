@@ -1,5 +1,5 @@
 /**
- * Shared TypeScript types for Vaikai.lt
+ * Shared TypeScript types for ManoVaikai.lt
  * Matches Prisma schema models + API response types.
  */
 

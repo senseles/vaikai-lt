@@ -25,31 +25,38 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Vaikai.lt — Darželiai, auklės, būreliai ir specialistai visoje Lietuvoje",
+  metadataBase: new URL("https://manovaikai.lt"),
+  title: {
+    default: "ManoVaikai.lt — Darželių, auklių ir būrelių katalogas",
+    template: "%s | ManoVaikai.lt",
+  },
   description:
-    "Darželiai, auklės, būreliai ir vaikų specialistai visoje Lietuvoje. Atsiliepimai, vertinimai ir palyginimas. Vilnius, Kaunas, Klaipėda, Šiauliai, Panevėžys ir kiti miestai.",
-  keywords:
-    "darželiai, auklės, būreliai, specialistai, lopšelis, atsiliepimai, Vilnius, Kaunas, Klaipėda, Šiauliai, Panevėžys, vaikų ugdymas, Lietuva",
-  authors: [{ name: "Vaikai.lt" }],
-  metadataBase: new URL("https://vaikai.lt"),
+    "Raskite geriausią darželį, auklę, būrelį ar specialistą savo vaikui. Atsiliepimai, palyginimas, registracijos informacija visoje Lietuvoje.",
+  keywords: ["darželiai", "auklės", "būreliai", "vaikų specialistai", "Vilnius", "Kaunas", "Klaipėda", "lopšelis", "darželis", "vaiko priežiūra", "ikimokyklinis ugdymas"],
+  authors: [{ name: "ManoVaikai.lt" }],
   alternates: {
-    canonical: "/",
-    languages: { lt: "/", "x-default": "/" },
+    canonical: "https://manovaikai.lt",
   },
   openGraph: {
     type: "website",
-    title: "Vaikai.lt — Darželiai, auklės, būreliai ir specialistai",
-    description:
-      "Padedame tėveliams visoje Lietuvoje rasti darželius, aukles, būrelius ir specialistus. Skaitykite atsiliepimus, palyginkite ir rinkitės!",
-    url: "https://vaikai.lt/",
-    siteName: "Vaikai.lt",
     locale: "lt_LT",
+    url: "https://manovaikai.lt",
+    siteName: "ManoVaikai.lt",
+    title: "ManoVaikai.lt — Darželių, auklių ir būrelių katalogas",
+    description:
+      "Raskite geriausią darželį, auklę, būrelį ar specialistą savo vaikui Lietuvoje.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vaikai.lt — Darželiai, auklės, būreliai ir specialistai",
+    title: "ManoVaikai.lt — Darželių katalogas",
     description:
-      "Padedame tėveliams visoje Lietuvoje rasti darželius, aukles, būrelius ir specialistus.",
+      "Raskite geriausią darželį savo vaikui Lietuvoje.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large" as const, "max-snippet": -1 },
   },
   icons: {
     icon: [
@@ -79,7 +86,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
         {/* Analytics — uncomment and set domain when going live */}
-        {/* <script defer data-domain="vaikai.lt" src="https://plausible.io/js/script.js" /> */}
+        {/* <script defer data-domain="manovaikai.lt" src="https://plausible.io/js/script.js" /> */}
         {/* Prevent FOUC for dark mode */}
         <script
           dangerouslySetInnerHTML={{
@@ -100,9 +107,9 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Organization',
-              name: 'Vaikai.lt',
-              url: 'https://vaikai.lt',
-              logo: 'https://vaikai.lt/icons/icon-512.png',
+              name: 'ManoVaikai.lt',
+              url: 'https://manovaikai.lt',
+              logo: 'https://manovaikai.lt/icons/icon-512.png',
               description:
                 'Padedame tėveliams visoje Lietuvoje rasti darželius, aukles, būrelius ir specialistus.',
               sameAs: [],
@@ -110,6 +117,24 @@ export default function RootLayout({
                 '@type': 'ContactPoint',
                 contactType: 'customer service',
                 availableLanguage: 'Lithuanian',
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'ManoVaikai.lt',
+              url: 'https://manovaikai.lt',
+              description: 'Darželių, auklių ir būrelių katalogas Lietuvoje',
+              inLanguage: 'lt',
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: 'https://manovaikai.lt/paieska?q={search_term_string}',
+                'query-input': 'required name=search_term_string',
               },
             }),
           }}

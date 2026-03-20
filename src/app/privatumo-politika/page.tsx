@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Privatumo politika | Vaikai.lt',
-  description: 'Vaikai.lt privatumo politika — kaip renkame, saugome ir naudojame jūsų duomenis.',
+  title: 'Privatumo politika | ManoVaikai.lt',
+  description: 'ManoVaikai.lt privatumo politika — kaip renkame, saugome ir naudojame jūsų duomenis.',
   alternates: {
-    canonical: 'https://vaikai.lt/privatumo-politika',
+    canonical: 'https://manovaikai.lt/privatumo-politika',
   },
 };
 
@@ -26,7 +26,7 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-3">1. Bendrosios nuostatos</h2>
           <p>
-            Vaikai.lt (toliau — &bdquo;Platforma&ldquo;) gerbia jūsų privatumą ir įsipareigoja saugoti jūsų asmens duomenis
+            ManoVaikai.lt (toliau — &bdquo;Platforma&ldquo;) gerbia jūsų privatumą ir įsipareigoja saugoti jūsų asmens duomenis
             pagal Europos Sąjungos Bendrąjį duomenų apsaugos reglamentą (BDAR/GDPR) ir Lietuvos Respublikos
             asmens duomenų teisinės apsaugos įstatymą.
           </p>
@@ -74,7 +74,7 @@ export default function PrivacyPolicyPage() {
             <li><strong>Teisė nesutikti</strong> — nesutikti su duomenų tvarkymu tam tikrais tikslais.</li>
           </ul>
           <p>
-            Norėdami pasinaudoti šiomis teisėmis, kreipkitės el. paštu: <strong>info@vaikai.lt</strong>
+            Norėdami pasinaudoti šiomis teisėmis, kreipkitės el. paštu: <strong>info@manovaikai.lt</strong>
           </p>
         </section>
 
@@ -101,7 +101,7 @@ export default function PrivacyPolicyPage() {
             Jei turite klausimų dėl privatumo politikos, kreipkitės:
           </p>
           <p className="mt-2">
-            <strong>El. paštas:</strong> info@vaikai.lt
+            <strong>El. paštas:</strong> info@manovaikai.lt
           </p>
         </section>
       </div>

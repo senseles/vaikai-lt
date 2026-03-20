@@ -10,7 +10,7 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     quote:
-      "Vaikai.lt padėjo rasti puikų darželį šalia namų. Labai patogi palyginimo funkcija!",
+      "ManoVaikai.lt padėjo rasti puikų darželį šalia namų. Labai patogi palyginimo funkcija!",
     author: "Inga M.",
     role: "Mama, Vilnius",
     rating: 5,

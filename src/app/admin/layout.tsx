@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import AdminShell from '@/components/admin/AdminShell';
 
 export const metadata: Metadata = {
-  title: 'Administravimas | Vaikai.lt',
+  title: 'Administravimas | ManoVaikai.lt',
   robots: { index: false },
 };
 

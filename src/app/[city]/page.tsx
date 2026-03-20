@@ -33,10 +33,10 @@ const PER_PAGE = 12;
 
 export async function generateMetadata({ params }: CityPageProps) {
   const cityName = CITY_NAMES[params.city];
-  if (!cityName) return { title: 'Puslapis nerastas | Vaikai.lt' };
-  const title = `Darželiai, auklės, būreliai — ${cityName} | Vaikai.lt`;
+  if (!cityName) return { title: 'Puslapis nerastas | ManoVaikai.lt' };
+  const title = `Darželiai, auklės, būreliai — ${cityName} | ManoVaikai.lt`;
   const description = `Darželių, auklių, būrelių ir specialistų sąrašas ${cityName} mieste. Atsiliepimai ir vertinimai.`;
-  const url = `https://vaikai.lt/${params.city}`;
+  const url = `https://manovaikai.lt/${params.city}`;
   return {
     title,
     description,
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: CityPageProps) {
       title,
       description,
       url,
-      siteName: 'Vaikai.lt',
+      siteName: 'ManoVaikai.lt',
       locale: 'lt_LT',
       type: 'website',
     },
@@ -164,7 +164,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   const localBusinessJsonLd = kindergartens.slice(0, 5).map((kg) => ({
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    '@id': `https://vaikai.lt/${citySlug}#${kg.slug}`,
+    '@id': `https://manovaikai.lt/${citySlug}#${kg.slug}`,
     name: kg.name,
     address: {
       '@type': 'PostalAddress',
@@ -189,8 +189,8 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Pradžia', item: 'https://vaikai.lt/' },
-      { '@type': 'ListItem', position: 2, name: cityName, item: `https://vaikai.lt/${citySlug}` },
+      { '@type': 'ListItem', position: 1, name: 'Pradžia', item: 'https://manovaikai.lt/' },
+      { '@type': 'ListItem', position: 2, name: cityName, item: `https://manovaikai.lt/${citySlug}` },
     ],
   };
 

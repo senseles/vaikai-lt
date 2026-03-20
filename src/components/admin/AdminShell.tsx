@@ -123,7 +123,7 @@ export default function AdminShell({ children }: { readonly children: React.Reac
             <div className="w-14 h-14 bg-[#2d6a4f] rounded-2xl flex items-center justify-center mx-auto mb-4">
               <span className="text-white text-xl font-bold">V</span>
             </div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Vaikai.lt Admin</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">ManoVaikai.lt Admin</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Prisijunkite prie administravimo skydelio</p>
           </div>
           <form onSubmit={login} className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 space-y-4">
@@ -181,7 +181,7 @@ export default function AdminShell({ children }: { readonly children: React.Reac
               <span className="text-white text-sm font-bold">V</span>
             </div>
             <div className="min-w-0">
-              <h1 className="text-sm font-bold text-white truncate">Vaikai.lt</h1>
+              <h1 className="text-sm font-bold text-white truncate">ManoVaikai.lt</h1>
               <p className="text-xs text-slate-400">Administravimas</p>
             </div>
           </div>

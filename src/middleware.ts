@@ -74,7 +74,7 @@ const NOT_FOUND_HTML = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>404 — Puslapis nerastas | Vaikai.lt</title>
+<title>404 — Puslapis nerastas | ManoVaikai.lt</title>
 <meta name="robots" content="noindex"/>
 <style>
 body{font-family:Inter,system-ui,sans-serif;margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f9fafb;color:#111827;text-align:center}

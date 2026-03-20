@@ -15,17 +15,17 @@ interface SearchPageProps {
 
 export async function generateMetadata({ searchParams }: SearchPageProps) {
   const q = searchParams.q ?? '';
-  const title = q ? `„${q}" — Paieška | Vaikai.lt` : 'Paieška | Vaikai.lt';
+  const title = q ? `„${q}" — Paieška | ManoVaikai.lt` : 'Paieška | ManoVaikai.lt';
   const description = 'Ieškokite darželių, auklių, būrelių ir specialistų visoje Lietuvoje.';
   return {
     title,
     description,
-    alternates: { canonical: 'https://vaikai.lt/paieska' },
+    alternates: { canonical: 'https://manovaikai.lt/paieska' },
     openGraph: {
       title,
       description,
-      url: 'https://vaikai.lt/paieska',
-      siteName: 'Vaikai.lt',
+      url: 'https://manovaikai.lt/paieska',
+      siteName: 'ManoVaikai.lt',
       locale: 'lt_LT',
       type: 'website',
     },

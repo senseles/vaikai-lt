@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const SITE_HOSTNAME = process.env.NEXT_PUBLIC_SITE_URL
   ? new URL(process.env.NEXT_PUBLIC_SITE_URL).hostname
-  : 'vaikai.lt';
+  : 'manovaikai.lt';
 
 /**
  * Verify the request Origin/Referer matches the expected site.

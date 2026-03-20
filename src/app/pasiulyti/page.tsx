@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import SubmissionForm from './SubmissionForm';
 
 export const metadata: Metadata = {
-  title: 'Pasiūlyti naują įrašą | Vaikai.lt',
+  title: 'Pasiūlyti naują įrašą | ManoVaikai.lt',
   description: 'Pasiūlykite naują darželį, auklę, būrelį ar specialistą mūsų platformai.',
   robots: { index: true, follow: true },
 };

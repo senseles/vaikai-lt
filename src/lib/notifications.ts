@@ -14,7 +14,7 @@ interface EmailPayload {
   body: string;
 }
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'admin@vaikai.lt';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'admin@manovaikai.lt';
 
 /**
  * Send an email notification. Currently logs to console.
@@ -50,7 +50,7 @@ export async function notifyNewReview(review: {
 
   await sendEmail({
     to: ADMIN_EMAIL,
-    subject: `Naujas atsiliepimas laukia patvirtinimo — Vaikai.lt`,
+    subject: `Naujas atsiliepimas laukia patvirtinimo — ManoVaikai.lt`,
     body: [
       `Naujas atsiliepimas apie ${typeLabel}:`,
       ``,
@@ -58,7 +58,7 @@ export async function notifyNewReview(review: {
       `Įvertinimas: ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}`,
       `Tekstas: ${review.text}`,
       ``,
-      `Patvirtinkite arba atmeskite: https://vaikai.lt/admin`,
+      `Patvirtinkite arba atmeskite: https://manovaikai.lt/admin`,
     ].join('\n'),
   });
 }
@@ -72,12 +72,12 @@ export async function notifyReviewReport(report: {
 }): Promise<void> {
   await sendEmail({
     to: ADMIN_EMAIL,
-    subject: `Pranešimas apie atsiliepimą — Vaikai.lt`,
+    subject: `Pranešimas apie atsiliepimą — ManoVaikai.lt`,
     body: [
       `Gautas pranešimas apie atsiliepimą (ID: ${report.reviewId})`,
       report.reason ? `Priežastis: ${report.reason}` : '',
       ``,
-      `Peržiūrėkite: https://vaikai.lt/admin`,
+      `Peržiūrėkite: https://manovaikai.lt/admin`,
     ].join('\n'),
   });
 }

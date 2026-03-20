@@ -86,11 +86,11 @@ export default async function HomePage() {
   const searchActionJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Vaikai.lt',
-    url: 'https://vaikai.lt',
+    name: 'ManoVaikai.lt',
+    url: 'https://manovaikai.lt',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://vaikai.lt/paieska?q={search_term_string}',
+      target: 'https://manovaikai.lt/paieska?q={search_term_string}',
       'query-input': 'required name=search_term_string',
     },
   };

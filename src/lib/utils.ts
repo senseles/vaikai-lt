@@ -1,5 +1,5 @@
 /**
- * Utility functions for Vaikai.lt
+ * Utility functions for ManoVaikai.lt
  */
 
 import { CITY_TO_REGION } from './regions';

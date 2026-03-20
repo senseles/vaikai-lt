@@ -13,16 +13,16 @@ interface AuklePageProps {
 
 export async function generateMetadata({ params }: AuklePageProps) {
   const item = await prisma.aukle.findUnique({ where: { slug: params.slug } });
-  if (!item) return { title: 'Nerastas | Vaikai.lt' };
-  const title = `${item.name} — Auklė ${item.city} | Vaikai.lt`;
+  if (!item) return { title: 'Nerastas | ManoVaikai.lt' };
+  const title = `${item.name} — Auklė ${item.city} | ManoVaikai.lt`;
   const description = item.description
     ? item.description.slice(0, 155)
     : `${item.name} — auklės paslaugos ${item.city} mieste. Atsiliepimai ir vertinimai.`;
   return {
     title,
     description,
-    alternates: { canonical: `https://vaikai.lt/aukles/${item.slug}` },
-    openGraph: { title, description, url: `https://vaikai.lt/aukles/${item.slug}`, siteName: 'Vaikai.lt', locale: 'lt_LT', type: 'website' },
+    alternates: { canonical: `https://manovaikai.lt/aukles/${item.slug}` },
+    openGraph: { title, description, url: `https://manovaikai.lt/aukles/${item.slug}`, siteName: 'ManoVaikai.lt', locale: 'lt_LT', type: 'website' },
   };
 }
 
@@ -34,9 +34,9 @@ export default async function AuklePage({ params }: AuklePageProps) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Pradžia', item: 'https://vaikai.lt/' },
-      { '@type': 'ListItem', position: 2, name: item.city, item: `https://vaikai.lt/${toSlug(item.city)}` },
-      { '@type': 'ListItem', position: 3, name: item.name, item: `https://vaikai.lt/aukles/${item.slug}` },
+      { '@type': 'ListItem', position: 1, name: 'Pradžia', item: 'https://manovaikai.lt/' },
+      { '@type': 'ListItem', position: 2, name: item.city, item: `https://manovaikai.lt/${toSlug(item.city)}` },
+      { '@type': 'ListItem', position: 3, name: item.name, item: `https://manovaikai.lt/aukles/${item.slug}` },
     ],
   };
 
