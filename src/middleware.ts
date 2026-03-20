@@ -195,8 +195,8 @@ export async function middleware(request: NextRequest) {
     "form-action 'self'",
     // Frame ancestors: none (equivalent to X-Frame-Options: DENY)
     "frame-ancestors 'none'",
-    // Block mixed content
-    "upgrade-insecure-requests",
+    // TODO: Re-enable after SSL certificate is provisioned
+    // "upgrade-insecure-requests",
   ].join('; ');
   response.headers.set('Content-Security-Policy', csp);
 
