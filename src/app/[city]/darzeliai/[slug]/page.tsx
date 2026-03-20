@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma';
 import { CITY_NAMES } from '@/lib/cities';
 import StarRating from '@/components/StarRating';
 import FavoriteButton from '@/components/FavoriteButton';
+import SuggestEditButton from '@/components/SuggestEditModal';
 import EntityPageShell from '@/components/EntityPageShell';
 
 interface PageProps {
@@ -112,7 +113,10 @@ export default async function KindergartenPage({ params }: PageProps) {
             </div>
             <p className="text-gray-500 dark:text-gray-400 mt-1">{cityName}{item.address ? `, ${item.address}` : ''}</p>
           </div>
-          <FavoriteButton itemId={item.id} itemType="kindergarten" />
+          <div className="flex items-center gap-2 shrink-0">
+            <SuggestEditButton entityId={item.id} entityType="kindergarten" entityName={item.name} currentData={item as unknown as Record<string, unknown>} />
+            <FavoriteButton itemId={item.id} itemType="kindergarten" />
+          </div>
         </div>
         {item.baseRating > 0 && (
           <div className="flex items-center gap-2 mt-3">

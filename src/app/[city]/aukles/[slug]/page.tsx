@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma';
 import { CITY_NAMES } from '@/lib/cities';
 import StarRating from '@/components/StarRating';
 import FavoriteButton from '@/components/FavoriteButton';
+import SuggestEditButton from '@/components/SuggestEditModal';
 import EntityPageShell from '@/components/EntityPageShell';
 
 interface PageProps {
@@ -98,7 +99,7 @@ export default async function AuklePage({ params }: PageProps) {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white break-words">{item.name}</h1>
             <p className="text-gray-500 dark:text-gray-400 mt-1">{cityName}{item.area ? `, ${item.area}` : ''}</p>
           </div>
-          <FavoriteButton itemId={item.id} itemType="aukle" />
+          <div className="flex items-center gap-2 shrink-0"><SuggestEditButton entityId={item.id} entityType="aukle" entityName={item.name} currentData={item as unknown as Record<string, unknown>} /><FavoriteButton itemId={item.id} itemType="aukle" /></div>
         </div>
         {item.baseRating > 0 && (
           <div className="flex items-center gap-2 mt-3">
