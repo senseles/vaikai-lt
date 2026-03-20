@@ -270,19 +270,7 @@ export default function AuthPage() {
             <div className="w-full border-t border-gray-200 dark:border-slate-600" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="px-3 bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-400 uppercase tracking-wider">arba el. paštu</span>
-          </div>
-        </div>
-
-        {/* Email/password section */}
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200 dark:border-slate-600" />
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="px-3 bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              arba
-            </span>
+            <span className="px-3 bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-400 uppercase tracking-wider">arba</span>
           </div>
         </div>
 
