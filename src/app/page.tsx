@@ -27,18 +27,6 @@ const RecentlyViewed = dynamicImport(() => import("@/components/RecentlyViewed")
   loading: () => <div className="h-32" />,
 });
 
-const Testimonials = dynamicImport(() => import("@/components/Testimonials"), {
-  loading: () => (
-    <div className="py-12 md:py-16 animate-pulse">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="h-8 w-64 bg-gray-200 dark:bg-slate-700 rounded mx-auto mb-8" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => <div key={i} className="h-40 bg-gray-200 dark:bg-slate-700 rounded-xl" />)}
-        </div>
-      </div>
-    </div>
-  ),
-});
 
 const FaqAccordion = dynamicImport(() => import("@/components/FaqAccordion"), {
   loading: () => (

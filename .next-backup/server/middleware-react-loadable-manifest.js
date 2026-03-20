@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST='{"app/[city]/CityPageClient.tsx -> @/components/CompareTable":{"id":9117,"files":["static/chunks/9117.cd345bfea7d2b5c1.js"]}}';

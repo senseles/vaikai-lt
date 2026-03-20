@@ -1,1 +1,0 @@
-"use strict";exports.id=1382,exports.ids=[1382],exports.modules={81382:(e,t,r)=>{r.r(t),r.d(t,{default:()=>o});let o=(0,r(68570).createProxy)(String.raw`/home/openclaw/Projects/vaikai-lt/src/components/ServiceWorkerRegistration.tsx#default`)}};

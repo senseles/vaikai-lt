@@ -1,1 +1,0 @@
-"use strict";exports.id=2303,exports.ids=[2303],exports.modules={12303:(t,e,o)=>{o.r(e),o.d(e,{default:()=>r});let r=(0,o(68570).createProxy)(String.raw`/home/openclaw/Projects/vaikai-lt/src/components/MobileBottomNav.tsx#default`)}};
