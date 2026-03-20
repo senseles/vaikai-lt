@@ -68,7 +68,7 @@ export default async function HomePage() {
     { label: "Būreliai", value: s.bureliai.toLocaleString('lt-LT'), emoji: "🎨" },
     { label: "Specialistai", value: s.specialists.toLocaleString('lt-LT'), emoji: "👨‍⚕️" },
     { label: "Miestai", value: `${s.cities}+`, emoji: "🏙️" },
-    { label: "Atsiliepimai", value: s.reviews.toLocaleString('lt-LT'), emoji: "⭐" },
+    ...(s.reviews > 0 ? [{ label: "Atsiliepimai", value: s.reviews.toLocaleString('lt-LT'), emoji: "⭐" }] : []),
   ];
 
   const searchActionJsonLd = {

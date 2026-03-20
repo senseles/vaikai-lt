@@ -177,9 +177,11 @@ export default function RecentlyViewed({ onItemClick }: RecentlyViewedProps) {
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
                   {item.city}
                 </p>
-                <div className="mt-2">
-                  <StarRating rating={item.baseRating} size="sm" />
-                </div>
+                {item.baseRating > 0 && (
+                  <div className="mt-2">
+                    <StarRating rating={item.baseRating} size="sm" />
+                  </div>
+                )}
               </button>
             );
           })}

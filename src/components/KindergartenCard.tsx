@@ -44,8 +44,14 @@ export default memo(function KindergartenCard({ item, onSelect, href, compareSel
 
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center gap-2">
-            <StarRating rating={item.baseRating} size="sm" />
-            <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount})</span>
+            {item.baseRating > 0 ? (
+              <>
+                <StarRating rating={item.baseRating} size="sm" />
+                <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount})</span>
+              </>
+            ) : (
+              <span className="text-sm text-gray-400 dark:text-gray-500">Dar nėra atsiliepimų</span>
+            )}
           </div>
 
           {onCompareToggle && (

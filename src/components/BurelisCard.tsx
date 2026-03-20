@@ -45,8 +45,14 @@ export default memo(function BurelisCard({ item, onSelect, href, compareSelected
 
         <div className="flex items-center justify-between gap-2 mt-3 min-w-0">
           <div className="flex items-center gap-2 shrink-0">
-            <StarRating rating={item.baseRating} size="sm" />
-            <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount})</span>
+            {item.baseRating > 0 ? (
+              <>
+                <StarRating rating={item.baseRating} size="sm" />
+                <span className="text-sm text-gray-500 dark:text-gray-400">({item.baseReviewCount})</span>
+              </>
+            ) : (
+              <span className="text-sm text-gray-400 dark:text-gray-500">Dar nėra atsiliepimų</span>
+            )}
           </div>
           {item.price && <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate min-w-0">{item.price}</span>}
         </div>
