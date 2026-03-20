@@ -11,7 +11,7 @@ interface FaqItem {
   readonly richAnswer?: ReactNode;
 }
 
-const linkCls = "text-primary hover:underline font-medium";
+const linkCls = "text-[#2d6a4f] dark:text-green-400 underline font-medium hover:text-[#40916c]";
 
 const faqItems: readonly FaqItem[] = [
   {
