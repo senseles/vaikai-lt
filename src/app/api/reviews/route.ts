@@ -42,7 +42,8 @@ export async function GET(request: NextRequest) {
     });
 
     return jsonResponse(reviews);
-  } catch {
+  } catch (error) {
+    console.error('[Reviews GET] Error:', error);
     return errorResponse('Vidine serverio klaida', 500);
   }
 }

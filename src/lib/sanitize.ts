@@ -1,12 +1,21 @@
-import DOMPurify from 'isomorphic-dompurify';
 import { z } from 'zod';
 
 /**
- * Sanitize a string by stripping all HTML tags via DOMPurify.
+ * Sanitize a string by stripping all HTML tags and dangerous content.
+ * Lightweight replacement for DOMPurify — no jsdom dependency.
  * Returns trimmed, clean text.
  */
 export function sanitizeString(input: string): string {
-  return DOMPurify.sanitize(input, { ALLOWED_TAGS: [] }).trim();
+  return input
+    .replace(/<script[\s\S]*?<\/script>/gi, '')   // Remove script tags + content
+    .replace(/<style[\s\S]*?<\/style>/gi, '')      // Remove style tags + content
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')   // Remove event handlers
+    .replace(/javascript\s*:/gi, '')                // Remove javascript: URIs
+    .replace(/<[^>]*>/g, '')                        // Strip all remaining HTML tags
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>')    // Decode common entities
+    .replace(/&amp;/g, '&').replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'").replace(/&#x2F;/g, '/')
+    .trim();
 }
 
 /**
