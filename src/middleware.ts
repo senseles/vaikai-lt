@@ -7,6 +7,67 @@ import { VALID_CITY_SLUGS } from '@/lib/cities';
 /** Known top-level routes that are NOT city slugs */
 const KNOWN_ROUTES = new Set(['', 'megstamiausieji', 'paieska', 'admin', 'prisijungti', 'registracija', 'privatumo-politika', 'forumas', 'aukles', 'bureliai', 'specialistai', 'slaptazodis', 'profilis', 'pasiulyti']);
 
+// --- Edge-compatible in-memory rate limiter for auth endpoints ---
+interface RateLimitEntry { count: number; resetAt: number }
+const authRateLimitStore = new Map<string, RateLimitEntry>();
+
+/** Extract client IP with Cloudflare priority */
+function getClientIpFromRequest(request: NextRequest): string {
+  return (
+    request.headers.get('cf-connecting-ip') ??
+    request.headers.get('x-real-ip') ??
+    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+    request.ip ??
+    '127.0.0.1'
+  );
+}
+
+/**
+ * Edge-compatible rate limit check. Returns 429 response if limited, null if allowed.
+ */
+function checkAuthRateLimit(
+  request: NextRequest,
+  identifier: string,
+  maxRequests: number,
+  windowSeconds: number,
+): NextResponse | null {
+  const ip = getClientIpFromRequest(request);
+  const key = `${identifier}:${ip}`;
+  const now = Date.now();
+
+  const existing = authRateLimitStore.get(key);
+  if (!existing || now >= existing.resetAt) {
+    authRateLimitStore.set(key, { count: 1, resetAt: now + windowSeconds * 1000 });
+    return null;
+  }
+
+  existing.count += 1;
+  if (existing.count > maxRequests) {
+    const retryAfter = Math.ceil((existing.resetAt - now) / 1000);
+    return NextResponse.json(
+      { error: 'Per daug užklausų. Bandykite vėliau.' },
+      { status: 429, headers: { 'Retry-After': String(retryAfter) } },
+    );
+  }
+  return null;
+}
+
+// Periodic cleanup of expired entries (every 60s)
+let authCleanupTimer: ReturnType<typeof setInterval> | null = null;
+function ensureAuthCleanup() {
+  if (authCleanupTimer) return;
+  authCleanupTimer = setInterval(() => {
+    const now = Date.now();
+    authRateLimitStore.forEach((entry, key) => {
+      if (now >= entry.resetAt) authRateLimitStore.delete(key);
+    });
+  }, 60_000);
+  if (authCleanupTimer && typeof authCleanupTimer === 'object' && 'unref' in authCleanupTimer) {
+    (authCleanupTimer as NodeJS.Timeout).unref();
+  }
+}
+ensureAuthCleanup();
+
 /** Minimal 404 HTML — styled to match the site */
 const NOT_FOUND_HTML = `<!DOCTYPE html>
 <html lang="lt">
@@ -41,6 +102,29 @@ export async function middleware(request: NextRequest) {
         headers: { 'Content-Type': 'text/html; charset=utf-8' },
       });
     }
+  }
+
+  // --- Block auth info leak endpoints ---
+  if (pathname === '/api/auth/providers') {
+    return new NextResponse(NOT_FOUND_HTML, {
+      status: 404,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
+  }
+
+  // --- Rate limit auth endpoints (defense in depth) ---
+  // NextAuth credential login: 5 POST requests per 5 minutes per IP
+  if (request.method === 'POST' && (
+    pathname === '/api/auth/callback/credentials' ||
+    pathname === '/api/auth/signin'
+  )) {
+    const limited = checkAuthRateLimit(request, 'nextauth-login', 5, 300);
+    if (limited) return limited;
+  }
+  // Admin login: 5 POST requests per 15 minutes per IP
+  if (request.method === 'POST' && pathname === '/api/admin/login') {
+    const limited = checkAuthRateLimit(request, 'admin-login-mw', 5, 900);
+    if (limited) return limited;
   }
 
   // --- Admin API auth ---
@@ -105,6 +189,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/api/admin/:path*',
+    '/api/auth/:path*',
     '/((?!api|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.json|icons|og-image).*)',
   ],
 };

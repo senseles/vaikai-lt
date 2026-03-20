@@ -17,7 +17,9 @@ export type AuditAction =
   | 'FORUM_DELETE'
   | 'REPORT_REVIEW'
   | 'SUBMISSION_APPROVE'
-  | 'SUBMISSION_REJECT';
+  | 'SUBMISSION_REJECT'
+  | 'LOGIN_SUCCESS'
+  | 'LOGIN_FAILED';
 
 interface AuditLogParams {
   action: AuditAction;

@@ -5,6 +5,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import prisma from '@/lib/prisma';
 import { verifyPassword, hashPassword, needsRehash } from '@/lib/password';
+import { logAuditEvent } from '@/lib/audit';
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -34,17 +35,37 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'El. paštas', type: 'email' },
         password: { label: 'Slaptažodis', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
+        const ip = req?.headers?.['x-forwarded-for']?.toString().split(',')[0].trim()
+          ?? req?.headers?.['x-real-ip']?.toString()
+          ?? 'unknown';
+
         if (!credentials?.email || !credentials?.password) return null;
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
-        if (!user || !user.passwordHash) return null;
+        if (!user || !user.passwordHash) {
+          logAuditEvent({
+            action: 'LOGIN_FAILED',
+            targetType: 'user',
+            targetId: credentials.email,
+            details: `NextAuth credentials login failed (user not found). IP: ${ip}`,
+          });
+          return null;
+        }
 
         const valid = verifyPassword(credentials.password, user.passwordHash);
-        if (!valid) return null;
+        if (!valid) {
+          logAuditEvent({
+            action: 'LOGIN_FAILED',
+            targetType: 'user',
+            targetId: credentials.email,
+            details: `NextAuth credentials login failed (wrong password). IP: ${ip}`,
+          });
+          return null;
+        }
 
         // Rehash legacy passwords
         if (needsRehash(user.passwordHash)) {
@@ -54,6 +75,13 @@ export const authOptions: NextAuthOptions = {
             data: { passwordHash: newHash },
           });
         }
+
+        logAuditEvent({
+          action: 'LOGIN_SUCCESS',
+          targetType: 'user',
+          targetId: user.id,
+          details: `NextAuth credentials login. IP: ${ip}`,
+        });
 
         return {
           id: user.id,
