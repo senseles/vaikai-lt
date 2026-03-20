@@ -1,5 +1,4 @@
 import Link from "next/link";
-import NewsletterSignup from "./NewsletterSignup";
 import { toSlug } from "@/lib/utils";
 
 export default function Footer() {
@@ -54,15 +53,9 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Newsletter + Info */}
+          {/* Info */}
           <div className="col-span-2 sm:col-span-1">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm uppercase tracking-wider">Naujienlaiškis</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Gaukite naujausias žinias apie vaikiškų paslaugų naujienas.
-            </p>
-            <NewsletterSignup />
-
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 mt-6 text-sm uppercase tracking-wider">Informacija</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm uppercase tracking-wider">Informacija</h3>
             <ul className="space-y-2">
               <li><Link href="/forumas" prefetch={true} className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">Tėvų forumas</Link></li>
               <li><Link href="/pasiulyti" prefetch={true} className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">✏️ Pasiūlyti darželį/auklę</Link></li>
