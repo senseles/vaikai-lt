@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
         status: 200,
         headers: {
           'Content-Type': 'text/csv; charset=utf-8',
-          'Content-Disposition': 'attachment; filename="vaikai-export.csv"',
+          'Content-Disposition': 'attachment; filename="manovaikai-export.csv"',
           'Content-Length': String(csvBuffer.byteLength),
         },
       });
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
-        'Content-Disposition': 'attachment; filename="vaikai-export.json"',
+        'Content-Disposition': 'attachment; filename="manovaikai-export.json"',
         'Content-Length': String(jsonBuffer.byteLength),
       },
     });

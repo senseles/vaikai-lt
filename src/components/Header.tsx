@@ -84,7 +84,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 text-xl font-extrabold text-primary hover:opacity-85 transition-opacity">
             <span className="text-2xl" aria-hidden="true">👶</span>
-            <span>Vaikai<span className="text-secondary">.lt</span></span>
+            <span>ManoVaikai<span className="text-secondary">.lt</span></span>
           </Link>
 
           {/* Desktop nav */}
