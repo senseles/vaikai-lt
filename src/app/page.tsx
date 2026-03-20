@@ -170,8 +170,7 @@ export default async function HomePage() {
       {/* Cities */}
       <CitySelector />
 
-      {/* Testimonials */}
-      <Testimonials />
+      {/* Testimonials removed — will add real ones later */}
 
       {/* FAQ */}
       <FaqAccordion />
