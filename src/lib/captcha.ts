@@ -7,7 +7,10 @@ const HCAPTCHA_SECRET = process.env.HCAPTCHA_SECRET || '0x0000000000000000000000
 const VERIFY_URL = 'https://hcaptcha.com/siteverify';
 
 export async function verifyCaptcha(token: string | undefined | null): Promise<boolean> {
-  // Skip verification in development if no secret configured
+  // Skip verification if no real secret configured (test/dev mode)
+  if (HCAPTCHA_SECRET === '0x0000000000000000000000000000000000000000') {
+    return true; // Allow all in test mode
+  }
   if (!token) return false;
 
   try {
