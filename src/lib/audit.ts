@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 export type AuditAction =
   | 'REVIEW_APPROVE'
   | 'REVIEW_REJECT'
+  | 'REVIEW_EDIT'
   | 'REVIEW_DELETE'
   | 'ENTITY_CREATE'
   | 'ENTITY_UPDATE'

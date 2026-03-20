@@ -18,7 +18,8 @@ interface ReviewsModalProps {
   readonly onClose: () => void;
 }
 
-export default function ReviewsModal({ itemId, itemType, itemName, onClose }: ReviewsModalProps) {
+export default function ReviewsModal({ itemId, itemType: _itemType, itemName, onClose }: ReviewsModalProps) {
+  void _itemType; // Used for future filtering
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
