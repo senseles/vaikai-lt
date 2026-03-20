@@ -89,8 +89,25 @@ a:hover{background:#40916c}
 <body><div class="c"><div class="n">404</div><h1>Puslapis nerastas</h1><p>Atsiprašome, bet šis puslapis neegzistuoja arba buvo perkeltas.</p><a href="/">Grįžti į pradžią</a></div></body>
 </html>`;
 
+/** Sensitive files/paths that should always 404 */
+const BLOCKED_PATHS = new Set([
+  '/.env', '/.env.local', '/.env.production', '/.env.development',
+  '/.git', '/.git/config', '/.git/HEAD',
+  '/.gitignore', '/.npmrc', '/.htaccess',
+  '/wp-admin', '/wp-login.php', '/xmlrpc.php',
+  '/phpmyadmin', '/adminer.php',
+]);
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // --- Block sensitive file access ---
+  if (BLOCKED_PATHS.has(pathname) || pathname.startsWith('/.env') || pathname.startsWith('/.git/')) {
+    return new NextResponse(NOT_FOUND_HTML, {
+      status: 404,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
+  }
 
   // --- City slug validation ---
   // Check root-level single-segment paths (e.g., /vilnius, /nonexistent)
