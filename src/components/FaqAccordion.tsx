@@ -23,7 +23,7 @@ const faqItems: readonly FaqItem[] = [
         Registracija vykdoma per savivaldybės sistemą. Prašymus galima teikti internetu:
         <ul className="mt-2 ml-4 space-y-1 list-disc">
           <li>Vilniuje — <a href="https://svietimas.vilnius.lt" target="_blank" rel="noopener noreferrer" className={linkCls}>svietimas.vilnius.lt</a></li>
-          <li>Kaune — <a href="https://darzelis.kaunas.lt" target="_blank" rel="noopener noreferrer" className={linkCls}>darzelis.kaunas.lt</a></li>
+          <li>Kaune — <a href="https://www.kaunas.lt/" target="_blank" rel="noopener noreferrer" className={linkCls}>kaunas.lt</a></li>
           <li>Klaipėdoje — <a href="https://www.klaipeda.lt/svietimas" target="_blank" rel="noopener noreferrer" className={linkCls}>klaipeda.lt/svietimas</a></li>
           <li>Šiauliuose — <a href="https://www.siauliai.lt" target="_blank" rel="noopener noreferrer" className={linkCls}>siauliai.lt</a></li>
           <li>Panevėžyje — <a href="https://www.panevezys.lt" target="_blank" rel="noopener noreferrer" className={linkCls}>panevezys.lt</a></li>
