@@ -28,7 +28,7 @@ export default async function AllAuklesPage() {
     grouped.set(item.city, list);
   }
 
-  const cities = [...grouped.keys()].sort((a, b) => a.localeCompare(b, 'lt'));
+  const cities = Array.from(grouped.keys()).sort((a, b) => a.localeCompare(b, 'lt'));
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -69,7 +69,7 @@ export default async function AllAuklesPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {cityItems.map((item) => (
                 <Link key={item.id} href={citySlug ? `/${citySlug}/aukles/${item.slug}` : `/aukles/${item.slug}`}>
-                  <AukleCard item={item} />
+                  <AukleCard item={item as never} />
                 </Link>
               ))}
             </div>
