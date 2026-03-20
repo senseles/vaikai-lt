@@ -98,6 +98,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/prisijungti',
+    error: '/prisijungti',
   },
   callbacks: {
     async jwt({ token, user }) {

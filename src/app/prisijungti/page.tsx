@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import CaptchaWidget from '@/components/CaptchaWidget';
@@ -65,7 +65,23 @@ export default function AuthPage() {
   const [captchaToken, setCaptchaToken] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
+
+  // Show error from NextAuth redirect (e.g. OAuth failure)
+  useEffect(() => {
+    const authError = searchParams.get('error');
+    if (authError) {
+      const errorMessages: Record<string, string> = {
+        CredentialsSignin: 'Neteisingas el. paštas arba slaptažodis',
+        OAuthAccountNotLinked: 'Šis el. paštas jau naudojamas su kitu prisijungimo būdu',
+        OAuthSignin: 'Klaida prisijungiant per Google',
+        OAuthCallback: 'Klaida prisijungiant per Google',
+        Default: 'Prisijungimo klaida. Bandykite dar kartą.',
+      };
+      setError(errorMessages[authError] || errorMessages.Default);
+    }
+  }, [searchParams]);
 
   // Redirect if already logged in
   useEffect(() => {
