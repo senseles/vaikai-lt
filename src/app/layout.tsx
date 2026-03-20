@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large" as const, "max-snippet": -1 },
   },
   verification: {
-    google: 'GOOGLE_VERIFICATION_CODE_HERE',
+    google: 'google39b4559b0391f8d9',
   },
   icons: {
     icon: [
