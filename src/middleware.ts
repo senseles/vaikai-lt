@@ -121,13 +121,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // --- Block auth info leak endpoints ---
-  if (pathname === '/api/auth/providers') {
-    return new NextResponse(NOT_FOUND_HTML, {
-      status: 404,
-      headers: { 'Content-Type': 'text/html; charset=utf-8' },
-    });
-  }
+  // /api/auth/providers is required by NextAuth for OAuth (Google, Facebook)
 
   // --- Rate limit auth endpoints (defense in depth) ---
   // NextAuth credential login: 5 POST requests per 5 minutes per IP
