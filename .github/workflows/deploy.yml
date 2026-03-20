@@ -1,0 +1,52 @@
+name: Deploy to Netlify
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Wake up Neon DB
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+        run: |
+          node -e "
+            const{PrismaClient}=require('@prisma/client');
+            const p=new PrismaClient();
+            p.\$queryRaw\`SELECT 1\`.then(()=>{console.log('DB awake');p.\$disconnect()}).catch(e=>{console.log('DB wake failed:',e.message.slice(0,80));p.\$disconnect()});
+          "
+          sleep 2
+
+      - name: Build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+          DIRECT_URL: ${{ secrets.DATABASE_URL_PROD }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL: https://manovaikai.lt
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        run: npm run build
+
+      - name: Deploy to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: npx netlify-cli deploy --prod --skip-functions-cache --message "Auto-deploy $(git log -1 --pretty=%s)"
