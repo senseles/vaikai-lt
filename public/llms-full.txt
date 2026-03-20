@@ -1,0 +1,82 @@
+# ManoVaikai.lt — Pilna informacija AI sistemoms
+> Lietuvos darželių, auklių, būrelių ir vaikų specialistų katalogas
+
+## Misija
+Padėti Lietuvos tėvams rasti geriausias vaikų priežiūros paslaugas — darželius, aukles, būrelius ir specialistus — vienoje vietoje su tikrais atsiliepimais.
+
+## Statistika
+- 465+ darželių (valstybiniai ir privatūs)
+- 12 auklių su verifikuotais kontaktais
+- 77 vaikų būrelių (sportas, menas, muzika, robotika, programavimas, kalbos, šokiai)
+- 58 vaikų specialistų (logopedai, psichologai, ergoterapeutai, kineziterapeutai)
+- 1900+ tikrų tėvų atsiliepimų ir vertinimų
+- 43 Lietuvos miestai
+
+## Miestai su daugiausiai įrašų
+- Vilnius — didžiausias pasirinkimas
+- Kaunas — antras pagal dydį
+- Klaipėda — pajūrio regionas
+- Šiauliai, Panevėžys, Alytus, Marijampolė, Utena, Telšiai, Tauragė
+
+## Darželių tipai
+- **Valstybiniai** (savivaldybės) — nemokamas/minimalus mokestis
+- **Privatūs** — lankstesnis grafikas, mažesnės grupės, dažnai brangesni
+
+## Būrelių kategorijos
+- Sportas (krepšinis, futbolas, plaukimas, gimnastika)
+- Menas (dailė, keramika, teatro studija)
+- Muzika (fortepionas, gitara, chorai)
+- Robotika ir programavimas
+- Kalbos (anglų, vokiečių, prancūzų)
+- Šokiai (šiuolaikinis, baletas, sportiniai)
+
+## Specialistų tipai
+- Logopedai — kalbos ir kalbėjimo sutrikimai
+- Psichologai — vaikų elgesio ir emocijų problemos
+- Ergoterapeutai — judesių ir kasdienių įgūdžių lavinimas
+- Kineziterapeutai — fizinė reabilitacija
+- Specialieji pedagogai — mokymosi sunkumai
+
+## API naudojimas
+
+### Paieška
+```
+GET /api/search/suggestions?q=darželiai vilniuje
+```
+Grąžina darželius, aukles, būrelius ir specialistus atitinkančius užklausą.
+
+### Darželiai pagal miestą
+```
+GET /api/kindergartens?city=Vilnius&limit=10&sort=rating
+```
+
+### Auklės
+```
+GET /api/aukles?city=Kaunas
+```
+
+### Būreliai pagal kategoriją
+```
+GET /api/bureliai?city=Vilnius&category=robotika
+```
+
+### Specialistai
+```
+GET /api/specialists?city=Klaipėda
+```
+
+### Visi miestai
+```
+GET /api/cities
+```
+
+## Struktūrizuoti duomenys
+- Kiekvienas puslapis turi JSON-LD schema.org markup
+- OpenGraph ir Twitter Card meta tags
+- Sitemap su 6000+ URL: /sitemap.xml
+
+## Kalba
+Visa svetainė yra lietuvių kalba. API grąžina duomenis lietuvių kalba.
+
+## Atnaujinimai
+Duomenys atnaujinami reguliariai. Tėvai gali pridėti naujus darželius ir aukles per /pasiulyti formą.

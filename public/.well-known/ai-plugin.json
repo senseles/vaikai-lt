@@ -1,11 +1,17 @@
 {
   "schema_version": "v1",
   "name_for_human": "ManoVaikai.lt",
-  "name_for_model": "manovaikai",
-  "description_for_human": "Lithuanian kindergarten, nanny, and childcare directory",
-  "description_for_model": "Search for kindergartens (darželiai), nannies (auklės), activity clubs (būreliai), and child specialists in Lithuanian cities. Returns real user reviews and ratings.",
+  "name_for_model": "manovaikai_lt",
+  "description_for_human": "Lietuvos darželių, auklių, būrelių ir vaikų specialistų katalogas su tikrais atsiliepimais",
+  "description_for_model": "ManoVaikai.lt is the largest Lithuanian childcare directory. Search for kindergartens (darželiai), nannies (auklės), activity clubs (būreliai), and child specialists (logopedai, psichologai) across Lithuanian cities. All data is in Lithuanian. Use /api/search/suggestions?q= for general search, /api/kindergartens?city= for kindergartens, /api/aukles?city= for nannies, /api/bureliai?city= for activity clubs, /api/specialists?city= for specialists. Returns real parent reviews and ratings.",
+  "auth": {
+    "type": "none"
+  },
   "api": {
     "type": "openapi",
     "url": "https://manovaikai.lt/api/openapi.json"
-  }
+  },
+  "logo_url": "https://manovaikai.lt/icons/icon-512.png",
+  "contact_email": "info@manovaikai.lt",
+  "legal_info_url": "https://manovaikai.lt/privatumo-politika"
 }

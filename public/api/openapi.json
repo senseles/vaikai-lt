@@ -1,0 +1,123 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ManoVaikai.lt API",
+    "description": "Lietuvos darželių, auklių, būrelių ir vaikų specialistų katalogas. Paieška pagal miestą, pavadinimą, kategoriją. Tikri tėvų atsiliepimai ir vertinimai.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ManoVaikai.lt",
+      "url": "https://manovaikai.lt"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://manovaikai.lt",
+      "description": "Production"
+    }
+  ],
+  "paths": {
+    "/api/search/suggestions": {
+      "get": {
+        "operationId": "searchSuggestions",
+        "summary": "Paieška darželių, auklių, būrelių ir specialistų",
+        "description": "Ieško pagal pavadinimą, miestą arba kategoriją. Grąžina darželius, aukles, būrelius ir specialistus.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Paieškos tekstas (pvz. 'darželiai Vilniuje', 'auklė Kaune', 'logopedas')",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paieškos rezultatai",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "suggestions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": { "type": "string", "enum": ["kindergarten", "aukle", "burelis", "specialist"] },
+                          "name": { "type": "string" },
+                          "city": { "type": "string" },
+                          "slug": { "type": "string" },
+                          "rating": { "type": "number" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/kindergartens": {
+      "get": {
+        "operationId": "getKindergartens",
+        "summary": "Gauti darželių sąrašą",
+        "description": "Grąžina darželius filtruojant pagal miestą, tipą ir kitus parametrus.",
+        "parameters": [
+          { "name": "city", "in": "query", "schema": { "type": "string" }, "description": "Miestas (pvz. 'Vilnius', 'Kaunas')" },
+          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["valstybinis", "privatus"] }, "description": "Darželio tipas" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 }, "description": "Rezultatų limitas" },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } },
+          { "name": "sort", "in": "query", "schema": { "type": "string", "enum": ["rating", "name", "reviews"] } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Darželių sąrašas su atsiliepimais"
+          }
+        }
+      }
+    },
+    "/api/aukles": {
+      "get": {
+        "operationId": "getAukles",
+        "summary": "Gauti auklių sąrašą",
+        "parameters": [
+          { "name": "city", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } }
+        ],
+        "responses": { "200": { "description": "Auklių sąrašas" } }
+      }
+    },
+    "/api/bureliai": {
+      "get": {
+        "operationId": "getBureliai",
+        "summary": "Gauti būrelių sąrašą",
+        "parameters": [
+          { "name": "city", "in": "query", "schema": { "type": "string" } },
+          { "name": "category", "in": "query", "schema": { "type": "string" }, "description": "Kategorija (sportas, menas, muzika, robotika...)" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } }
+        ],
+        "responses": { "200": { "description": "Būrelių sąrašas" } }
+      }
+    },
+    "/api/specialists": {
+      "get": {
+        "operationId": "getSpecialists",
+        "summary": "Gauti vaikų specialistų sąrašą",
+        "parameters": [
+          { "name": "city", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } }
+        ],
+        "responses": { "200": { "description": "Specialistų sąrašas" } }
+      }
+    },
+    "/api/cities": {
+      "get": {
+        "operationId": "getCities",
+        "summary": "Gauti visų miestų sąrašą su statistika",
+        "responses": { "200": { "description": "Miestų sąrašas" } }
+      }
+    }
+  }
+}

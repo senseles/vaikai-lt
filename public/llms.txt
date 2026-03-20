@@ -1,14 +1,35 @@
 # ManoVaikai.lt
-> Lithuanian kindergarten, nanny, and childcare directory
+> Lietuvos darželių, auklių, būrelių ir vaikų specialistų katalogas su tikrais tėvų atsiliepimais
 
-ManoVaikai.lt is a comprehensive directory of childcare services in Lithuania including kindergartens (darželiai), nannies (auklės), activity clubs (būreliai), and child specialists.
+## Apie
+ManoVaikai.lt — didžiausias Lietuvos vaikų priežiūros paslaugų katalogas. Padedame tėvams rasti geriausią darželį, auklę, būrelį ar specialistą savo vaikui.
+
+## Duomenys
+- 465+ darželių (valstybiniai ir privatūs) visoje Lietuvoje
+- 12 auklių su kontaktais ir atsiliepimais
+- 77 būrelių (sportas, menas, muzika, robotika, kalbos)
+- 58 vaikų specialistai (logopedai, psichologai, ergoterapeutai)
+- 1900+ tikrų tėvų atsiliepimų
+- 43 miestai: Vilnius, Kaunas, Klaipėda, Šiauliai, Panevėžys ir kt.
 
 ## API
-- Search: GET /api/search/suggestions?q={query} — returns matching entities
-- Kindergartens: GET /api/kindergartens?city={city}&limit={n}
+- Paieška: GET /api/search/suggestions?q={tekstas}
+- Darželiai: GET /api/kindergartens?city={miestas}&limit={n}
+- Auklės: GET /api/aukles?city={miestas}
+- Būreliai: GET /api/bureliai?city={miestas}&category={kategorija}
+- Specialistai: GET /api/specialists?city={miestas}
+- Miestai: GET /api/cities
+- OpenAPI: /api/openapi.json
 
-## Coverage
-- 465+ kindergartens across Lithuania
-- Cities: Vilnius, Kaunas, Klaipėda, Šiauliai, Panevėžys, and more
-- Types: valstybinis (public), privatus (private)
-- Languages: Lithuanian, Polish, Russian, English
+## Puslapiai
+- Pagrindinis: /
+- Miesto puslapis: /{miestas} (pvz. /vilnius, /kaunas)
+- Darželis: /{miestas}/darzeliai/{slug}
+- Auklė: /aukles/{slug}
+- Būrelis: /bureliai/{slug}
+- Specialistas: /specialistai/{slug}
+- Paieška: /paieska?q={tekstas}
+- Forumas: /forumas
+
+## Kontaktai
+Svetainė: https://manovaikai.lt
