@@ -2,16 +2,35 @@
 
 import { useState } from "react";
 
+import Link from "next/link";
+import { type ReactNode } from "react";
+
 interface FaqItem {
   readonly question: string;
   readonly answer: string;
+  readonly richAnswer?: ReactNode;
 }
+
+const linkCls = "text-primary hover:underline font-medium";
 
 const faqItems: readonly FaqItem[] = [
   {
     question: "Kaip registruoti vaiką į darželį?",
     answer:
       "Registracija vykdoma per savivaldybės sistemą. Vilniuje — svietimas.vilnius.lt, Kaune — darzelis.kaunas.lt, kituose miestuose — per atitinkamą savivaldybės portalą. Prašymus galima teikti internetu.",
+    richAnswer: (
+      <>
+        Registracija vykdoma per savivaldybės sistemą. Prašymus galima teikti internetu:
+        <ul className="mt-2 ml-4 space-y-1 list-disc">
+          <li>Vilniuje — <a href="https://svietimas.vilnius.lt" target="_blank" rel="noopener noreferrer" className={linkCls}>svietimas.vilnius.lt</a></li>
+          <li>Kaune — <a href="https://darzelis.kaunas.lt" target="_blank" rel="noopener noreferrer" className={linkCls}>darzelis.kaunas.lt</a></li>
+          <li>Klaipėdoje — <a href="https://www.klaipeda.lt/svietimas" target="_blank" rel="noopener noreferrer" className={linkCls}>klaipeda.lt/svietimas</a></li>
+          <li>Šiauliuose — <a href="https://www.siauliai.lt" target="_blank" rel="noopener noreferrer" className={linkCls}>siauliai.lt</a></li>
+          <li>Panevėžyje — <a href="https://www.panevezys.lt" target="_blank" rel="noopener noreferrer" className={linkCls}>panevezys.lt</a></li>
+        </ul>
+        <p className="mt-2">Kituose miestuose — per atitinkamą savivaldybės portalą.</p>
+      </>
+    ),
   },
   {
     question: "Nuo kokio amžiaus priimami vaikai?",
@@ -31,7 +50,12 @@ const faqItems: readonly FaqItem[] = [
   {
     question: "Kaip pasirinkti tinkamą darželį savo vaikui?",
     answer:
-      "Atkreipkite dėmesį į darželio vietą, ugdymo programą, grupių dydį ir auklėtojų kvalifikaciją. Naudinga aplankyti darželį asmeniškai ir pasikalbėti su kitais tėvais. Mūsų svetainėje galite palyginti darželius pagal įvairius kriterijus.",
+      "Atkreipkite dėmesį į darželio vietą, ugdymo programą, grupių dydį ir auklėtojų kvalifikaciją. Naudinga aplankyti darželį asmeniškai ir pasikalbėti su kitais tėvais.",
+    richAnswer: (
+      <>
+        Atkreipkite dėmesį į darželio vietą, ugdymo programą, grupių dydį ir auklėtojų kvalifikaciją. Naudinga aplankyti darželį asmeniškai ir pasikalbėti su kitais tėvais. Mūsų svetainėje galite <Link href="/paieska" className={linkCls}>ieškoti darželių</Link> pagal įvairius kriterijus ir skaityti <Link href="/forumas" className={linkCls}>tėvų atsiliepimus forume</Link>.
+      </>
+    ),
   },
   {
     question: "Kuo skiriasi valstybinis ir privatus darželis?",
@@ -42,6 +66,11 @@ const faqItems: readonly FaqItem[] = [
     question: "Kaip rasti gerą auklę?",
     answer:
       "Mūsų kataloge galite ieškoti auklių pagal miestą, patirtį ir teikiamas paslaugas. Rekomenduojame pasitikrinti rekomendacijas, susitarti dėl bandomojo laikotarpio ir aptarti visas sąlygas iš anksto.",
+    richAnswer: (
+      <>
+        Mūsų <Link href="/paieska?q=auklė" className={linkCls}>auklių kataloge</Link> galite ieškoti pagal miestą, patirtį ir teikiamas paslaugas. Rekomenduojame pasitikrinti rekomendacijas, susitarti dėl bandomojo laikotarpio ir aptarti visas sąlygas iš anksto.
+      </>
+    ),
   },
   {
     question: "Nuo kokio amžiaus galima vesti vaiką į būrelius?",
@@ -57,6 +86,11 @@ const faqItems: readonly FaqItem[] = [
     question: "Kaip veikia palyginimo funkcija?",
     answer:
       'Pasirinkite kelias įstaigas ir spauskite „Palyginti". Sistema parodys jų pagrindines savybes greta — kainas, darbo laiką, ugdymo programas ir atsiliepimų vertinimus, kad galėtumėte lengvai palyginti.',
+    richAnswer: (
+      <>
+        Pridėkite įstaigas į <Link href="/megstamiausieji" className={linkCls}>mėgstamiausius</Link> paspaudę ❤️ mygtuką. Sistema parodys jų pagrindines savybes greta — kainas, darbo laiką, ugdymo programas ir atsiliepimų vertinimus, kad galėtumėte lengvai palyginti.
+      </>
+    ),
   },
   {
     question: "Ar informacija svetainėje yra nemokama?",
@@ -66,7 +100,12 @@ const faqItems: readonly FaqItem[] = [
   {
     question: "Kaip pridėti savo įstaigą į katalogą?",
     answer:
-      'Jei esate paslaugų teikėjas, galite užregistruoti savo įstaigą paspaudę „Pridėti įstaigą" svetainės viršuje. Užpildykite informaciją apie teikiamas paslaugas, ir jūsų profilis bus matomas tėvams po patvirtinimo.',
+      'Jei esate paslaugų teikėjas, galite užregistruoti savo įstaigą. Užpildykite informaciją apie teikiamas paslaugas, ir jūsų profilis bus matomas tėvams po patvirtinimo.',
+    richAnswer: (
+      <>
+        Jei esate paslaugų teikėjas, galite <Link href="/pasiulyti" className={linkCls}>užregistruoti savo įstaigą</Link> — užpildykite informaciją apie teikiamas paslaugas, ir jūsų profilis bus matomas tėvams po patvirtinimo.
+      </>
+    ),
   },
   {
     question: "Ar galiu pasirinkti ugdymo kalbą?",
@@ -121,7 +160,7 @@ export default function FaqAccordion() {
               </button>
               {openIndex === i && (
                 <div id={`faq-answer-${i}`} role="region" aria-labelledby={`faq-question-${i}`} className="px-4 sm:px-5 pb-4 text-gray-600 dark:text-gray-400 text-sm leading-relaxed animate-fade-in">
-                  {item.answer}
+                  {item.richAnswer || item.answer}
                 </div>
               )}
             </div>
