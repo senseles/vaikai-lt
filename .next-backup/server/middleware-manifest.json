@@ -1,0 +1,128 @@
+{
+  "version": 3,
+  "middleware": {
+    "/": {
+      "files": [
+        "server/edge-instrumentation.js",
+        "server/edge-runtime-webpack.js",
+        "server/src/middleware.js"
+      ],
+      "name": "src/middleware",
+      "page": "/",
+      "matchers": [
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/api\\/admin(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(.json)?[\\/#\\?]?$",
+          "originalSource": "/api/admin/:path*"
+        },
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/api\\/auth(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(.json)?[\\/#\\?]?$",
+          "originalSource": "/api/auth/:path*"
+        },
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?(?:\\/((?!api|_next\\/static|_next\\/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.json|icons|og-image).*))(.json)?[\\/#\\?]?$",
+          "originalSource": "/((?!api|_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.json|icons|og-image).*)"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "env": {
+        "__NEXT_BUILD_ID": "6YfhQzO07CCoB2TC_fHDP",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "mWaZNuoB0/1XDsSfxyVsjiLKpof9WHXYUsRLP45h/UU=",
+        "__NEXT_PREVIEW_MODE_ID": "ae4d3e301cb6db322e3c3b78c453b7e2",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "f63cb5dd1e48a930b513091d042d54afeb23295e6279f90aa553469486b756c5",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "6e5f08348da013ff6aa80be1d5183c17bccdcb5f014aa41dd0bcb8545cb6fa6c"
+      }
+    }
+  },
+  "functions": {
+    "/opengraph-image/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "server/interception-route-rewrite-manifest.js",
+        "server/edge-instrumentation.js",
+        "server/edge-runtime-webpack.js",
+        "server/edge-chunks/713.js",
+        "server/app/opengraph-image/route.js"
+      ],
+      "name": "app/opengraph-image/route",
+      "page": "/opengraph-image/route",
+      "matchers": [
+        {
+          "regexp": "^/opengraph\\-image$",
+          "originalSource": "/opengraph-image"
+        }
+      ],
+      "wasm": [
+        {
+          "name": "wasm_77d9faebf7af9e421806970ce10a58e9d83116d7",
+          "filePath": "server/edge-chunks/wasm_77d9faebf7af9e421806970ce10a58e9d83116d7.wasm"
+        },
+        {
+          "name": "wasm_ef4866ecae192fd87727067cf2c0c0cf9fb8b020",
+          "filePath": "server/edge-chunks/wasm_ef4866ecae192fd87727067cf2c0c0cf9fb8b020.wasm"
+        }
+      ],
+      "assets": [
+        {
+          "name": "noto-sans-v27-latin-regular.5dda3fca77107598.ttf",
+          "filePath": "server/edge-chunks/asset_noto-sans-v27-latin-regular.5dda3fca77107598.ttf"
+        }
+      ],
+      "env": {
+        "__NEXT_BUILD_ID": "6YfhQzO07CCoB2TC_fHDP",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "mWaZNuoB0/1XDsSfxyVsjiLKpof9WHXYUsRLP45h/UU=",
+        "__NEXT_PREVIEW_MODE_ID": "ae4d3e301cb6db322e3c3b78c453b7e2",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "f63cb5dd1e48a930b513091d042d54afeb23295e6279f90aa553469486b756c5",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "6e5f08348da013ff6aa80be1d5183c17bccdcb5f014aa41dd0bcb8545cb6fa6c"
+      }
+    },
+    "/[city]/opengraph-image/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "server/interception-route-rewrite-manifest.js",
+        "server/edge-instrumentation.js",
+        "server/edge-runtime-webpack.js",
+        "server/edge-chunks/713.js",
+        "server/app/[city]/opengraph-image/route.js"
+      ],
+      "name": "app/[city]/opengraph-image/route",
+      "page": "/[city]/opengraph-image/route",
+      "matchers": [
+        {
+          "regexp": "^/(?<city>[^/]+?)/opengraph\\-image$",
+          "originalSource": "/[city]/opengraph-image"
+        }
+      ],
+      "wasm": [
+        {
+          "name": "wasm_77d9faebf7af9e421806970ce10a58e9d83116d7",
+          "filePath": "server/edge-chunks/wasm_77d9faebf7af9e421806970ce10a58e9d83116d7.wasm"
+        },
+        {
+          "name": "wasm_ef4866ecae192fd87727067cf2c0c0cf9fb8b020",
+          "filePath": "server/edge-chunks/wasm_ef4866ecae192fd87727067cf2c0c0cf9fb8b020.wasm"
+        }
+      ],
+      "assets": [
+        {
+          "name": "noto-sans-v27-latin-regular.5dda3fca77107598.ttf",
+          "filePath": "server/edge-chunks/asset_noto-sans-v27-latin-regular.5dda3fca77107598.ttf"
+        }
+      ],
+      "env": {
+        "__NEXT_BUILD_ID": "6YfhQzO07CCoB2TC_fHDP",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "mWaZNuoB0/1XDsSfxyVsjiLKpof9WHXYUsRLP45h/UU=",
+        "__NEXT_PREVIEW_MODE_ID": "ae4d3e301cb6db322e3c3b78c453b7e2",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "f63cb5dd1e48a930b513091d042d54afeb23295e6279f90aa553469486b756c5",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "6e5f08348da013ff6aa80be1d5183c17bccdcb5f014aa41dd0bcb8545cb6fa6c"
+      }
+    }
+  },
+  "sortedMiddleware": [
+    "/"
+  ]
+}

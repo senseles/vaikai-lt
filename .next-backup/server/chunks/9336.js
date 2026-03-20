@@ -1,0 +1,1 @@
+"use strict";exports.id=9336,exports.ids=[9336],exports.modules={9336:(e,t,o)=>{o.r(t),o.d(t,{default:()=>r});let r=(0,o(68570).createProxy)(String.raw`/home/openclaw/Projects/vaikai-lt/src/components/FaqAccordion.tsx#default`)}};

@@ -63,10 +63,10 @@ export default async function HomePage() {
   const s = await getStats();
 
   const stats = [
-    { label: "Darželiai", value: s.kindergartens.toLocaleString('lt-LT'), emoji: "🏫" },
-    { label: "Auklės", value: s.aukles.toLocaleString('lt-LT'), emoji: "👩‍👧" },
-    { label: "Būreliai", value: s.bureliai.toLocaleString('lt-LT'), emoji: "🎨" },
-    { label: "Specialistai", value: s.specialists.toLocaleString('lt-LT'), emoji: "👨‍⚕️" },
+    { label: "Darželiai", value: s.kindergartens.toLocaleString('lt-LT'), emoji: "🏫", href: "/darzeliai" },
+    { label: "Auklės", value: s.aukles.toLocaleString('lt-LT'), emoji: "👩‍👧", href: "/aukles" },
+    { label: "Būreliai", value: s.bureliai.toLocaleString('lt-LT'), emoji: "🎨", href: "/bureliai" },
+    { label: "Specialistai", value: s.specialists.toLocaleString('lt-LT'), emoji: "👨‍⚕️", href: "/specialistai" },
     { label: "Miestai", value: `${s.cities}+`, emoji: "🏙️" },
     ...(s.reviews > 0 ? [{ label: "Atsiliepimai", value: s.reviews.toLocaleString('lt-LT'), emoji: "⭐" }] : []),
   ];
@@ -117,6 +117,17 @@ export default async function HomePage() {
           {/* Stats */}
           <div className="mt-8 sm:mt-14 grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-6">
             {stats.map((stat, i) => (
+              stat.href ? (
+              <Link
+                key={stat.label}
+                href={stat.href}
+                className={`flex flex-col items-center min-h-[4.5rem] sm:min-h-[5rem] animate-fade-in-up stagger-${i + 1} hover:scale-105 transition-transform cursor-pointer`}
+              >
+                <span className="text-xl sm:text-3xl mb-0.5 sm:mb-1" role="img" aria-hidden="true">{stat.emoji}</span>
+                <span className="text-base sm:text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</span>
+                <span className="text-[11px] sm:text-sm text-gray-500 dark:text-gray-400">{stat.label}</span>
+              </Link>
+            ) : (
               <div
                 key={stat.label}
                 className={`flex flex-col items-center min-h-[4.5rem] sm:min-h-[5rem] animate-fade-in-up stagger-${i + 1}`}
@@ -125,6 +136,7 @@ export default async function HomePage() {
                 <span className="text-base sm:text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</span>
                 <span className="text-[11px] sm:text-sm text-gray-500 dark:text-gray-400">{stat.label}</span>
               </div>
+            )
             ))}
           </div>
         </div>
