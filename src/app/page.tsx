@@ -24,7 +24,7 @@ const CitySelector = dynamicImport(() => import("@/components/CitySelector"), {
 
 const RecentlyViewed = dynamicImport(() => import("@/components/RecentlyViewed"), {
   ssr: false,
-  loading: () => <div className="h-32" />,
+  loading: () => null,
 });
 
 
@@ -103,8 +103,8 @@ export default async function HomePage() {
               Didžiausia vaikų paslaugų platforma Lietuvoje
             </p>
             <h1 className="text-[1.625rem] leading-tight sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4 sm:mb-5">
-              Raskite geriausią darželį,{" "}
-              <span className="text-primary dark:text-green-400">auklę ar būrelį</span>{" "}
+              Raskite geriausią{" "}
+              <span className="text-primary dark:text-green-400">darželį, auklę ar būrelį</span>{" "}
               savo vaikui
             </h1>
             <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">

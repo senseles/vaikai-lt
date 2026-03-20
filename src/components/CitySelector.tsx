@@ -6,11 +6,11 @@ import { useRouter } from 'next/navigation';
 import { CITIES } from '@/lib/cities';
 
 const topCities = [
-  { name: 'Vilnius', slug: 'vilnius', emoji: '🏛️' },
-  { name: 'Kaunas', slug: 'kaunas', emoji: '🏰' },
-  { name: 'Klaipėda', slug: 'klaipeda', emoji: '⚓' },
-  { name: 'Šiauliai', slug: 'siauliai', emoji: '☀️' },
-  { name: 'Panevėžys', slug: 'panevezys', emoji: '🌿' },
+  { name: 'Vilnius', slug: 'vilnius' },
+  { name: 'Kaunas', slug: 'kaunas' },
+  { name: 'Klaipėda', slug: 'klaipeda' },
+  { name: 'Šiauliai', slug: 'siauliai' },
+  { name: 'Panevėžys', slug: 'panevezys' },
 ] as const;
 
 const regionCities: Record<string, ReadonlyArray<{ name: string; slug: string }>> = {
@@ -102,9 +102,8 @@ export default function CitySelector() {
               key={city.slug}
               href={`/${city.slug}`}
               prefetch={true}
-              className={`flex flex-col items-center gap-1.5 sm:gap-2 p-4 sm:p-5 rounded-xl bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 hover:border-primary dark:hover:border-primary-light hover:shadow-lg active:shadow-sm active:scale-[0.98] transition-all group min-h-[5.5rem] sm:min-h-[6rem] ${i === topCities.length - 1 ? 'col-span-2 sm:col-span-1' : ''}`}
+              className={`flex flex-col items-center justify-center gap-1.5 sm:gap-2 p-4 sm:p-5 rounded-xl bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 hover:border-primary dark:hover:border-primary-light hover:shadow-lg active:shadow-sm active:scale-[0.98] transition-all group min-h-[5.5rem] sm:min-h-[6rem] ${i === topCities.length - 1 ? 'col-span-2 sm:col-span-1' : ''}`}
             >
-              <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">{city.emoji}</span>
               <span className="font-semibold text-sm sm:text-base text-gray-800 dark:text-gray-200 group-hover:text-primary dark:group-hover:text-primary-light transition-colors">
                 {city.name}
               </span>

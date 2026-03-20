@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Kindergarten, Aukle, Burelis, Specialist } from '@/types';
@@ -39,6 +39,7 @@ interface CityPageClientProps {
   readonly initialCategory: Category;
   readonly initialType: string;
   readonly initialSort: string;
+  readonly initialSearch: string;
   readonly totalPages: Record<Category, number>;
   readonly totalCounts: Record<Category, number>;
   readonly currentPage: number;
@@ -55,6 +56,7 @@ export default function CityPageClient({
   initialCategory,
   initialType,
   initialSort,
+  initialSearch,
   totalPages,
   totalCounts,
   currentPage,
@@ -65,7 +67,7 @@ export default function CityPageClient({
   const searchParams = useSearchParams();
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
   const [showCompare, setShowCompare] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
 
   const category = (searchParams.get('category') as Category) || initialCategory;
   const type = searchParams.get('type') ?? initialType;
@@ -82,6 +84,17 @@ export default function CityPageClient({
     if (!('page' in updates)) params.delete('page');
     router.push(`/${citySlug}?${params.toString()}`);
   }, [router, citySlug, searchParams]);
+
+  // Debounced search - update URL after user stops typing for 500ms
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const currentSearch = searchParams.get('search') ?? '';
+      if (searchQuery !== currentSearch) {
+        updateParams({ search: searchQuery });
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleCompare = useCallback((id: string) => {
     setCompareIds((prev) => {
@@ -117,54 +130,12 @@ export default function CityPageClient({
     });
   };
 
-  // Lithuanian character normalization map for fuzzy search
-  const ltNorm = (s: string): string =>
-    s.toLowerCase()
-      .replace(/ą/g, 'a').replace(/č/g, 'c').replace(/ę/g, 'e')
-      .replace(/ė/g, 'e').replace(/į/g, 'i').replace(/š/g, 's')
-      .replace(/ų/g, 'u').replace(/ū/g, 'u').replace(/ž/g, 'z');
-
-  // Simple fuzzy match: allows 1 character mismatch for words >= 4 chars
-  const fuzzyMatch = (text: string, query: string): boolean => {
-    const nt = ltNorm(text);
-    const nq = ltNorm(query);
-    // Direct includes (normalized)
-    if (nt.includes(nq)) return true;
-    // Split query into words and check each
-    const words = nq.split(/\s+/).filter(w => w.length > 0);
-    return words.every(word => {
-      if (nt.includes(word)) return true;
-      // For short words, only exact normalized match
-      if (word.length < 4) return false;
-      // Allow 1 character difference (Levenshtein-like sliding window)
-      for (let i = 0; i <= nt.length - word.length + 1; i++) {
-        const chunk = nt.substring(i, i + word.length);
-        let diffs = 0;
-        for (let j = 0; j < word.length; j++) {
-          if (chunk[j] !== word[j]) diffs++;
-          if (diffs > 1) break;
-        }
-        if (diffs <= 1) return true;
-      }
-      return false;
-    });
-  };
-
-  const filterBySearch = <T extends { name: string; description?: string | null; address?: string | null; area?: string | null; category?: string | null; specialty?: string | null }>(items: T[]): T[] => {
-    if (!searchQuery.trim()) return items;
-    const q = searchQuery.trim();
-    return items.filter((item) => {
-      const fields = [item.name, item.description, item.address, item.area, item.category, item.specialty];
-      return fields.some((f) => f ? fuzzyMatch(f, q) : false);
-    });
-  };
-
   const itemsForCategory = () => {
     switch (category) {
-      case 'darzeliai': return filterBySearch(kindergartens);
-      case 'aukles': return filterBySearch(filterByPrice(aukles));
-      case 'bureliai': return filterBySearch(bureliai);
-      case 'specialistai': return filterBySearch(filterByPrice(specialists));
+      case 'darzeliai': return kindergartens;
+      case 'aukles': return filterByPrice(aukles);
+      case 'bureliai': return bureliai;
+      case 'specialistai': return filterByPrice(specialists);
     }
   };
 
@@ -279,10 +250,10 @@ export default function CityPageClient({
 
       {/* Cards */}
       <h2 className="sr-only">{categoryTabs.find(t => t.id === category)?.label ?? 'Rezultatai'}</h2>
-      {searchQuery && (
+      {initialSearch && (
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Rasta: <span className="font-semibold text-gray-700 dark:text-gray-200">{items.length}</span> {items.length === 1 ? 'rezultatas' : items.length < 10 ? 'rezultatai' : 'rezultatų'}
-          {' '}pagal &bdquo;<span className="font-medium">{searchQuery}</span>&ldquo;
+          Rasta: <span className="font-semibold text-gray-700 dark:text-gray-200">{totalCounts[category]}</span> {totalCounts[category] === 1 ? 'rezultatas' : totalCounts[category] < 10 ? 'rezultatai' : 'rezultatų'}
+          {' '}pagal &bdquo;<span className="font-medium">{initialSearch}</span>&ldquo;
         </p>
       )}
       {items.length === 0 ? (
@@ -292,7 +263,7 @@ export default function CityPageClient({
             title="Nerasta rezultatų"
             description="Šiame mieste su pasirinktais filtrais rezultatų nerasta. Pabandykite pakeisti filtrus."
           />
-          <SuggestButton searchQuery={searchQuery} city={citySlug} resultCount={0} />
+          <SuggestButton searchQuery={initialSearch} city={citySlug} resultCount={0} />
         </>
       ) : (
         <ErrorBoundary fallback={<EmptyState icon="filter" title="Klaida" description="Nepavyko atvaizduoti rezultatų. Pabandykite perkrauti puslapį." />}>
@@ -323,7 +294,7 @@ export default function CityPageClient({
               </ScrollReveal>
             ))}
           </div>
-          <SuggestButton searchQuery={searchQuery} city={citySlug} resultCount={items.length} variant="inline" />
+          <SuggestButton searchQuery={initialSearch} city={citySlug} resultCount={items.length} variant="inline" />
         </ErrorBoundary>
       )}
 

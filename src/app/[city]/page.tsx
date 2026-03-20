@@ -8,7 +8,7 @@ import CityPageClient from './CityPageClient';
 
 interface CityPageProps {
   readonly params: { city: string };
-  readonly searchParams: { category?: string; type?: string; sort?: string; page?: string; sub?: string; spec?: string; area?: string; price?: string };
+  readonly searchParams: { category?: string; type?: string; sort?: string; page?: string; sub?: string; spec?: string; area?: string; price?: string; search?: string };
 }
 
 /** Tell Next.js which city slugs are valid — unknown slugs get 404 before rendering */
@@ -75,6 +75,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   const page = Math.max(1, Number(searchParams.page) || 1);
   const skip = (page - 1) * PER_PAGE;
   const orderBy = getOrderBy(sort);
+  const searchQuery = searchParams.search?.trim() ?? '';
 
   // Build where clauses
   const kindergartenWhere: Record<string, unknown> = { city: cityName };
@@ -87,19 +88,52 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
   // Apply area filter to all categories
   if (area) kindergartenWhere.area = area;
 
+  // Apply search filter to kindergartens
+  if (searchQuery) {
+    kindergartenWhere.OR = [
+      { name: { contains: searchQuery, mode: 'insensitive' as const } },
+      { description: { contains: searchQuery, mode: 'insensitive' as const } },
+      { address: { contains: searchQuery, mode: 'insensitive' as const } },
+      { area: { contains: searchQuery, mode: 'insensitive' as const } },
+    ];
+  }
+
   const aukleWhere: Record<string, unknown> = { city: cityName };
   if (area) aukleWhere.area = area;
+  if (searchQuery) {
+    aukleWhere.OR = [
+      { name: { contains: searchQuery, mode: 'insensitive' as const } },
+      { description: { contains: searchQuery, mode: 'insensitive' as const } },
+      { area: { contains: searchQuery, mode: 'insensitive' as const } },
+    ];
+  }
 
   const burelisWhere: Record<string, unknown> = { city: cityName };
   if (sub) burelisWhere.category = sub;
   if (area) burelisWhere.area = area;
+  if (searchQuery) {
+    burelisWhere.OR = [
+      { name: { contains: searchQuery, mode: 'insensitive' as const } },
+      { description: { contains: searchQuery, mode: 'insensitive' as const } },
+      { area: { contains: searchQuery, mode: 'insensitive' as const } },
+      { category: { contains: searchQuery, mode: 'insensitive' as const } },
+    ];
+  }
 
   const specialistWhere: Record<string, unknown> = { city: cityName };
   if (spec) specialistWhere.specialty = { contains: spec, mode: 'insensitive' as const };
   if (area) specialistWhere.area = area;
+  if (searchQuery) {
+    specialistWhere.OR = [
+      { name: { contains: searchQuery, mode: 'insensitive' as const } },
+      { description: { contains: searchQuery, mode: 'insensitive' as const } },
+      { area: { contains: searchQuery, mode: 'insensitive' as const } },
+      { specialty: { contains: searchQuery, mode: 'insensitive' as const } },
+    ];
+  }
 
   // Cache key based on all query params
-  const cacheKey = `city-${citySlug}-${category}-${type}-${sort}-${page}-${sub}-${spec}-${area}`;
+  const cacheKey = `city-${citySlug}-${category}-${type}-${sort}-${page}-${sub}-${spec}-${area}-${searchQuery}`;
 
   const getCityData = unstable_cache(
     async () => {
@@ -254,6 +288,7 @@ export default async function CityPage({ params, searchParams }: CityPageProps) 
           initialCategory={category}
           initialType={type}
           initialSort={sort}
+          initialSearch={searchQuery}
           totalPages={totalPages}
           totalCounts={{
             darzeliai: kindergartenTotal,

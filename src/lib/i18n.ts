@@ -9,7 +9,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'nav.language': 'Pasirinkti kalbą',
     'nav.darkMode': 'Perjungti tamsų režimą',
     'nav.openMenu': 'Atidaryti meniu',
-
+lets pu
     // Home page
     'home.hero.title': 'Raskite geriausią darželį, auklę ar būrelį savo vaikui',
     'home.hero.subtitle': 'Patikimi atsiliepimai ir vertinimai iš tikrų tėvų visoje Lietuvoje',
