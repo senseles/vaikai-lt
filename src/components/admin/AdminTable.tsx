@@ -31,6 +31,7 @@ interface AdminTableProps {
   readonly fields: FieldDef[];
   readonly entityLabel: string;
   readonly perPage?: number;
+  readonly extraActions?: (item: Record<string, unknown>) => React.ReactNode;
 }
 
 // ─── Sort Arrow ───
@@ -278,6 +279,7 @@ function MobileCardView({
   onToggleSelect,
   onEdit,
   onDeleteRequest,
+  extraActions,
 }: {
   readonly items: Record<string, unknown>[];
   readonly columns: ColumnDef[];
@@ -285,6 +287,7 @@ function MobileCardView({
   readonly onToggleSelect: (id: string) => void;
   readonly onEdit: (item: Record<string, unknown>) => void;
   readonly onDeleteRequest: (item: Record<string, unknown>) => void;
+  readonly extraActions?: (item: Record<string, unknown>) => React.ReactNode;
 }) {
   return (
     <div className="space-y-2">
@@ -334,7 +337,8 @@ function MobileCardView({
             </div>
 
             {/* Actions */}
-            <div className="flex gap-2 pl-7 pt-2 border-t border-gray-100 dark:border-slate-700">
+            <div className="flex gap-2 pl-7 pt-2 border-t border-gray-100 dark:border-slate-700 flex-wrap">
+              {extraActions && extraActions(item)}
               <button
                 onClick={() => onEdit(item)}
                 className="px-3 py-1.5 text-xs bg-[#2d6a4f] text-white rounded-lg hover:bg-[#40916c] font-medium transition-colors min-h-[32px]"
@@ -357,7 +361,7 @@ function MobileCardView({
 
 // ─── Main AdminTable Component ───
 
-export default function AdminTable({ apiPath, columns, fields, entityLabel, perPage = 25 }: AdminTableProps) {
+export default function AdminTable({ apiPath, columns, fields, entityLabel, perPage = 25, extraActions }: AdminTableProps) {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [searchInput, setSearchInput] = useState('');
   const search = useDebounce(searchInput, 300);
@@ -667,6 +671,7 @@ export default function AdminTable({ apiPath, columns, fields, entityLabel, perP
                         </td>
                       ))}
                       <td className="px-4 py-3 text-right whitespace-nowrap">
+                        {extraActions && extraActions(item)}
                         <button
                           onClick={() => handleEdit(item)}
                           className="text-[#2d6a4f] hover:text-[#40916c] text-sm font-medium transition-colors mr-3"

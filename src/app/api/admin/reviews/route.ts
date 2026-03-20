@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
   const pending = searchParams.get('pending') === 'true';
   const approved = searchParams.get('approved') === 'true';
   const itemType = searchParams.get('itemType');
+  const itemId = searchParams.get('itemId');
   const rating = searchParams.get('rating');
   const search = searchParams.get('search');
 
@@ -25,6 +26,10 @@ export async function GET(request: NextRequest) {
 
   if (itemType && ['kindergarten', 'aukle', 'burelis', 'specialist'].includes(itemType)) {
     where.itemType = itemType;
+  }
+
+  if (itemId && typeof itemId === 'string') {
+    where.itemId = itemId;
   }
 
   if (rating) {

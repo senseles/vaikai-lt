@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import AdminTable from '@/components/admin/AdminTable';
 import type { ColumnDef, FieldDef } from '@/components/admin/AdminTable';
+import ReviewsModal from '@/components/admin/ReviewsModal';
 
 const columns: ColumnDef[] = [
   {
@@ -53,6 +55,8 @@ const columns: ColumnDef[] = [
 const fields: FieldDef[] = [
   { key: 'name', label: 'Pavadinimas', type: 'text', required: true, placeholder: 'Darželio pavadinimas' },
   { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
+  { key: 'region', label: 'Rajonas / Seniūnija', type: 'text', placeholder: 'pvz. Pavilnys, Antakalnis' },
+  { key: 'area', label: 'Mikrorajonas', type: 'text', placeholder: 'pvz. Pašilaičiai' },
   { key: 'type', label: 'Tipas', type: 'select', options: [{ value: 'valstybinis', label: 'Valstybinis' }, { value: 'privatus', label: 'Privatus' }] },
   { key: 'address', label: 'Adresas', type: 'text', placeholder: 'Gatvė 1' },
   { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
@@ -61,10 +65,15 @@ const fields: FieldDef[] = [
   { key: 'ageFrom', label: 'Amžius nuo (metai)', type: 'number' },
   { key: 'groups', label: 'Grupių skaičius', type: 'number' },
   { key: 'hours', label: 'Darbo laikas', type: 'text', placeholder: '7:00 – 18:00' },
+  { key: 'features', label: 'Ypatybės (JSON masyvas)', type: 'textarea', placeholder: '["baseinas", "sporto salė", "logopedas"]' },
   { key: 'description', label: 'Aprašymas', type: 'textarea' },
+  { key: 'note', label: 'Pastaba (admin)', type: 'textarea', placeholder: 'Vidinė pastaba, nerodoma vartotojams' },
+  { key: 'imageUrl', label: 'Nuotraukos URL', type: 'text', placeholder: 'https://...' },
 ];
 
 export default function AdminDarzeliai() {
+  const [reviewTarget, setReviewTarget] = useState<{ id: string; name: string } | null>(null);
+
   return (
     <div>
       <div className="mb-6">
@@ -77,7 +86,24 @@ export default function AdminDarzeliai() {
         fields={fields}
         entityLabel="darželių"
         perPage={25}
+        extraActions={(item) => (
+          <button
+            onClick={() => setReviewTarget({ id: String(item.id), name: String(item.name) })}
+            className="px-2 py-1 text-xs text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg"
+            title="Atsiliepimai"
+          >
+            💬
+          </button>
+        )}
       />
+      {reviewTarget && (
+        <ReviewsModal
+          itemId={reviewTarget.id}
+          itemType="kindergarten"
+          itemName={reviewTarget.name}
+          onClose={() => setReviewTarget(null)}
+        />
+      )}
     </div>
   );
 }

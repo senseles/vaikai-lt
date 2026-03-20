@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import AdminTable from '@/components/admin/AdminTable';
 import type { ColumnDef, FieldDef } from '@/components/admin/AdminTable';
+import ReviewsModal from '@/components/admin/ReviewsModal';
 
 const columns: ColumnDef[] = [
   {
@@ -52,17 +54,24 @@ const columns: ColumnDef[] = [
 const fields: FieldDef[] = [
   { key: 'name', label: 'Pavadinimas', type: 'text', required: true, placeholder: 'Būrelio pavadinimas' },
   { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
+  { key: 'region', label: 'Rajonas / Seniūnija', type: 'text', placeholder: 'pvz. Pavilnys' },
+  { key: 'area', label: 'Mikrorajonas', type: 'text', placeholder: 'pvz. Pašilaičiai' },
+  { key: 'address', label: 'Adresas', type: 'text', placeholder: 'Gatvė 1' },
   { key: 'category', label: 'Kategorija', type: 'text', placeholder: 'Menai, sportas...' },
   { key: 'subcategory', label: 'Subkategorija', type: 'text', placeholder: 'Piešimas, futbolas...' },
   { key: 'ageRange', label: 'Amžiaus grupė', type: 'text', placeholder: '5-12 m.' },
   { key: 'price', label: 'Kaina', type: 'text', placeholder: '50 €/mėn.' },
   { key: 'schedule', label: 'Tvarkaraštis', type: 'text', placeholder: 'Pirm., Treč. 16:00' },
   { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
+  { key: 'email', label: 'El. paštas', type: 'text', placeholder: 'el@pastas.lt' },
   { key: 'website', label: 'Svetainė', type: 'text', placeholder: 'https://...' },
   { key: 'description', label: 'Aprašymas', type: 'textarea' },
+  { key: 'imageUrl', label: 'Nuotraukos URL', type: 'text', placeholder: 'https://...' },
 ];
 
 export default function AdminBureliai() {
+  const [reviewTarget, setReviewTarget] = useState<{ id: string; name: string } | null>(null);
+
   return (
     <div>
       <div className="mb-6">
@@ -75,7 +84,19 @@ export default function AdminBureliai() {
         fields={fields}
         entityLabel="būrelių"
         perPage={25}
+        extraActions={(item) => (
+          <button
+            onClick={() => setReviewTarget({ id: String(item.id), name: String(item.name) })}
+            className="px-2 py-1 text-xs text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg"
+            title="Atsiliepimai"
+          >
+            💬
+          </button>
+        )}
       />
+      {reviewTarget && (
+        <ReviewsModal itemId={reviewTarget.id} itemType="burelis" itemName={reviewTarget.name} onClose={() => setReviewTarget(null)} />
+      )}
     </div>
   );
 }

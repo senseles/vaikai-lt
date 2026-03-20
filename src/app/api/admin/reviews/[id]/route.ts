@@ -10,31 +10,43 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   try {
     const body = await request.json();
 
-    // Only allow updating the approval status — prevent modifying rating, text, etc.
-    const data: { isApproved?: boolean } = {};
+    // Allow updating approval status, text, authorName, rating
+    const data: { isApproved?: boolean; text?: string; authorName?: string; rating?: number } = {};
     if (typeof body.isApproved === 'boolean') {
       data.isApproved = body.isApproved;
+    }
+    if (typeof body.text === 'string' && body.text.trim().length > 0 && body.text.trim().length <= 2000) {
+      data.text = body.text.trim();
+    }
+    if (typeof body.authorName === 'string' && body.authorName.trim().length > 0 && body.authorName.trim().length <= 100) {
+      data.authorName = body.authorName.trim();
+    }
+    if (typeof body.rating === 'number' && Number.isInteger(body.rating) && body.rating >= 1 && body.rating <= 5) {
+      data.rating = body.rating;
     }
 
     if (Object.keys(data).length === 0) {
       return NextResponse.json(
-        { success: false, error: 'Bent vienas laukas (isApproved) privalomas' },
+        { success: false, error: 'Bent vienas laukas privalomas (isApproved, text, authorName, rating)' },
         { status: 400 },
       );
     }
 
     // Fetch current state for audit log
-    const current = await prisma.review.findUnique({ where: { id }, select: { isApproved: true } });
+    const current = await prisma.review.findUnique({ where: { id }, select: { isApproved: true, text: true, authorName: true, rating: true } });
 
     const updated = await prisma.review.update({ where: { id }, data });
 
     // Audit log
+    const auditAction = data.isApproved !== undefined
+      ? (data.isApproved ? 'REVIEW_APPROVE' : 'REVIEW_REJECT')
+      : 'REVIEW_EDIT';
     logAuditEvent({
-      action: data.isApproved ? 'REVIEW_APPROVE' : 'REVIEW_REJECT',
+      action: auditAction,
       targetType: 'review',
       targetId: id,
-      oldValue: current ? String(current.isApproved) : null,
-      newValue: String(data.isApproved),
+      oldValue: current ? JSON.stringify(current) : null,
+      newValue: JSON.stringify(data),
     });
 
     return NextResponse.json({ success: true, data: updated });

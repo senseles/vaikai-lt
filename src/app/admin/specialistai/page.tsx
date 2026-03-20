@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import AdminTable from '@/components/admin/AdminTable';
 import type { ColumnDef, FieldDef } from '@/components/admin/AdminTable';
+import ReviewsModal from '@/components/admin/ReviewsModal';
 
 const columns: ColumnDef[] = [
   {
@@ -52,16 +54,23 @@ const columns: ColumnDef[] = [
 const fields: FieldDef[] = [
   { key: 'name', label: 'Vardas', type: 'text', required: true, placeholder: 'Vardas Pavardė' },
   { key: 'city', label: 'Miestas', type: 'text', required: true, placeholder: 'Vilnius' },
+  { key: 'region', label: 'Rajonas / Seniūnija', type: 'text', placeholder: 'pvz. Pavilnys' },
+  { key: 'area', label: 'Mikrorajonas', type: 'text', placeholder: 'pvz. Pašilaičiai' },
+  { key: 'address', label: 'Adresas', type: 'text', placeholder: 'Gatvė 1' },
   { key: 'specialty', label: 'Specializacija', type: 'text', placeholder: 'Logopedas, psichologas...' },
   { key: 'clinic', label: 'Klinika', type: 'text', placeholder: 'Klinikos pavadinimas' },
   { key: 'price', label: 'Kaina', type: 'text', placeholder: '40 €/vizitas' },
   { key: 'phone', label: 'Telefonas', type: 'text', placeholder: '+370 ...' },
+  { key: 'email', label: 'El. paštas', type: 'text', placeholder: 'el@pastas.lt' },
   { key: 'website', label: 'Svetainė', type: 'text', placeholder: 'https://...' },
   { key: 'languages', label: 'Kalbos', type: 'text', placeholder: 'Lietuvių, anglų' },
   { key: 'description', label: 'Aprašymas', type: 'textarea' },
+  { key: 'imageUrl', label: 'Nuotraukos URL', type: 'text', placeholder: 'https://...' },
 ];
 
 export default function AdminSpecialistai() {
+  const [reviewTarget, setReviewTarget] = useState<{ id: string; name: string } | null>(null);
+
   return (
     <div>
       <div className="mb-6">
@@ -74,7 +83,19 @@ export default function AdminSpecialistai() {
         fields={fields}
         entityLabel="specialistų"
         perPage={25}
+        extraActions={(item) => (
+          <button
+            onClick={() => setReviewTarget({ id: String(item.id), name: String(item.name) })}
+            className="px-2 py-1 text-xs text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg"
+            title="Atsiliepimai"
+          >
+            💬
+          </button>
+        )}
       />
+      {reviewTarget && (
+        <ReviewsModal itemId={reviewTarget.id} itemType="specialist" itemName={reviewTarget.name} onClose={() => setReviewTarget(null)} />
+      )}
     </div>
   );
 }
